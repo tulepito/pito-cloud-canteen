@@ -47,6 +47,7 @@ const NotificationItemIcon: React.FC<NotificationItemIconProps> = (props) => {
       break;
     case ENotificationType.ORDER_RATING:
     case ENotificationType.BOOKER_RATE_ORDER:
+    case ENotificationType.ADMIN_APPROVE_PARTNER_REPLY_REVIEW:
       icon = <IconRatingStar />;
       break;
     case ENotificationType.PARTNER_FOOD_CREATED_BY_ADMIN:

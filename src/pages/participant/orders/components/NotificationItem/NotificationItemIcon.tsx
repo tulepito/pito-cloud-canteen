@@ -39,6 +39,8 @@ const NotificationItemIcon: React.FC<NotificationItemIconProps> = (props) => {
       icon = <IconClock variant="withBackground" />;
       break;
     case ENotificationType.ORDER_RATING:
+    case ENotificationType.ADMIN_REPLY_REVIEW:
+    case ENotificationType.PARTNER_REPLY_REVIEW:
       icon = <IconRatingStar />;
       break;
     case ENotificationType.PARTNER_FOOD_CREATED_BY_ADMIN:

@@ -165,18 +165,20 @@ const SubOrderReviewModal: React.FC<SubOrderReviewModalProps> = (props) => {
               </div>
             </RenderWhen>
             <div className={css.detailReview}>{detailTextRating}</div>
-            <div className={css.imageList}>
-              {reviewImages.map((image: TImage) => (
-                <div key={image.id.uuid} className={css.imageWrapper}>
-                  <ResponsiveImage
-                    alt=""
-                    image={image}
-                    className={css.reviewImage}
-                    variants={[EImageVariants.landscapeCrop2x]}
-                  />
-                </div>
-              ))}
-            </div>
+            <RenderWhen condition={reviewImages.length > 0}>
+              <div className={css.imageList}>
+                {reviewImages.map((image: TImage) => (
+                  <div key={image.id.uuid} className={css.imageWrapper}>
+                    <ResponsiveImage
+                      alt=""
+                      image={image}
+                      className={css.reviewImage}
+                      variants={[EImageVariants.landscapeCrop2x]}
+                    />
+                  </div>
+                ))}
+              </div>
+            </RenderWhen>
             {replies && replies.length > 0 && (
               <div className="mt-3 pl-12 border-l border-gray-300">
                 {replies.map((reply: TReviewReply) => (

@@ -13,6 +13,7 @@ import { processReply } from '@redux/slices/Reviews.admin.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import type { RatingListing } from '@src/types';
 import { CurrentUser } from '@src/utils/data';
+import { formatTimestamp } from '@src/utils/dates';
 import { EUserRole } from '@src/utils/enums';
 
 interface ReviewCardProps {
@@ -142,6 +143,13 @@ const ReviewCard = ({
               {authorName}
             </span>
           </div>
+          <span className="bg-white text-gray-500 pe-2 flex py-1 text-xs items-center gap-1">
+            Đã đặt món:{' '}
+            <span className="font-bold">{reviewInformation.foodName}</span> vào{' '}
+            <span className="font-bold">
+              {formatTimestamp(reviewInformation.timestamp, 'dd/MM/yyyy')}
+            </span>
+          </span>
 
           {/* Rating */}
           <div className="grid md:grid-cols-[auto,1fr] w-fit grid-cols-1 gap-2 items-center mb-1">
@@ -149,8 +157,8 @@ const ReviewCard = ({
               {reviewInformation.generalRating &&
                 renderStars(reviewInformation.generalRating)}
             </div>
-            <span className="text-gray-500 text-sm">
-              {reviewInformation.orderCode} • {reviewInformation.foodName}
+            <span className="text-gray-500 text-xs font-bold">
+              #{reviewInformation.orderCode}
             </span>
           </div>
           <div className="flex gap-2 items-center mb-1">

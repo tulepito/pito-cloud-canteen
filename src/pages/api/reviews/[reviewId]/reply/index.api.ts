@@ -9,6 +9,7 @@ import { emailSendingFactory, EmailTemplateTypes } from '@services/email';
 import { fetchListing, fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { createNativeNotification } from '@services/nativeNotification';
+import { createFirebaseDocNotification } from '@services/notifications';
 import participantChecker from '@services/permissionChecker/participant';
 import { getSdk, handleError } from '@services/sdk';
 import { createSlackNotification } from '@services/slackNotification';
@@ -16,10 +17,20 @@ import type { RatingListing, TReviewReply } from '@src/types';
 import { CurrentUser, Listing, User } from '@src/utils/data';
 import {
   ENativeNotificationType,
+  ENotificationType,
   ESlackNotificationType,
   EUserRole,
 } from '@src/utils/enums';
 import { SuccessResponse } from '@src/utils/response';
+
+type TPostReplyReviewQuery = {
+  reviewId: string;
+};
+
+type TPostReplyReview = {
+  replyContent: string;
+  replyRole: EUserRole;
+};
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const apiMethod = req.method;
@@ -30,8 +41,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     switch (apiMethod) {
       case HttpMethod.POST: {
         try {
-          const { reviewId } = req.query;
-          const { replyContent, replyRole } = req.body;
+          const { reviewId } = req.query as TPostReplyReviewQuery;
+          const { replyContent, replyRole } = req.body as TPostReplyReview;
 
           if (!reviewId || !replyContent || !replyRole) {
             return res.status(400).json({
@@ -41,7 +52,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           }
 
           const reviewResponse = await integrationSdk.listings.show({
-            id: reviewId as string,
+            id: reviewId,
           });
           const [review]: RatingListing[] =
             denormalisedResponseEntities(reviewResponse);
@@ -51,6 +62,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
               error: 'Review not found',
             });
           }
+
+          const orderResponse = await integrationSdk.listings.show({
+            id: review.attributes?.metadata?.orderId,
+          });
+          const [order] = denormalisedResponseEntities(orderResponse);
+          const planId = Listing(order).getMetadata().plans[0];
 
           const authorUser = await sdk.currentUser.show();
           const [author] = denormalisedResponseEntities(authorUser);
@@ -82,7 +99,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           if (replyRole === EUserRole.partner) {
             replyObject = {
               id: uuidv4(),
-              authorId: author.id?.uuid || '',
+              authorId: author.id?.uuid,
               authorName: author.attributes.profile.displayName,
               replyRole,
               replyContent,
@@ -92,10 +109,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
               approvedBy: undefined,
             };
           } else {
+            // ADMIN reply
             replyObject = {
               id: uuidv4(),
-              authorId: author.id?.uuid || '',
-              authorName: author.attributes.profile.displayName,
+              authorId: author.id?.uuid,
+              authorName: 'PITO Cloud Canteen',
               replyRole,
               replyContent,
               repliedAt: new Date().getTime(),
@@ -103,7 +121,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           }
 
           await integrationSdk.listings.update({
-            id: reviewId as string,
+            id: reviewId,
             metadata: {
               ...review?.attributes?.metadata,
               replies: [
@@ -114,7 +132,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           });
 
           const newReviewResponse = await integrationSdk.listings.show({
-            id: reviewId as string,
+            id: reviewId,
           });
           const [updatedReview] =
             denormalisedResponseEntities(newReviewResponse);
@@ -123,40 +141,51 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           if (replyRole === EUserRole.admin) {
             const reviewListing = Listing(updatedReview);
             const { foodName, reviewerId } = reviewListing.getMetadata();
-            try {
-              await emailSendingFactory(
-                EmailTemplateTypes.PARTICIPANT.PARTICIPANT_REVIEW_REPLY,
-                {
-                  reviewId: reviewId as string,
-                  replyContent,
-                  replyAuthorName: author.attributes.profile.displayName,
-                  foodName,
-                  isPartnerReply: false,
-                },
-              );
-            } catch (error) {
-              console.error('Error sending email for admin reply:', error);
-              // Don't fail the request if email sending fails
-            }
 
-            // Send native notification
-            try {
-              await createNativeNotification(
-                ENativeNotificationType.AdminReplyReview,
-                {
-                  participantId: reviewerId,
-                  reviewId: reviewId as string,
-                  replyContent,
-                  foodName,
-                },
-              );
-            } catch (error) {
-              console.error(
-                'Error sending native notification for admin reply:',
-                error,
-              );
-              // Don't fail the request if notification fails
-            }
+            const results = await Promise.allSettled(
+              [
+                emailSendingFactory(
+                  EmailTemplateTypes.PARTICIPANT.PARTICIPANT_REVIEW_REPLY,
+                  {
+                    reviewId,
+                    replyContent,
+                    replyAuthorName: 'PITO Cloud Canteen',
+                    foodName,
+                    isPartnerReply: false,
+                  },
+                ),
+                createNativeNotification(
+                  ENativeNotificationType.AdminReplyReview,
+                  {
+                    participantId: reviewerId,
+                    reviewId,
+                    replyContent,
+                    foodName,
+                  },
+                ),
+                review.attributes?.metadata?.timestamp &&
+                  createFirebaseDocNotification(
+                    ENotificationType.ADMIN_REPLY_REVIEW,
+                    {
+                      userId: reviewerId,
+                      subOrderDate: Number(
+                        review.attributes?.metadata?.timestamp,
+                      ),
+                      foodName,
+                      planId,
+                    },
+                  ),
+              ].filter(Boolean),
+            );
+
+            results.forEach((result, idx) => {
+              if (result.status === 'rejected') {
+                console.error(
+                  `Notification promise ${idx} failed:`,
+                  result.reason,
+                );
+              }
+            });
           }
 
           // Send Slack notification to admin if partner replied
@@ -187,21 +216,23 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                 restaurantListing?.getPublicData()?.title ||
                 author.attributes.profile.displayName;
 
-              await createSlackNotification(
-                ESlackNotificationType.PARTNER_REPLY_REVIEW,
-                {
-                  partnerReplyReviewData: {
-                    reviewId: reviewId as string,
-                    reviewLink,
-                    partnerName,
-                    replyContent,
-                    foodName,
-                    reviewerName,
-                    ratingScore: generalRating || 0,
-                    orderCode: orderCode || '',
+              Promise.all([
+                createSlackNotification(
+                  ESlackNotificationType.PARTNER_REPLY_REVIEW,
+                  {
+                    partnerReplyReviewData: {
+                      reviewId,
+                      reviewLink,
+                      partnerName,
+                      replyContent,
+                      foodName,
+                      reviewerName,
+                      ratingScore: generalRating,
+                      orderCode,
+                    },
                   },
-                },
-              );
+                ),
+              ]);
             } catch (error) {
               console.error(
                 'Error sending Slack notification for partner reply:',
@@ -215,7 +246,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             message: 'Reply created successfully',
           }).send(res);
         } catch (error) {
-          console.error('Error in GET reviews:', error);
+          console.error('Error in POST reply:', error);
           handleError(res, error);
         }
         break;
