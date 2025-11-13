@@ -161,7 +161,7 @@ export const createNativeNotification = async (
         oneSignalUserIds.forEach((oneSignalUserId: string) => {
           sendNotification({
             title: '💬 Có phản hồi mới về đánh giá của bạn',
-            content: `Admin đã phản hồi về đánh giá của bạn cho món ${
+            content: `PITO Cloud Canteen đã phản hồi về đánh giá của bạn cho món ${
               foodName || 'món ăn'
             }. Nhấn để xem chi tiết!`,
             url,

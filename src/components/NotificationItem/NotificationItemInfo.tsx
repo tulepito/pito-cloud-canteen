@@ -456,6 +456,24 @@ const NotificationItemInfo: React.FC<NotificationItemInfoProps> = (props) => {
           <div className={css.pastTime}>{pastTime}</div>
         </div>
       );
+    case ENotificationType.ADMIN_APPROVE_PARTNER_REPLY_REVIEW:
+      return (
+        <div className={css.contentWrapper}>
+          <div className={css.content}>
+            {intl.formatMessage(
+              {
+                id: 'NotificationItemInfo.title.adminApprovePartnerReplyReview',
+              },
+              {
+                span: (msg: any) => <span className={css.boldText}>{msg}</span>,
+                foodName,
+                subOrderDate: formattedDate,
+              },
+            )}
+          </div>
+          <div className={css.pastTime}>{pastTime}</div>
+        </div>
+      );
     default:
       return <div></div>;
   }

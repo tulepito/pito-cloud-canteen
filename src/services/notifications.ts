@@ -366,6 +366,47 @@ export const createFirebaseDocNotification = async (
         break;
       }
 
+      case ENotificationType.ADMIN_REPLY_REVIEW: {
+        const { subOrderDate, planId, foodName } = notificationParams;
+        data = {
+          ...data,
+          subOrderDate,
+          planId,
+          foodName,
+          relatedLink: `/participant/sub-orders?planId=${planId}&timestamp=${subOrderDate}`,
+        };
+
+        break;
+      }
+
+      case ENotificationType.ADMIN_APPROVE_PARTNER_REPLY_REVIEW: {
+        const { subOrderDate, planId, foodName } = notificationParams;
+        data = {
+          ...data,
+          subOrderDate,
+          planId,
+          foodName,
+          relatedLink: `/partner/reviews`,
+        };
+
+        break;
+      }
+
+      case ENotificationType.PARTNER_REPLY_REVIEW: {
+        const { subOrderDate, planId, foodName, partnerName } =
+          notificationParams;
+        data = {
+          ...data,
+          subOrderDate,
+          planId,
+          foodName,
+          partnerName,
+          relatedLink: `/participant/sub-orders?planId=${planId}&timestamp=${subOrderDate}`,
+        };
+
+        break;
+      }
+
       default:
         break;
     }
