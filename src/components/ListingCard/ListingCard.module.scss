@@ -96,7 +96,6 @@
     border-radius: 50%;
     border: 1px solid $primaryPri2;
     @include flexCenter;
-    flex-shrink: 0;
   }
 
   .selectDisabled {
@@ -110,6 +109,7 @@
   }
 
   .removeDish {
+    margin-bottom: 5px;
     cursor: pointer;
     width: 24px;
     height: 24px;

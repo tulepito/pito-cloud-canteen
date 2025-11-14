@@ -13,6 +13,7 @@ import Tooltip from '@components/Tooltip/Tooltip';
 import { isOrderOverDeadline as isOverDeadline } from '@helpers/orderHelper';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { useViewport } from '@hooks/useViewport';
+import type { TPlanData } from '@src/types/order';
 import { Listing } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
 import { EOrderStates } from '@src/utils/enums';
@@ -23,7 +24,7 @@ import TabActions from './TabActions';
 import css from './SectionOrderListing.module.scss';
 
 type TSectionOrderListingProps = {
-  plan: any;
+  plan: TPlanData;
   onSelectTab: (restaurant: any) => void;
   orderDay: string;
 };
@@ -92,13 +93,13 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
     toast.success(
       foodName
         ? `${intl.formatMessage({
-          id: 'da-them-mon',
-        })} ${foodName} ${intl.formatMessage({
-          id: 'cho-ngay',
-        })} ${formatTimestamp(+timestamp)}`
+            id: 'da-them-mon',
+          })} ${foodName} ${intl.formatMessage({
+            id: 'cho-ngay',
+          })} ${formatTimestamp(+timestamp)}`
         : `${intl.formatMessage({
-          id: 'khong-chon-mon-cho-ngay',
-        })} ${formatTimestamp(+timestamp)}`,
+            id: 'khong-chon-mon-cho-ngay',
+          })} ${formatTimestamp(+timestamp)}`,
       {
         position: isMobileLayout ? 'top-center' : 'bottom-center',
         toastId: 'add-to-cart',
@@ -125,13 +126,9 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
     const convertedData: any = [];
     Object.keys(plan).forEach((item, oIndex) => {
       const isLast = oIndex === Object.keys(plan).length - 1;
-      const {
-        foodList,
-        restaurant,
-      }: { foodList: any[]; restaurant: any; memberOrder: any } = plan[item];
-      const cartItem = cartList?.[item as any] || {};
+      const { foodList, restaurant } = plan[item];
+      const cartItem = cartList?.[item] || {};
       const hasDishInCart = cartItem.foodId;
-      const hasSecondDish = !!cartItem.secondaryFoodId;
       const planDate = DateTime.fromMillis(Number(item)).toJSDate();
       const itemLabel = (
         <div className={classNames(css.tabTitle, {})}>
@@ -140,9 +137,6 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
               id: `Calendar.week.dayHeader.${planDate.getDay()}`,
             })}
             , {planDate.getDate()}/{planDate.getMonth() + 1}
-            {hasSecondDish && (
-              <span className={css.secondFoodIndicator}> +1</span>
-            )}
           </div>
           {hasDishInCart &&
             (hasDishInCart === 'notJoined' ? (
@@ -210,8 +204,9 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
       <div className={css.sectionMainOrder}>
         <Tabs
           items={tabItems}
-          defaultActiveKey={`${(defaultActiveKey < 0 ? 0 : defaultActiveKey) + 1
-            }`}
+          defaultActiveKey={`${
+            (defaultActiveKey < 0 ? 0 : defaultActiveKey) + 1
+          }`}
           contentClassName={css.sectionMainOrderListings}
           headerClassName={css.sectionMainOrderHeader}
           onChange={onSelectTab}

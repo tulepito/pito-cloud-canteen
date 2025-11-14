@@ -2,7 +2,7 @@ import classNames from 'classnames';
 
 import IconClose from '@components/Icons/IconClose/IconClose';
 import IconRefreshing from '@components/Icons/IconRefreshing/IconRefreshing';
-import { useAppDispatch } from '@hooks/reduxHooks';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { ParticipantPlanThunks } from '@pages/participant/plans/[planId]/ParticipantPlanPage.slice';
 
 import css from './CartItem.module.scss';
@@ -27,6 +27,9 @@ const CartItem: React.FC<TCartItemProps> = ({
   foodPosition,
 }) => {
   const dispatch = useAppDispatch();
+  const isAllowAddSecondFood = useAppSelector(
+    (state) => state.ParticipantPlanPage.isAllowAddSecondFood,
+  );
 
   const handleAutoSelect = () => {
     dispatch(ParticipantPlanThunks.recommendFoodSubOrder(subOrderDate!));
@@ -42,16 +45,20 @@ const CartItem: React.FC<TCartItemProps> = ({
           <IconClose onClick={onRemove} className={css.iconClose} />
         )}
       </div>
-      <div>
-        {foodPosition === 'first' && (
-          <span className="text-primaryPri2 text-xs font-medium">(Món 1)</span>
-        )}
-        {foodPosition === 'second' && (
-          <span className="text-sematicGreen2 text-xs font-medium">
-            (Món 2)
-          </span>
-        )}
-      </div>
+      {isAllowAddSecondFood && (
+        <div>
+          {foodPosition === 'first' && (
+            <span className="text-primaryPri2 text-xs font-medium">
+              (Món 1)
+            </span>
+          )}
+          {foodPosition === 'second' && (
+            <span className="text-sematicGreen2 text-xs font-medium">
+              (Món 2)
+            </span>
+          )}
+        </div>
+      )}
       <div className={css.value}>
         <IconRefreshing className={css.icon} onClick={handleAutoSelect} />
         <span>{value}</span>

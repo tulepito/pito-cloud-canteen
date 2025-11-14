@@ -4,6 +4,7 @@ import classNames from 'classnames';
 
 import Button from '@components/Button/Button';
 import IconRefreshing from '@components/Icons/IconRefreshing/IconRefreshing';
+import type { TMemberPlan } from '@redux/slices/shoppingCart.slice';
 
 import CartItemList from './CartItemList';
 
@@ -12,7 +13,7 @@ import css from './SectionOrderPanel.module.scss';
 type TOrderPanelBody = {
   className?: string;
   loadDataInProgress?: boolean;
-  cartList: any;
+  cartList: TMemberPlan;
   cartListKeys: string[];
   plan: any;
   handleRemoveItem: (dayId: string) => void;

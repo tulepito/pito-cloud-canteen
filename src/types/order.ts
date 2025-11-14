@@ -1,5 +1,7 @@
 import type { EParticipantOrderStatus } from '@src/utils/enums';
 
+import type { FoodListing, RestaurantListing } from '.';
+
 export type TLineItem = {
   id: string;
   name: string;
@@ -20,17 +22,27 @@ export type TMemberOrders = {
   [participantId: string]: TCartItem;
 };
 
+export type TMemberOrderDetail = TMemberOrders;
+
+export type TShoppingCartMemberPlan = {
+  [dayId: string]: {
+    [memberId: string]: TCartItem;
+  };
+};
+
 export type TPlanOrder = {
   [dayId: string]: {
     memberOrders: TMemberOrders;
   };
 };
 
-export type TUpdateParticipantOrderApiBody = {
+export type TUpdateParticipantOrderBody = {
   orderId: string;
-  orderDays: string[];
+  orderDays?: string[]; // for manual pick food
   planId: string;
-  planData: TPlanOrder;
+  planData?: TShoppingCartMemberPlan; // for manual pick food
+  orderDay?: string; // for auto pick food
+  memberOrders?: TMemberOrders; // for auto pick food
 };
 
 export type TFood = {
@@ -59,5 +71,13 @@ export type TOrderDetail = {
     transactionId: string;
     lastTransition: string;
     trackingLink?: string;
+  };
+};
+
+export type TPlanData = {
+  [dayId: string]: {
+    foodList: FoodListing[];
+    restaurant: RestaurantListing;
+    memberOrder: TMemberOrderDetail;
   };
 };
