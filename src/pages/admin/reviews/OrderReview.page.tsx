@@ -92,9 +92,15 @@ const OrderReviewPage = () => {
   );
 
   const handlePageChange = useCallback(
-    (newPage: number) => {
+    (newPage: number, pageSize: number) => {
       setPage(newPage);
-      dispatch(fetchReviews({ ...filtersRef.current, page: newPage }));
+      dispatch(
+        fetchReviews({
+          ...filtersRef.current,
+          page: newPage,
+          limit: pageSize,
+        }),
+      );
     },
     [dispatch],
   );
