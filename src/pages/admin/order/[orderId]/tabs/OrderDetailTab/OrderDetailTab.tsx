@@ -91,6 +91,7 @@ const OrderDetailTab: React.FC<OrderDetailTabProps> = (props) => {
     orderValidationsInProgressState,
     fetchOrderInProgress,
   } = useAppSelector((state) => state.OrderManagement);
+
   const dispatch = useAppDispatch();
   const router = useRouter();
   const {

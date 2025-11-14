@@ -290,6 +290,8 @@ const queryTransactions = createAsyncThunk(
         const [subOrderDate, subOrderDateData] = entry;
         const { transactionId } = (subOrderDateData as TObject) || {};
 
+        console.log('transactionId', transactionId);
+
         if (transactionId) {
           const txResponse = await fetchTxApi(transactionId);
 

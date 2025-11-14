@@ -375,6 +375,10 @@ export enum ENotificationType {
   BOOKER_ORDER_CHANGED = 'BOOKER_ORDER_CHANGED',
   BOOKER_RATE_ORDER = 'BOOKER_RATE_ORDER',
   BOOKER_PICKING_ORDER = 'BOOKER_PICKING_ORDER',
+
+  ADMIN_REPLY_REVIEW = 'ADMIN_REPLY_REVIEW',
+  ADMIN_APPROVE_PARTNER_REPLY_REVIEW = 'ADMIN_APPROVE_PARTNER_REPLY_REVIEW',
+  PARTNER_REPLY_REVIEW = 'PARTNER_REPLY_REVIEW',
 }
 export enum ENotificationPopupType {
   success = 'success',
@@ -426,6 +430,8 @@ export enum ENativeNotificationType {
   PartnerTransitOrderToCanceled = 'PartnerTransitOrderToCanceled',
   PartnerEditSubOrder = 'PartnerEditSubOrder',
   PartnerSubOrderNegativeRating = 'PartnerSubOrderNegativeRating',
+  AdminReplyReview = 'AdminReplyReview',
+  AdminApprovePartnerReplyReview = 'AdminApprovePartnerReplyReview',
 }
 
 export enum EBookerNativeNotificationType {
@@ -472,6 +478,7 @@ export enum ESlackNotificationType {
   PARTNER_REJECTS_SUB_ORDER = 'partnerRejectsSubOrder',
   PARTICIPANT_RATING = 'participantRating',
   PARTICIPANT_ORDER_PERSISTENCE_FAILED = 'participantOrderPersistenceFailed',
+  PARTNER_REPLY_REVIEW = 'partnerReplyReview',
 }
 
 export enum QuizStep {

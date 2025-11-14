@@ -134,6 +134,7 @@ export const postParticipantRatingFn = async ({
       orderCode,
       foodName,
       foodId,
+      generalRatingValue: [generalRating.toString()],
     },
   });
 

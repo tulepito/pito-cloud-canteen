@@ -9,8 +9,10 @@ import IconSpinner from '@components/Icons/IconSpinner/IconSpinner';
 import Modal from '@components/Modal/Modal';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
+import { renderReplyRole } from '@helpers/review/ui';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { useViewport } from '@hooks/useViewport';
+import type { TReviewReply } from '@src/types';
 import { Listing } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
 import { EImageVariants } from '@src/utils/enums';
@@ -51,6 +53,7 @@ const SubOrderReviewModal: React.FC<SubOrderReviewModalProps> = (props) => {
     detailRating = {},
     generalRating,
     detailTextRating,
+    replies = [],
   } = subOrderReviewListing.getMetadata();
   const { food, packaging } = detailRating;
   useEffect(() => {
@@ -78,7 +81,14 @@ const SubOrderReviewModal: React.FC<SubOrderReviewModalProps> = (props) => {
           <IconSpinner />
         </div>
         <RenderWhen.False>
-          <>
+          <div
+            style={{
+              maxHeight: isMobileLayout ? '90vh' : '70vh',
+              overflowY: 'auto',
+              scrollbarWidth: 'thin',
+              scrollbarColor: '#d1d5db #fff',
+            }}
+            className="scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
             <div className={css.goBack} onClick={onClose}>
               <IconArrow direction="left" />
               <span>
@@ -155,19 +165,45 @@ const SubOrderReviewModal: React.FC<SubOrderReviewModalProps> = (props) => {
               </div>
             </RenderWhen>
             <div className={css.detailReview}>{detailTextRating}</div>
-            <div className={css.imageList}>
-              {reviewImages.map((image: TImage) => (
-                <div key={image.id.uuid} className={css.imageWrapper}>
-                  <ResponsiveImage
-                    alt=""
-                    image={image}
-                    className={css.reviewImage}
-                    variants={[EImageVariants.landscapeCrop2x]}
-                  />
-                </div>
-              ))}
-            </div>
-          </>
+            <RenderWhen condition={reviewImages.length > 0}>
+              <div className={css.imageList}>
+                {reviewImages.map((image: TImage) => (
+                  <div key={image.id.uuid} className={css.imageWrapper}>
+                    <ResponsiveImage
+                      alt=""
+                      image={image}
+                      className={css.reviewImage}
+                      variants={[EImageVariants.landscapeCrop2x]}
+                    />
+                  </div>
+                ))}
+              </div>
+            </RenderWhen>
+            {replies && replies.length > 0 && (
+              <div className="mt-3 pl-12 border-l border-gray-300">
+                {replies.map((reply: TReviewReply) => (
+                  <div
+                    key={reply.id || `${reply.repliedAt}-${reply.authorId}`}
+                    className="mb-2">
+                    <div className="flex items-start gap-2 mb-1">
+                      <div className="w-6 h-6 bg-[#ef3d2a] rounded-full flex items-center justify-center text-white text-xs font-semibold">
+                        {reply.authorName?.charAt(0) || 'U'}
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-gray-500 font-semibold text-sm">
+                          {reply.authorName || 'NA'}
+                        </span>
+                        {reply.replyRole && renderReplyRole(reply.replyRole)}
+                      </div>
+                    </div>
+                    <p className="text-gray-700 text-sm leading-relaxed ml-8">
+                      {reply.replyContent}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </RenderWhen.False>
       </RenderWhen>
     </Modal>

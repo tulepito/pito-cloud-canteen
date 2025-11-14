@@ -14,5 +14,4 @@ export type TReviewDetail = {
 
 export type TTotalRating = {
   rating: number;
-  total: number;
 };

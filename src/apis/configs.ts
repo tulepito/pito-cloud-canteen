@@ -50,7 +50,10 @@ export const apiBaseUrl = () => {
   return `${window.location.origin}/api`;
 };
 
-export const getApi = (path: string, params: TObject = {}) => {
+export const getApi = <T = any>(
+  path: string,
+  params: TObject = {},
+): Promise<AxiosResponse<T>> => {
   // get 'JSONParams' in req.query, remember using JSON.parse()
   // to convert JSONParams into params
 
@@ -69,11 +72,11 @@ export const getDedupApi = <T = any>(path: string, params: TObject = {}) => {
   });
 };
 
-export const postApi = (
+export const postApi = <T = any>(
   path: string,
   body: TObject = {},
   options: { signal?: AbortSignal } = {},
-) => {
+): Promise<AxiosResponse<T>> => {
   return axios.post(`${apiBaseUrl()}${path}`, body, {
     signal: options.signal, // ✅ hỗ trợ huỷ bằng AbortController
   });

@@ -1,16 +1,21 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
+import { toast } from 'react-toastify';
+import { isAxiosError } from 'axios';
 import classNames from 'classnames';
-import { uniq } from 'lodash';
-import { useRouter } from 'next/router';
 
+import RatingReview from '@components/RatingReview/RatingReview';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { useViewport } from '@hooks/useViewport';
-import { partnerPaths } from '@src/paths';
+import {
+  fetchPartnerReviews,
+  setFilters,
+  submitReply,
+} from '@redux/slices/Reviews.partner.slice';
+import { currentUserSelector } from '@redux/slices/user.slice';
+import { CurrentUser } from '@src/utils/data';
+import type { EUserRole } from '@src/utils/enums';
 
-import PartnerReviewDetailTable from './components/PartnerReviewDetailTable/PartnerReviewDetailTable';
-import type { TPartnerReviewsFilterFormValues } from './components/PartnerReviewsFilterForm/PartnerReviewsFilterForm';
-import PartnerReviewsFilterForm from './components/PartnerReviewsFilterForm/PartnerReviewsFilterForm';
 import SummarizeReview from './components/SummarizeReview/SummarizeReview';
 import { ManageReviewsThunks } from './ManageReviews.slice';
 
@@ -19,11 +24,60 @@ import css from './ManageReviews.module.scss';
 const ManageReviewsPage = () => {
   const dispatch = useAppDispatch();
   const intl = useIntl();
-  const router = useRouter();
   const { isMobileLayout } = useViewport();
+
+  const FIRST_PAGE = 1;
+  const [page, setPage] = useState(FIRST_PAGE);
   const {
-    query: { rating: queryRating },
-  } = router;
+    reviews,
+    pagination,
+    fetchReviewsInProgress,
+    fetchReviewsError,
+    filters,
+  } = useAppSelector((state) => state.partnerReviews);
+  const currentUser = useAppSelector(currentUserSelector);
+
+  const currentUserGetter = CurrentUser(currentUser);
+  const { displayName } = currentUserGetter.getProfile();
+
+  const filtersRef = useRef(filters);
+
+  // Keep filtersRef in sync with filters
+  useEffect(() => {
+    filtersRef.current = filters;
+  }, [filters]);
+
+  useEffect(() => {
+    dispatch(fetchPartnerReviews({}));
+  }, [dispatch]);
+
+  const handlePageChange = useCallback(
+    (newPage: number) => {
+      setPage(newPage);
+      dispatch(fetchPartnerReviews({ ...filtersRef.current, page: newPage }));
+    },
+    [dispatch],
+  );
+
+  const handleSearch = useCallback(
+    (orderCode: string) => {
+      const trimmedOrderCode = orderCode.trim();
+      const newOrderCode = trimmedOrderCode || undefined;
+      const newFilters = { ...filtersRef.current, orderCode: newOrderCode };
+      dispatch(setFilters({ orderCode: newOrderCode }));
+      dispatch(fetchPartnerReviews({ ...newFilters, page: 1 }));
+    },
+    [dispatch],
+  );
+
+  const handleFilterRating = useCallback(
+    (ratings: number[]) => {
+      const newFilters = { ...filtersRef.current, ratings };
+      dispatch(setFilters({ ratings }));
+      dispatch(fetchPartnerReviews({ ...newFilters, page: 1 }));
+    },
+    [dispatch],
+  );
 
   const averageFoodRating = useAppSelector(
     (state) => state.ManageReviews.averageFoodRating,
@@ -40,66 +94,44 @@ const ManageReviewsPage = () => {
   const totalNumberOfReivews = useAppSelector(
     (state) => state.ManageReviews.totalNumberOfReivews,
   );
-  const ratingDetail = useAppSelector(
-    (state) => state.ManageReviews.ratingDetail,
-  );
-
-  const convertRatingToNumber = (rating: string) => {
-    const result: number[] = [];
-    rating.split(',').forEach((rate) => {
-      result.push(Number(rate));
-    });
-
-    return result;
-  };
-
-  const ratings = useMemo(() => {
-    const result = [];
-
-    if (queryRating) {
-      if (Array.isArray(queryRating)) {
-        queryRating.forEach((rating) => {
-          result.push(...convertRatingToNumber(rating));
-        });
-      } else {
-        result.push(...convertRatingToNumber(queryRating));
-      }
-    }
-
-    return uniq(result);
-  }, [queryRating]);
 
   useEffect(() => {
     if (isFirstLoad) dispatch(ManageReviewsThunks.loadReviewSummarizeData());
   }, [isFirstLoad, dispatch]);
 
-  const handleFilterChange = ({
-    ratings: ratingFormValue,
-  }: TPartnerReviewsFilterFormValues) => {
-    router.replace({
-      pathname: partnerPaths.ManageReviews,
-      query: {
-        ...(ratingFormValue.length
-          ? { rating: ratingFormValue.join(',') }
-          : {}),
-      },
-    });
-  };
-
-  const handleClearFilter = () => {
-    router.replace({
-      pathname: partnerPaths.ManageReviews,
-      query: {},
-    });
-  };
-
-  const filterForm = (
-    <PartnerReviewsFilterForm
-      onSubmit={handleFilterChange}
-      onClearFilter={handleClearFilter}
-      ratingDetail={ratingDetail}
-      initialValues={{ ratings: uniq(ratings) }}
-    />
+  const handleReply = useCallback(
+    async ({
+      reviewId,
+      replyRole,
+      replyContent,
+    }: {
+      reviewId: string;
+      replyRole: EUserRole;
+      replyContent: string;
+    }) => {
+      try {
+        await dispatch(
+          submitReply({
+            reviewId,
+            replyRole,
+            replyContent,
+            authorId: currentUser?.id?.uuid || '',
+            authorName: displayName || '',
+          }),
+        ).unwrap();
+      } catch (error) {
+        console.error('Error submitting reply:', error);
+        let message = 'Có lỗi xảy ra. Vui lòng thử lại.';
+        if (isAxiosError(error)) {
+          const data = error.response?.data as { error?: string } | undefined;
+          message = data?.error ?? error.message;
+        } else if (error instanceof Error) {
+          message = error.message;
+        }
+        toast.error(message);
+      }
+    },
+    [dispatch, currentUser?.id?.uuid, displayName],
   );
 
   return (
@@ -122,7 +154,19 @@ const ManageReviewsPage = () => {
           totalNumberOfReivews={totalNumberOfReivews}
         />
       </div>
-      <PartnerReviewDetailTable ratings={ratings} filterForm={filterForm} />
+      <RatingReview
+        reviews={reviews}
+        fetchReviewsInProgress={fetchReviewsInProgress}
+        fetchReviewsError={fetchReviewsError}
+        pagination={pagination}
+        handleReply={handleReply}
+        handlePageChange={handlePageChange}
+        handleSearch={handleSearch}
+        handleFilterRating={handleFilterRating}
+        page={page}
+        isShowFilters={true}
+        selectedRatings={filters.ratings}
+      />
     </div>
   );
 };

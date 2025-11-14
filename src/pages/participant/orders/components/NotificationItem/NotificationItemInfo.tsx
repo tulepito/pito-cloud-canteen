@@ -22,6 +22,7 @@ const NotificationItemInfo: React.FC<NotificationItemInfoProps> = (props) => {
     orderTitle,
     subOrderDate = 0,
     foodName,
+    partnerName,
   } = notificationItem;
   const { seconds } = createdAt;
   const formattedDate = formatTimestamp(subOrderDate, 'dd/MM/yyyy');
@@ -149,7 +150,43 @@ const NotificationItemInfo: React.FC<NotificationItemInfoProps> = (props) => {
           <div className={css.pastTime}>{pastTime}</div>
         </div>
       );
-
+    case ENotificationType.ADMIN_REPLY_REVIEW:
+      return (
+        <div className={css.contentWrapper}>
+          <div className={css.content}>
+            {intl.formatMessage(
+              {
+                id: 'NotificationItemInfo.title.adminReplyReview',
+              },
+              {
+                span: (msg: any) => <span className={css.boldText}>{msg}</span>,
+                foodName,
+                subOrderDate: formattedDate,
+              },
+            )}
+          </div>
+          <div className={css.pastTime}>{pastTime}</div>
+        </div>
+      );
+    case ENotificationType.PARTNER_REPLY_REVIEW:
+      return (
+        <div className={css.contentWrapper}>
+          <div className={css.content}>
+            {intl.formatMessage(
+              {
+                id: 'NotificationItemInfo.title.partnerReplyReview',
+              },
+              {
+                span: (msg: any) => <span className={css.boldText}>{msg}</span>,
+                foodName,
+                subOrderDate: formattedDate,
+                partnerName,
+              },
+            )}
+          </div>
+          <div className={css.pastTime}>{pastTime}</div>
+        </div>
+      );
     default:
       return <div></div>;
   }
