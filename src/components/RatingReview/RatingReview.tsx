@@ -31,7 +31,7 @@ interface RatingReviewProps {
   pagination: TPagination;
   page: number;
   handleSearch?: (orderCode: string) => void;
-  handlePageChange?: (page: number) => void;
+  handlePageChange?: (page: number, pageSize: number) => void;
   isShowFilters?: boolean;
   isDisabledReply?: boolean;
   handleFilterRating?: (ratings: number[]) => void;

@@ -52,9 +52,15 @@ const ManageReviewsPage = () => {
   }, [dispatch]);
 
   const handlePageChange = useCallback(
-    (newPage: number) => {
+    (newPage: number, pageSize: number) => {
       setPage(newPage);
-      dispatch(fetchPartnerReviews({ ...filtersRef.current, page: newPage }));
+      dispatch(
+        fetchPartnerReviews({
+          ...filtersRef.current,
+          page: newPage,
+          limit: pageSize,
+        }),
+      );
     },
     [dispatch],
   );
