@@ -14,9 +14,10 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { participantOrderManagementThunks } from '@redux/slices/ParticipantOrderManagementPage.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { participantPaths } from '@src/paths';
+import type { TUpdateParticipantOrderBody } from '@src/types/order';
 import { CurrentUser } from '@src/utils/data';
 import { isOver } from '@src/utils/dates';
-import { EOrderStates } from '@src/utils/enums';
+import { EOrderStates, EParticipantOrderStatus } from '@src/utils/enums';
 
 import { OrderListThunks } from '../../OrderList.slice';
 
@@ -94,18 +95,20 @@ const SubOrderDetailModal: React.FC<TSubOrderDetailModalProps> = (props) => {
 
   const onRejectDish = async () => {
     const currentUserId = CurrentUser(user).getId();
-    const payload = {
-      updateValues: {
-        orderId,
-        orderDay: last(orderDay.split(' - ')),
-        planId,
-        memberOrders: {
-          [currentUserId]: {
-            status: EVENT_STATUS.NOT_JOINED_STATUS,
-            foodId: '',
-          },
+    const updateValues: TUpdateParticipantOrderBody = {
+      orderId,
+      orderDay: last(orderDay.split(' - ')),
+      planId,
+      memberOrders: {
+        [currentUserId]: {
+          status: EParticipantOrderStatus.notJoined,
+          foodId: '',
+          requirement: '',
         },
       },
+    };
+    const payload = {
+      updateValues,
       orderId,
     };
     if (from === 'orderList') {

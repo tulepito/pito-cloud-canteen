@@ -24,6 +24,7 @@ import { createAsyncThunk } from '@redux/redux.helper';
 import { ParticipantOrderManagementActions } from '@redux/slices/ParticipantOrderManagementPage.slice';
 import { userThunks } from '@redux/slices/user.slice';
 import type { FoodListing, ParticipantSubOrderDocument } from '@src/types';
+import type { TUpdateParticipantOrderBody } from '@src/types/order';
 import type { Image, VariantKey } from '@src/types/utils';
 import {
   CurrentUser,
@@ -300,7 +301,10 @@ const fetchOrders = createAsyncThunk(
 
 const updateSubOrder = createAsyncThunk(
   UPDATE_SUB_ORDER,
-  async (data: { orderId: string; updateValues: TObject }, { getState }) => {
+  async (
+    data: { orderId: string; updateValues: TUpdateParticipantOrderBody },
+    { getState },
+  ) => {
     const { allPlans } = getState().ParticipantOrderList;
     const { orderId, updateValues } = data;
     const { data: updateResponse } = await updateParticipantOrderApi(

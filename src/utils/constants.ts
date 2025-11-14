@@ -54,3 +54,5 @@ export const LOCAL_STORAGE_KEYS = {
 export const QUERY_REFS = {
   INVITATION_LINK: 'invitation-link' as const,
 };
+
+export const PICKING_ONLY_ONE_FOOD_NAMES = ['Chả', 'Bánh'];

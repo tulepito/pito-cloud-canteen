@@ -7,7 +7,7 @@ import cookies from '@services/cookie';
 import { fetchListing, fetchUser } from '@services/integrationHelper';
 import { addToProcessOrderQueue } from '@services/jobs/processOrder.job';
 import { getIntegrationSdk, getSdk, handleError } from '@services/sdk';
-import type { TUpdateParticipantOrderApiBody } from '@src/types/order';
+import type { TUpdateParticipantOrderBody } from '@src/types/order';
 import { EListingType } from '@src/utils/enums';
 import type { TListing } from '@src/utils/types';
 import {
@@ -132,7 +132,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     case HttpMethod.POST: {
       const { orderId } = req.query;
       const { planId, memberOrders, orderDay, orderDays, planData } =
-        req.body as TUpdateParticipantOrderApiBody & {
+        req.body as TUpdateParticipantOrderBody & {
           memberOrders: any;
           orderDay: string;
         };

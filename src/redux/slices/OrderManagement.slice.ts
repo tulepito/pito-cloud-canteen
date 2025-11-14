@@ -283,7 +283,7 @@ const initialState: TOrderManagementState = {
 
   toggleScannerModeInProgress: false,
   toggleScannerModeError: '',
-  isAllowAddSecondFood: true,
+  isAllowAddSecondFood: false,
 };
 
 // ================ Thunk types ================ //
@@ -321,11 +321,14 @@ const loadData = createAsyncThunk(
   'app/OrderManagement/LOAD_DATA',
   async (payload: { orderId: string; isAdminFlow?: boolean }, { dispatch }) => {
     const { orderId, isAdminFlow = false } = payload;
-    console.log('loadData@@payload:', { payload });
     const response: any = await getBookerOrderDataApi(orderId);
-    console.log('loadData@@response:', { response });
     dispatch(SystemAttributesThunks.fetchVATPercentageByOrderId(orderId));
-
+    // Check if company is allowing add second food
+    const { companyId } = Listing(response.data.orderListing).getMetadata();
+    const isAllowAddSecondFood =
+      process.env.NEXT_PUBLIC_COMPANIES_ALLOWING_SECOND_FOOD?.includes(
+        companyId,
+      ) ?? false;
     if (isAdminFlow) {
       const { orderListing: orderData = {}, planListing: planData = {} } =
         response.data || {};
@@ -337,7 +340,7 @@ const loadData = createAsyncThunk(
       dispatch(AdminManageOrderActions.saveOrderDetail(orderDetail));
     }
 
-    return response.data;
+    return { ...response.data, isAllowAddSecondFood };
   },
 );
 
@@ -1821,6 +1824,9 @@ const OrderManagementSlice = createSlice({
         planData: newPlanData,
       };
     },
+    setIsAllowAddSecondFood: (state, { payload }) => {
+      state.isAllowAddSecondFood = payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -1853,6 +1859,7 @@ const OrderManagementSlice = createSlice({
           const {
             orderListing: orderData,
             planListing: planData,
+            isAllowAddSecondFood,
             // eslint-disable-next-line unused-imports/no-unused-vars
             statusCode,
             ...restPayload
@@ -1875,6 +1882,7 @@ const OrderManagementSlice = createSlice({
             draftOrderDetail: orderDetail,
             orderValidationsInProgressState,
             isAdminFlow,
+            isAllowAddSecondFood,
             fetchOrderInProgress: false,
             ...restPayload,
           };
