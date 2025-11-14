@@ -138,7 +138,7 @@ const ReviewCard = ({
         {/* Review Content */}
         <div className="flex-1">
           {/* Name and Time */}
-          <div className="flex items-center gap-2 mb-2">
+          <div className="flex items-center gap-2">
             <span className="text-gray-500 font-semibold text-sm">
               {authorName}
             </span>

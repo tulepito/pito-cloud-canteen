@@ -3,8 +3,9 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { HttpMethod } from '@apis/configs';
 import cookies from '@services/cookie';
 import { denormalisedResponseEntities } from '@services/data';
-import { getSdk, handleError } from '@services/sdk';
+import { getIntegrationSdk, getSdk, handleError } from '@services/sdk';
 import type { RatingListing } from '@src/types';
+import { buildFullNameFromProfile } from '@src/utils/emailTemplate/participantOrderPicking';
 import { EListingType, EUserRole } from '@src/utils/enums';
 import { SuccessResponse } from '@src/utils/response';
 import type { TPagination } from '@src/utils/types';
@@ -13,6 +14,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const apiMethod = req.method;
   try {
     const sdk = getSdk(req, res);
+    const integrationSdk = getIntegrationSdk();
 
     switch (apiMethod) {
       case HttpMethod.GET: {
@@ -45,8 +47,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             reviews.map(async (review) => {
               const metadata = review.attributes?.metadata;
               const authorId = metadata?.reviewerId;
-              const author = await sdk.users.show({
+              const author = await integrationSdk.users.show({
                 id: authorId as string,
+                include: ['profileImage'],
               });
               const [authorData] = denormalisedResponseEntities(author);
               const replies = review.attributes?.metadata?.replies || [];
@@ -57,9 +60,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
               );
               review.attributes!.metadata!.replies = validReplies;
 
+              const fullName = buildFullNameFromProfile(
+                authorData.attributes.profile,
+              );
+
               return {
                 ...review,
-                authorName: authorData.attributes.profile.displayName,
+                authorName: fullName,
               };
             }),
           );
