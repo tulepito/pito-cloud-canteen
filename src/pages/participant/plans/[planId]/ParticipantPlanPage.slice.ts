@@ -11,9 +11,11 @@ import {
 } from '@redux/slices/shoppingCart.slice';
 import type {
   TCartItem,
-  TPlanOrder,
-  TUpdateParticipantOrderApiBody,
+  TPlanData,
+  TShoppingCartMemberPlan,
+  TUpdateParticipantOrderBody,
 } from '@src/types/order';
+import { PICKING_ONLY_ONE_FOOD_NAMES } from '@src/utils/constants';
 import { CurrentUser, Listing } from '@src/utils/data';
 import type { TListing } from '@src/utils/types';
 import { EParticipantOrderStatus } from '@utils/enums';
@@ -35,6 +37,8 @@ const recommendFoodForShoppingCart = ({
   plans,
   dispatch,
   currentMealId,
+  currentSecondaryMealId,
+  isAllowAddSecondFood,
 }: {
   plan: any;
   subOrderDate: string;
@@ -43,38 +47,63 @@ const recommendFoodForShoppingCart = ({
   plans: string[];
   dispatch: any;
   currentMealId?: string;
+  currentSecondaryMealId?: string;
+  isAllowAddSecondFood?: boolean;
 }) => {
   const subOrder = plan[subOrderDate];
   const { foodList } = subOrder;
 
-  const suitablePriceFoodList = foodList.filter(
-    (food: TListing) =>
-      Listing(food).getAttributes().price.amount <= packagePerMember,
-  );
+  const getFoodIdList = (foods: TListing[]) =>
+    foods.map((food: TListing) => Listing(food).getId());
 
-  let mostSuitableFood: any = recommendFood({
-    foodList: suitablePriceFoodList,
-    subOrderFoodIds: suitablePriceFoodList.map((food: TListing) =>
-      Listing(food).getId(),
-    ),
-    allergies,
+  const suitablePriceFoodList = foodList.filter((food: TListing) => {
+    return Listing(food).getAttributes().price.amount <= packagePerMember;
   });
 
-  const mostSuitableFoodListing = Listing(mostSuitableFood!);
+  const pickRandomFood = (foods: TListing[]) => {
+    if (!foods.length) {
+      return undefined;
+    }
 
-  while (
-    currentMealId &&
-    suitablePriceFoodList.length > 1 &&
-    mostSuitableFoodListing.getId() === currentMealId
-  ) {
-    mostSuitableFood = recommendFood({
-      foodList: suitablePriceFoodList,
-      subOrderFoodIds: suitablePriceFoodList.map((food: TListing) =>
-        Listing(food).getId(),
-      ),
+    return recommendFood({
+      foodList: foods,
+      subOrderFoodIds: getFoodIdList(foods),
       allergies,
     });
+  };
+
+  const pickRandomFoodExcludingIds = (
+    foods: TListing[],
+    excludeIds: string[] = [],
+  ) => {
+    const filteredFoods = foods.filter((food: TListing) => {
+      const foodId = Listing(food).getId();
+
+      return !excludeIds.includes(foodId);
+    });
+
+    return pickRandomFood(filteredFoods);
+  };
+
+  let mostSuitableFood = pickRandomFood(suitablePriceFoodList);
+
+  if (currentMealId) {
+    const alternativeExcludeIds = [currentMealId];
+    const alternativeFood = pickRandomFoodExcludingIds(
+      suitablePriceFoodList,
+      alternativeExcludeIds,
+    );
+
+    if (alternativeFood) {
+      mostSuitableFood = alternativeFood;
+    }
   }
+
+  if (!mostSuitableFood) {
+    return { foodName: '' };
+  }
+
+  const mostSuitableFoodListing = Listing(mostSuitableFood as TListing);
 
   dispatch(
     shoppingCartThunks.addToCart({
@@ -84,15 +113,64 @@ const recommendFoodForShoppingCart = ({
     }),
   );
 
+  const primaryFoodTitle = mostSuitableFoodListing.getAttributes().title || '';
+  const isPrimarySingleSelectionFood = PICKING_ONLY_ONE_FOOD_NAMES.some(
+    (name) => primaryFoodTitle?.includes(name),
+  );
+
+  if (
+    isAllowAddSecondFood &&
+    !isPrimarySingleSelectionFood &&
+    suitablePriceFoodList.length > 1
+  ) {
+    const secondaryCandidates = suitablePriceFoodList.filter(
+      (food: TListing) => {
+        const listing = Listing(food);
+        const title = listing.getAttributes().title || '';
+        const isSingleSelectionFood = PICKING_ONLY_ONE_FOOD_NAMES.some((name) =>
+          title?.includes(name),
+        );
+
+        return (
+          listing.getId() !== mostSuitableFoodListing.getId() &&
+          !isSingleSelectionFood
+        );
+      },
+    );
+
+    const excludedSecondaryIds = [
+      mostSuitableFoodListing.getId(),
+      currentSecondaryMealId,
+    ].filter(Boolean) as string[];
+
+    const secondaryFood = pickRandomFoodExcludingIds(
+      secondaryCandidates,
+      excludedSecondaryIds,
+    );
+
+    if (secondaryFood) {
+      const secondaryFoodListing = Listing(secondaryFood as TListing);
+
+      dispatch(
+        shoppingCartThunks.addToCart({
+          planId: plans[0],
+          dayId: subOrderDate,
+          mealId: secondaryFoodListing.getId(),
+          isSecondFood: true,
+        }),
+      );
+    }
+  }
+
   return {
-    foodName: mostSuitableFoodListing.getAttributes().title,
+    foodName: primaryFoodTitle,
   };
 };
 
 type TParticipantPlanState = {
   restaurant: any;
   company: any;
-  plan: any;
+  plan: TPlanData;
   order: any;
   loadDataInProgress: boolean;
   loadDataError: any;
@@ -100,6 +178,7 @@ type TParticipantPlanState = {
   reloadDataError: any;
   submitDataInprogress: boolean;
   submitDataError: any;
+  isAllowAddSecondFood: boolean;
 };
 
 const initialState: TParticipantPlanState = {
@@ -113,6 +192,7 @@ const initialState: TParticipantPlanState = {
   reloadDataError: null,
   submitDataInprogress: false,
   submitDataError: null,
+  isAllowAddSecondFood: false,
 };
 
 const loadData = createAsyncThunk(
@@ -120,9 +200,13 @@ const loadData = createAsyncThunk(
   async (planId: string, { getState, dispatch }) => {
     const { currentUser } = getState().user;
     const currentUserId = currentUser?.id?.uuid;
-    const response: any = await loadPlanDataApi(planId);
-    const plan = response?.data?.data?.plan;
+    const response = await loadPlanDataApi(planId);
+    const { plan, order } = response?.data?.data || {};
     const orderDays = Object.keys(plan);
+    const isAllowAddSecondFood =
+      process.env.NEXT_PUBLIC_COMPANIES_ALLOWING_SECOND_FOOD?.includes(
+        Listing(order as TListing).getMetadata().companyId ?? '',
+      ) ?? false;
 
     orderDays.forEach((day) => {
       const {
@@ -131,7 +215,7 @@ const loadData = createAsyncThunk(
         requirement = '',
         secondaryFoodId,
         secondaryRequirement,
-      } = plan?.[day]?.memberOrder?.[currentUserId] || {};
+      } = plan[day].memberOrder[currentUserId];
 
       if (status !== EParticipantOrderStatus.empty) {
         dispatch(
@@ -162,7 +246,10 @@ const loadData = createAsyncThunk(
       }
     });
 
-    return response?.data?.data;
+    return {
+      ...response?.data?.data,
+      isAllowAddSecondFood,
+    };
   },
   {
     serializeError: storableError,
@@ -181,8 +268,13 @@ const reloadData = createAsyncThunk(
     dispatch(shoppingCartThunks.removeAllFromPlanCart({ planId }));
 
     orderDays.forEach((day) => {
-      const { status, requirement, foodId } =
-        plan?.[day]?.memberOrder?.[currentUserId] || {};
+      const {
+        status,
+        requirement,
+        foodId,
+        secondaryFoodId,
+        secondaryRequirement,
+      } = plan?.[day]?.memberOrder?.[currentUserId] || {};
 
       if (status !== EParticipantOrderStatus.empty) {
         dispatch(
@@ -195,6 +287,18 @@ const reloadData = createAsyncThunk(
             requirement,
           }),
         );
+        if (secondaryFoodId) {
+          dispatch(
+            shoppingCartActions.addToCart({
+              currentUserId,
+              planId,
+              dayId: day,
+              mealId: secondaryFoodId,
+              isSecondFood: true,
+              requirement: secondaryRequirement,
+            }),
+          );
+        }
       }
     });
 
@@ -215,11 +319,8 @@ const updateOrder = createAsyncThunk(
     const { currentUser } = getState().user;
     const currentUserId = currentUser?.id?.uuid;
     const { orders } = getState().shoppingCart;
-    console.log('orders', { orders });
     const planData = orders?.[currentUserId]?.[planId] || {};
-    console.log('planData', { planData });
     const orderDays = Object.keys(planData);
-    console.log('orderDays', { orderDays });
 
     const buildCartItem = (
       foodId: string,
@@ -247,42 +348,42 @@ const updateOrder = createAsyncThunk(
       return baseItem;
     };
 
-    const updatedPlan = orderDays.reduce<TPlanOrder>((acc, curr) => {
-      const {
-        foodId = '',
-        requirement = '',
-        secondaryFoodId,
-        secondaryRequirement,
-      } = planData[+curr] || {};
+    const updatedPlan = orderDays.reduce<TShoppingCartMemberPlan>(
+      (acc, curr) => {
+        const {
+          foodId = '',
+          requirement = '',
+          secondaryFoodId,
+          secondaryRequirement,
+        } = planData[+curr] || {};
 
-      return {
-        ...acc,
-        [curr]: {
-          [currentUserId]: buildCartItem(
-            foodId,
-            requirement,
-            secondaryFoodId,
-            secondaryRequirement,
-          ),
-        },
-      };
-    }, {});
+        return {
+          ...acc,
+          [curr]: {
+            [currentUserId]: buildCartItem(
+              foodId,
+              requirement,
+              secondaryFoodId,
+              secondaryRequirement,
+            ),
+          },
+        };
+      },
+      {},
+    );
 
-    const updateValues: TUpdateParticipantOrderApiBody = {
+    const updateValues: TUpdateParticipantOrderBody = {
       orderId,
       orderDays,
       planId,
       planData: updatedPlan,
     };
 
-    console.log('updateOrder@@updateValues:', {
-      updateValues: JSON.stringify(updateValues),
-    });
-
     const {
       data: { jobId },
     } = await updateParticipantOrderApi(orderId, updateValues);
     await dispatch(reloadData(planId));
+    // firebase documents for history sub-orders and rating feature
     await Promise.all(
       orderDays.map((timestamp: string) =>
         participantSubOrderAddDocumentApi({
@@ -304,14 +405,18 @@ export const recommendFoodSubOrder = createAsyncThunk(
   RECOMMEND_FOOD_SUB_ORDER,
   async (subOrderDate: string, { getState, dispatch }) => {
     const { currentUser } = getState().user;
-    const { plan, order } = getState().ParticipantPlanPage;
+    const { plan, order, isAllowAddSecondFood } =
+      getState().ParticipantPlanPage;
     const { orders } = getState().shoppingCart;
     const currentUserGetter = CurrentUser(currentUser!);
     const { allergies = [] } = currentUserGetter.getPublicData();
-    const orderListing = Listing(order!);
+    const orderListing = Listing(order as TListing);
     const { packagePerMember = 0, plans = [] } = orderListing.getMetadata();
     const currentMealId =
       orders[currentUserGetter.getId()]?.[plans[0]]?.[+subOrderDate]?.foodId;
+    const currentSecondaryMealId =
+      orders[currentUserGetter.getId()]?.[plans[0]]?.[+subOrderDate]
+        ?.secondaryFoodId;
 
     return recommendFoodForShoppingCart({
       plan,
@@ -321,6 +426,8 @@ export const recommendFoodSubOrder = createAsyncThunk(
       plans,
       dispatch,
       currentMealId,
+      currentSecondaryMealId,
+      isAllowAddSecondFood,
     });
   },
   {
@@ -332,12 +439,13 @@ const recommendFoodSubOrders = createAsyncThunk(
   RECOMMEND_FOOD_SUB_ORDERS,
   async (_, { getState, dispatch }) => {
     const { currentUser } = getState().user;
-    const { plan, order } = getState().ParticipantPlanPage;
+    const { plan, order, isAllowAddSecondFood } =
+      getState().ParticipantPlanPage;
     const { orders } = getState().shoppingCart;
     const currentUserGetter = CurrentUser(currentUser!);
     const currentUserId = currentUserGetter.getId();
     const { allergies = [] } = currentUserGetter.getPublicData();
-    const orderListing = Listing(order!);
+    const orderListing = Listing(order as TListing);
     const { packagePerMember = 0, plans = [] } = orderListing.getMetadata();
     const subOrderDates = Object.keys(plan);
     const notJoinedDay = Object.keys(plan).reduce(
@@ -373,6 +481,9 @@ const recommendFoodSubOrders = createAsyncThunk(
     recommendSubOrderDays.forEach((subOrderDate: string) => {
       const currentMealId =
         orders[currentUserGetter.getId()]?.[plans[0]]?.[+subOrderDate]?.foodId;
+      const currentSecondaryMealId =
+        orders[currentUserGetter.getId()]?.[plans[0]]?.[+subOrderDate]
+          ?.secondaryFoodId;
       recommendFoodForShoppingCart({
         plan,
         subOrderDate,
@@ -381,6 +492,8 @@ const recommendFoodSubOrders = createAsyncThunk(
         plans,
         dispatch,
         currentMealId,
+        currentSecondaryMealId,
+        isAllowAddSecondFood,
       });
     });
   },

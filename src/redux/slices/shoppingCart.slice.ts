@@ -65,7 +65,25 @@ export const shoppingCartSlice = createSlice({
         requirement: '',
       };
 
-      console.log('currentCartItem', { currentCartItem });
+      if (foodId === 'notJoined') {
+        return {
+          ...state,
+          orders: {
+            ...state.orders,
+            [currentUserId]: {
+              ...(state.orders?.[currentUserId] || {}),
+              [planId]: {
+                ...(state.orders?.[currentUserId]?.[planId] || {}),
+                [dayId]: {
+                  foodId,
+                  requirement: '',
+                },
+              },
+            },
+          },
+        };
+      }
+
       // Nếu là món thứ 2, thêm vào secondaryFoodId
       if (isSecondFood) {
         return {
