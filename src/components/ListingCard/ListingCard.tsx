@@ -60,7 +60,6 @@ const ListingCard: React.FC<TListCardProps> = ({
 
   const FOOD_TYPE_OPTIONS = useFoodTypeOptionsByLocale();
 
-  // Sử dụng hook phù hợp dựa trên isAllowAddSecondFood
   const singleFoodSelection = useSingleFoodSelection({
     mealId,
     planId,
@@ -84,7 +83,6 @@ const ListingCard: React.FC<TListCardProps> = ({
     onAddedToCart,
   });
 
-  // Chọn hook dựa trên isAllowAddSecondFood
   const selection = isAllowAddSecondFood
     ? dualFoodSelection
     : singleFoodSelection;
@@ -100,17 +98,14 @@ const ListingCard: React.FC<TListCardProps> = ({
   };
 
   const handleSelectFoodInModal = () => {
-    // Nếu là logic dual và bị restricted, đóng modal
     if (isAllowAddSecondFood && dualFoodSelection.isRestrictedForThisListing) {
       detailModalController.setFalse();
 
       return;
     }
 
-    // Gọi handler từ hook
     selection.handleAddToCart();
 
-    // Đóng modal sau khi thêm vào giỏ (nếu cần)
     if (isAllowAddSecondFood) {
       detailModalController.setFalse();
     }
@@ -167,7 +162,6 @@ const ListingCard: React.FC<TListCardProps> = ({
             {allergicIngredients.map((item: string) => `Có ${item}`).join(', ')}
           </p>
           <div className="flex items-center gap-2">
-            {/* Hiển thị checkmark nếu món đã được chọn */}
             {(selection.isFoodSelected || isSelected) && (
               <span
                 className={classNames(css.removeDish, css.flip)}
@@ -176,7 +170,6 @@ const ListingCard: React.FC<TListCardProps> = ({
                 <IconCheckmarkWithCircle className="items-center" />
               </span>
             )}
-            {/* Logic cho dual food selection */}
             {isAllowAddSecondFood && (
               <>
                 {dualFoodSelection.canShowAddAsSecondFood &&
