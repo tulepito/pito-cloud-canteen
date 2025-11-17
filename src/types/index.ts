@@ -384,6 +384,7 @@ export interface RatingListingMetadata {
   timestamp: number;
   replies?: TReviewReply[];
   generalRatingValue: number[];
+  slackThreadTs?: string;
 }
 
 export type RatingListing = ListingBuilder<
