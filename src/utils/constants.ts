@@ -55,4 +55,18 @@ export const QUERY_REFS = {
   INVITATION_LINK: 'invitation-link' as const,
 };
 
-export const PICKING_ONLY_ONE_FOOD_NAMES = ['Chả', 'Bánh'];
+export const PICKING_ONLY_ONE_FOOD_NAMES = (() => {
+  const envValue = process.env.NEXT_PUBLIC_PICKING_ONLY_ONE_FOOD_NAMES;
+  if (!envValue) return [];
+
+  try {
+    const parsed = JSON.parse(envValue);
+    if (Array.isArray(parsed)) {
+      return parsed;
+    }
+  } catch {
+    return [];
+  }
+
+  return [];
+})();
