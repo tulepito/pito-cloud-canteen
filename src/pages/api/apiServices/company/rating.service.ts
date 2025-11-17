@@ -140,6 +140,7 @@ export const postParticipantRatingFn = async ({
 
   createSlackNotification(ESlackNotificationType.PARTICIPANT_RATING, {
     participantRatingData: {
+      ratingId: response.data.data.id.uuid,
       ratingScore: generalRating,
       content: detailTextRating,
       images: imageUrlList,
