@@ -387,6 +387,8 @@ export interface RatingListingMetadata {
   replies?: TReviewReply[];
   generalRatingValue: number[];
   slackThreadTs?: string;
+  secondaryFoodName?: string;
+  secondaryFoodId?: string;
 }
 
 export type RatingListing = ListingBuilder<

@@ -62,6 +62,7 @@ const SubOrderCard: React.FC<SubOrderCardProps> = (props) => {
   const {
     foodImage,
     foodName,
+    secondaryFoodName,
     restaurantName,
     txStatus,
     id,
@@ -125,12 +126,18 @@ const SubOrderCard: React.FC<SubOrderCardProps> = (props) => {
       <div className={css.rightSide}>
         <div className={css.inforSection}>
           <div className={css.restaurantName}>{restaurantName}</div>
-          <div className={css.dishName}>{foodName}</div>
+          <div className={css.dishName}>
+            {foodName} {secondaryFoodName && `+ ${secondaryFoodName}`}
+          </div>
           <div className={css.time}>{subOrderTime}</div>
         </div>
         <div className={css.inforSectionDesktop}>
-          <div className={css.dishName} title={foodName}>
-            {foodName}
+          <div
+            className={css.dishName}
+            title={`${foodName} ${
+              secondaryFoodName && `+ ${secondaryFoodName}`
+            }`}>
+            {foodName} {secondaryFoodName && `+ ${secondaryFoodName}`}
           </div>
           <div className={css.time}>{subOrderTime}</div>
           <div className={css.restaurantName}>

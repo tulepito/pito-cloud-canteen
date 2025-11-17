@@ -61,276 +61,272 @@ const OrderDetailsTableComponent: React.FC<
   onDeletePermanentlyMembers,
   ableToUpdateOrder,
 }) => {
-    const intl = useIntl();
-    const { isMobileLayout } = useViewport();
-    const [expandingStatusMap, setExpandingStatusMap] = useState<any>({});
-    const [isManageDeletedModalOpen, setIsManageDeletedModalOpen] =
-      useState(false);
-    const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
+  const intl = useIntl();
+  const { isMobileLayout } = useViewport();
+  const [expandingStatusMap, setExpandingStatusMap] = useState<any>({});
+  const [isManageDeletedModalOpen, setIsManageDeletedModalOpen] =
+    useState(false);
+  const inProgress = useAppSelector(orderDetailsAnyActionsInProgress);
 
-    const allParticipantIds = compact(
-      data.concat(deletedTabData as any).map(({ memberData }) => memberData?.id),
-    );
-    const missingIds = difference(
-      allParticipantIds,
-      Object.keys(expandingStatusMap),
-    );
-    const actionDisabled = inProgress;
-    const isDataEmpty = deletedTabData?.length === 0;
-    const actionTdClasses = classNames(css.actionTd, {
-      [css.actionTdDisabled]: isDataEmpty,
-    });
+  const allParticipantIds = compact(
+    data.concat(deletedTabData as any).map(({ memberData }) => memberData?.id),
+  );
+  const missingIds = difference(
+    allParticipantIds,
+    Object.keys(expandingStatusMap),
+  );
+  const actionDisabled = inProgress;
+  const isDataEmpty = deletedTabData?.length === 0;
+  const actionTdClasses = classNames(css.actionTd, {
+    [css.actionTdDisabled]: isDataEmpty,
+  });
 
-    const totalText = intl.formatMessage({
-      id: totalTabIdByTabName[tab],
-    });
+  const totalText = intl.formatMessage({
+    id: totalTabIdByTabName[tab],
+  });
 
-    const handleClickViewDeletedList = () => {
-      if (!isDataEmpty) setIsManageDeletedModalOpen(true);
-    };
-    const handleCloseDeletedList = () => {
-      setIsManageDeletedModalOpen(false);
-    };
-
-    const doNothing = () => { };
-
-    const toggleCollapseStatus = (id: string) => () => {
-      setExpandingStatusMap({
-        ...expandingStatusMap,
-        [id]: !expandingStatusMap[id],
-      });
-    };
-
-    useEffect(() => {
-      if (!isEmpty(missingIds)) {
-        const updateObject = missingIds.reduce((result: any, id: string) => {
-          if (typeof result[id] === 'undefined') {
-            result[id] = false;
-          }
-
-          return result;
-        }, expandingStatusMap);
-        setExpandingStatusMap(updateObject);
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [JSON.stringify(missingIds)]);
-
-    return (
-      <>
-        <ManageDeletedListModal
-          isOpen={isManageDeletedModalOpen}
-          onClose={handleCloseDeletedList}
-          deletedTabData={deletedTabData}
-          onRestoreMembers={onRestoreMembers}
-          onDeletePermanentlyMembers={onDeletePermanentlyMembers}
-          disabled={!ableToUpdateOrder}
-        />
-        <table className={css.tableRoot}>
-          <thead>
-            <tr>
-              {tableHeads.map((head: string, index: number) => (
-                <th key={index} colSpan={index === 3 ? 2 : 1}>
-                  <span>{head} </span>
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td colSpan={5}>
-                <div className={css.scrollContainer}>
-                  <table>
-                    <tbody>
-                      {data.map((item) => {
-                        console.log('item', { item });
-                        const { isAnonymous, memberData, foodData, status } =
-                          item;
-                        const {
-                          foodName = '',
-                          foodPrice = 0,
-                          secondFoodName = '',
-                        } = foodData;
-
-                        const {
-                          id: memberId,
-                          name: memberName,
-                          email: memberEmail,
-                        } = memberData || {};
-                        // const hasFoodPrice = Number(foodPrice) > 0;
-                        const formattedFoodPrice = `${parseThousandNumber(
-                          foodPrice,
-                        )}đ`;
-
-                        console.log('foodPrice', { foodPrice });
-                        console.log('hasFoodPrice', Number(foodPrice) > 0);
-
-                        const isExpanding = expandingStatusMap[memberId];
-
-                        const rowClasses = classNames({
-                          [css.notAllowed]:
-                            status === EParticipantOrderStatus.notAllowed,
-                        });
-
-                        const memberNameComponent = (
-                          <RenderWhen condition={!isAnonymous}>
-                            <div className={css.memberName}>{memberName}</div>
-
-                            <RenderWhen.False>
-                              <div>
-                                <div className={css.memberNameWithAnonymous}>
-                                  {memberName}
-                                </div>
-                                <div className={css.stranger}>
-                                  {intl.formatMessage({
-                                    id: 'OrderDetailsTableComponent.strangerText',
-                                  })}
-                                </div>
-                              </div>
-                            </RenderWhen.False>
-                          </RenderWhen>
-                        );
-
-                        const foodNameClasses = classNames(css.foodName, {
-                          [css.foodNameWithAnonymous]: isAnonymous,
-                        });
-                        const foodNameComponent = (
-                          <>
-                            <div className={foodNameClasses}>
-                              {foodName}{' '}
-                              <RenderWhen condition={!!secondFoodName}>
-                                <span className={css.secondFoodName}>
-                                  <span className="font-light text-xs">x</span>{' '}
-                                  {secondFoodName}
-                                </span>
-                              </RenderWhen>
-                            </div>
-                          </>
-                        );
-
-                        const iconEditComponent = (
-                          <IconEdit
-                            className={css.icon}
-                            onClick={
-                              actionDisabled
-                                ? doNothing
-                                : onClickEditOrderItem(tab, memberId)
-                            }
-                          />
-                        );
-                        const iconDeleteComponent = (
-                          <IconDelete
-                            className={css.icon}
-                            onClick={
-                              actionDisabled
-                                ? doNothing
-                                : onClickDeleteOrderItem(memberId)
-                            }
-                          />
-                        );
-                        const actionIconComponents = isMobileLayout ? (
-                          <div className={css.iconsContainer}>
-                            <div className={css.iconContainer}>
-                              {iconEditComponent}
-                            </div>
-                            <div className={css.iconContainer}>
-                              {iconDeleteComponent}
-                            </div>
-                          </div>
-                        ) : (
-                          <>
-                            {iconEditComponent}
-                            {iconDeleteComponent}
-                          </>
-                        );
-
-                        return (
-                          <tr key={memberId} className={rowClasses}>
-                            <td title={memberName}>
-                              <RenderWhen condition={isMobileLayout}>
-                                <div className={css.mobileNameContainer}>
-                                  {memberNameComponent}
-
-                                  <RenderWhen condition={isExpanding}>
-                                    <span className={css.grayLabel}>
-                                      {memberEmail}
-                                    </span>
-                                  </RenderWhen>
-                                </div>
-
-                                <RenderWhen.False>
-                                  {memberNameComponent}
-                                </RenderWhen.False>
-                              </RenderWhen>
-                            </td>
-                            <td title={memberEmail}>{memberEmail}</td>
-                            <td title={foodName}>
-                              <RenderWhen condition={isMobileLayout}>
-                                <div className={css.mobileNameContainer}>
-                                  <div
-                                    className={classNames(
-                                      css.foodNameWithAction,
-                                      'gap-2',
-                                    )}>
-                                    {foodNameComponent}
-                                    <div className="min-size-5">
-                                      <IconArrow
-                                        onClick={toggleCollapseStatus(memberId)}
-                                        direction={isExpanding ? 'up' : 'down'}
-                                      />
-                                    </div>
-                                  </div>
-                                  <RenderWhen condition={isExpanding}>
-                                    <RenderWhen condition={ableToUpdateOrder}>
-                                      {actionIconComponents}
-                                    </RenderWhen>
-                                  </RenderWhen>
-                                </div>
-
-                                <RenderWhen.False>
-                                  {foodNameComponent}
-                                </RenderWhen.False>
-                              </RenderWhen>
-                            </td>
-                            <td>
-                              <RenderWhen condition={Number(foodPrice) > 0}>
-                                {formattedFoodPrice}
-                              </RenderWhen>
-                            </td>
-                            <td>
-                              <RenderWhen condition={ableToUpdateOrder}>
-                                <div
-                                  className={classNames(css.actionCell, 'flex')}>
-                                  {actionIconComponents}
-                                </div>
-                              </RenderWhen>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              </td>
-            </tr>
-            <tr className={css.totalRow}>
-              <td colSpan={2}>
-                <span className={css.totalText}>{totalText}</span>
-                <span>{data?.length}</span>
-              </td>
-              <td></td>
-              <td
-                colSpan={2}
-                onClick={handleClickViewDeletedList}
-                className={actionTdClasses}>
-                {intl.formatMessage({
-                  id: 'OrderDetailsTable.viewDeletedList',
-                })}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </>
-    );
+  const handleClickViewDeletedList = () => {
+    if (!isDataEmpty) setIsManageDeletedModalOpen(true);
   };
+  const handleCloseDeletedList = () => {
+    setIsManageDeletedModalOpen(false);
+  };
+
+  const doNothing = () => {};
+
+  const toggleCollapseStatus = (id: string) => () => {
+    setExpandingStatusMap({
+      ...expandingStatusMap,
+      [id]: !expandingStatusMap[id],
+    });
+  };
+
+  useEffect(() => {
+    if (!isEmpty(missingIds)) {
+      const updateObject = missingIds.reduce((result: any, id: string) => {
+        if (typeof result[id] === 'undefined') {
+          result[id] = false;
+        }
+
+        return result;
+      }, expandingStatusMap);
+      setExpandingStatusMap(updateObject);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(missingIds)]);
+
+  return (
+    <>
+      <ManageDeletedListModal
+        isOpen={isManageDeletedModalOpen}
+        onClose={handleCloseDeletedList}
+        deletedTabData={deletedTabData}
+        onRestoreMembers={onRestoreMembers}
+        onDeletePermanentlyMembers={onDeletePermanentlyMembers}
+        disabled={!ableToUpdateOrder}
+      />
+      <table className={css.tableRoot}>
+        <thead>
+          <tr>
+            {tableHeads.map((head: string, index: number) => (
+              <th key={index} colSpan={index === 3 ? 2 : 1}>
+                <span>{head} </span>
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td colSpan={5}>
+              <div className={css.scrollContainer}>
+                <table>
+                  <tbody>
+                    {data.map((item) => {
+                      console.log('item', { item });
+                      const { isAnonymous, memberData, foodData, status } =
+                        item;
+                      const {
+                        foodName = '',
+                        foodPrice = 0,
+                        secondFoodName = '',
+                      } = foodData;
+
+                      const {
+                        id: memberId,
+                        name: memberName,
+                        email: memberEmail,
+                      } = memberData || {};
+                      const formattedFoodPrice = `${parseThousandNumber(
+                        foodPrice,
+                      )}đ`;
+
+                      const isExpanding = expandingStatusMap[memberId];
+
+                      const rowClasses = classNames({
+                        [css.notAllowed]:
+                          status === EParticipantOrderStatus.notAllowed,
+                      });
+
+                      const memberNameComponent = (
+                        <RenderWhen condition={!isAnonymous}>
+                          <div className={css.memberName}>{memberName}</div>
+
+                          <RenderWhen.False>
+                            <div>
+                              <div className={css.memberNameWithAnonymous}>
+                                {memberName}
+                              </div>
+                              <div className={css.stranger}>
+                                {intl.formatMessage({
+                                  id: 'OrderDetailsTableComponent.strangerText',
+                                })}
+                              </div>
+                            </div>
+                          </RenderWhen.False>
+                        </RenderWhen>
+                      );
+
+                      const foodNameClasses = classNames(css.foodName, {
+                        [css.foodNameWithAnonymous]: isAnonymous,
+                      });
+                      const foodNameComponent = (
+                        <>
+                          <div className={foodNameClasses}>
+                            {foodName}{' '}
+                            <RenderWhen condition={!!secondFoodName}>
+                              <span className={css.secondFoodName}>
+                                <span className="font-light text-xs"> + </span>{' '}
+                                {secondFoodName}
+                              </span>
+                            </RenderWhen>
+                          </div>
+                        </>
+                      );
+
+                      const iconEditComponent = (
+                        <IconEdit
+                          className={css.icon}
+                          onClick={
+                            actionDisabled
+                              ? doNothing
+                              : onClickEditOrderItem(tab, memberId)
+                          }
+                        />
+                      );
+                      const iconDeleteComponent = (
+                        <IconDelete
+                          className={css.icon}
+                          onClick={
+                            actionDisabled
+                              ? doNothing
+                              : onClickDeleteOrderItem(memberId)
+                          }
+                        />
+                      );
+                      const actionIconComponents = isMobileLayout ? (
+                        <div className={css.iconsContainer}>
+                          <div className={css.iconContainer}>
+                            {iconEditComponent}
+                          </div>
+                          <div className={css.iconContainer}>
+                            {iconDeleteComponent}
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          {iconEditComponent}
+                          {iconDeleteComponent}
+                        </>
+                      );
+
+                      return (
+                        <tr key={memberId} className={rowClasses}>
+                          <td title={memberName}>
+                            <RenderWhen condition={isMobileLayout}>
+                              <div className={css.mobileNameContainer}>
+                                {memberNameComponent}
+
+                                <RenderWhen condition={isExpanding}>
+                                  <span className={css.grayLabel}>
+                                    {memberEmail}
+                                  </span>
+                                </RenderWhen>
+                              </div>
+
+                              <RenderWhen.False>
+                                {memberNameComponent}
+                              </RenderWhen.False>
+                            </RenderWhen>
+                          </td>
+                          <td title={memberEmail}>{memberEmail}</td>
+                          <td title={foodName}>
+                            <RenderWhen condition={isMobileLayout}>
+                              <div className={css.mobileNameContainer}>
+                                <div
+                                  className={classNames(
+                                    css.foodNameWithAction,
+                                    'gap-2',
+                                  )}>
+                                  {foodNameComponent}
+                                  <div className="min-size-5">
+                                    <IconArrow
+                                      onClick={toggleCollapseStatus(memberId)}
+                                      direction={isExpanding ? 'up' : 'down'}
+                                    />
+                                  </div>
+                                </div>
+                                <RenderWhen condition={isExpanding}>
+                                  <RenderWhen condition={ableToUpdateOrder}>
+                                    {actionIconComponents}
+                                  </RenderWhen>
+                                </RenderWhen>
+                              </div>
+
+                              <RenderWhen.False>
+                                {foodNameComponent}
+                              </RenderWhen.False>
+                            </RenderWhen>
+                          </td>
+                          <td>
+                            <RenderWhen condition={Number(foodPrice) > 0}>
+                              {formattedFoodPrice}
+                            </RenderWhen>
+                          </td>
+                          <td>
+                            <RenderWhen condition={ableToUpdateOrder}>
+                              <div
+                                className={classNames(css.actionCell, 'flex')}>
+                                {actionIconComponents}
+                              </div>
+                            </RenderWhen>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </td>
+          </tr>
+          <tr className={css.totalRow}>
+            <td colSpan={2}>
+              <span className={css.totalText}>{totalText}</span>
+              <span>{data?.length}</span>
+            </td>
+            <td></td>
+            <td
+              colSpan={2}
+              onClick={handleClickViewDeletedList}
+              className={actionTdClasses}>
+              {intl.formatMessage({
+                id: 'OrderDetailsTable.viewDeletedList',
+              })}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </>
+  );
+};
 
 export default OrderDetailsTableComponent;
