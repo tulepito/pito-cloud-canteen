@@ -10,7 +10,6 @@ import {
   submitReply,
 } from '@redux/slices/Reviews.admin.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
-import { CurrentUser } from '@src/utils/data';
 import type { EUserRole } from '@src/utils/enums';
 
 const OrderReviewPage = () => {
@@ -26,9 +25,6 @@ const OrderReviewPage = () => {
   const FIRST_PAGE = 1;
   const [page, setPage] = useState(FIRST_PAGE);
   const currentUser = useAppSelector(currentUserSelector);
-
-  const currentUserGetter = CurrentUser(currentUser);
-  const { displayName } = currentUserGetter.getProfile();
 
   const totalReviews = pagination.totalItems;
   const filtersRef = useRef(filters);
@@ -73,6 +69,7 @@ const OrderReviewPage = () => {
       replyRole: EUserRole;
       replyContent: string;
     }) => {
+      const adminName = 'PITO Cloud Canteen';
       try {
         await dispatch(
           submitReply({
@@ -80,7 +77,7 @@ const OrderReviewPage = () => {
             replyRole,
             replyContent,
             authorId: currentUser?.id?.uuid || '',
-            authorName: displayName || '',
+            authorName: adminName,
           }),
         );
       } catch (error) {
@@ -88,7 +85,7 @@ const OrderReviewPage = () => {
         toast.error((error as Error).message);
       }
     },
-    [dispatch, currentUser?.id?.uuid, displayName],
+    [dispatch, currentUser?.id?.uuid],
   );
 
   const handlePageChange = useCallback(
