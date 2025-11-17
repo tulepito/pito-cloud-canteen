@@ -44,8 +44,15 @@ const RatingSubOrderModal: React.FC<TRatingSubOrderModalProps> = (props) => {
   >();
   const dispatch = useAppDispatch();
   const { isMobileLayout } = useViewport();
-  const { companyName, orderId, restaurant, timestamp, planId, foodName } =
-    selectedEvent?.resource || {};
+  const {
+    companyName,
+    orderId,
+    restaurant,
+    timestamp,
+    planId,
+    foodName,
+    secondaryFoodName,
+  } = selectedEvent?.resource || {};
   const restaurantId = restaurant?.id;
   const formRef = useRef<any>(null);
   const intl = useIntl();
@@ -159,7 +166,9 @@ const RatingSubOrderModal: React.FC<TRatingSubOrderModalProps> = (props) => {
         isOpen={isOpen}
         handleClose={handleClose}
         containerClassName={classNames(css.modalContainer, '!px-4')}
-        title={`${intl.formatMessage({ id: 'danh-gia-mon' })} ${foodName}`}>
+        title={`${intl.formatMessage({ id: 'danh-gia-mon' })} ${foodName} ${
+          secondaryFoodName && `+ ${secondaryFoodName}`
+        }`}>
         {renderer}
       </Modal>
     );

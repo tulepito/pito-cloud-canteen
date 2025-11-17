@@ -75,11 +75,19 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         const plan: PlanListing = await fetchListing(planId);
         const planListing = Listing(plan as any);
         const { orderDetail = {} } = planListing.getMetadata();
-        const { foodId } =
+        const { foodId, secondaryFoodId } =
           orderDetail[timestamp]?.memberOrders?.[reviewerId] || {};
         const food = await fetchListing(foodId, ['author']);
         const foodListing = Listing(food);
         const { title: foodName } = foodListing.getAttributes();
+        const secondaryFood = secondaryFoodId
+          ? await fetchListing(secondaryFoodId, ['author'])
+          : null;
+        const secondaryFoodListing = secondaryFood
+          ? Listing(secondaryFood)
+          : null;
+        const { title: secondaryFoodName } =
+          secondaryFoodListing?.getAttributes() || {};
 
         if (!plan.attributes?.metadata?.orderId) {
           throw new Error('Order id not found');
@@ -105,6 +113,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           imageIdList,
           foodName,
           foodId,
+          ...(secondaryFoodId && { secondaryFoodName }),
+          ...(secondaryFoodId && { secondaryFoodId }),
           imageUrlList,
           orderCode: orderListing.attributes?.title,
           ratingUserName: buildFullName(
