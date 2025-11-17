@@ -104,6 +104,7 @@ export const addFirebaseDocument = async ({
       ...(extraParams || {}),
     };
   }
+
   if (status !== EParticipantOrderStatus.notJoined && secondaryFoodId) {
     const { foodName } = foodList[secondaryFoodId] || {};
     const foodResponse = await fetchListing(
@@ -125,6 +126,7 @@ export const addFirebaseDocument = async ({
         : null;
     subOrderDocument = {
       ...subOrderDocument,
+      secondaryFoodId,
       secondaryFoodName: foodName,
       ...(newSecondFoodImage && { secondaryFoodImage: newSecondFoodImage }),
     };
