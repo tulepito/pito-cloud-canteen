@@ -1452,6 +1452,8 @@
   "ParticipantChangePasswordRoute.title": "Change password",
   "ParticipantDashboardRoute.description": "My schedule",
   "ParticipantDashboardRoute.title": "My schedule",
+  "ParticipantEventsRoute.description": "Events",
+  "ParticipantEventsRoute.title": "Events",
   "ParticipantOrderManagement.tab.personal": "My orders",
   "ParticipantOrderManagementRoute.description": "Order details",
   "ParticipantOrderManagementRoute.title": "Order details",

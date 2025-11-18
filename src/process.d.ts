@@ -91,5 +91,7 @@ declare namespace NodeJS {
     NEXT_PUBLIC_REDIS_URL: string;
 
     NEXT_PUBLIC_GOOGLE_ANALYTICS_ID: string;
+
+    NEXT_PUBLIC_FIREBASE_EVENT_COLLECTION_NAME: string;
   }
 }

@@ -5,8 +5,10 @@ import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import flatten from 'lodash/flatten';
 import { DateTime } from 'luxon';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 
+import { getEmailsApi } from '@apis/participantApi';
 import BottomNavigationBar from '@components/BottomNavigationBar/BottomNavigationBar';
 import Button from '@components/Button/Button';
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
@@ -27,7 +29,7 @@ import { buildParticipantSubOrderDocumentId } from '@pages/api/participants/docu
 import { CalendarActions } from '@redux/slices/Calendar.slice';
 import { participantPaths } from '@src/paths';
 import type { PlanListing } from '@src/types';
-import { CurrentUser, Listing } from '@src/utils/data';
+import { CurrentUser, Listing, User } from '@src/utils/data';
 import {
   getEndDayOfWeek,
   getEndOfMonth,
@@ -45,6 +47,7 @@ import {
   EParticipantOrderStatus,
   ESubOrderTxStatus,
 } from '@src/utils/enums';
+import { HttpStatus } from '@src/utils/response';
 import {
   ETransition,
   TRANSITIONS_TO_STATE_CANCELED,
@@ -108,6 +111,55 @@ const OrderListPage = () => {
   const { isMobileLayout } = useViewport();
   const notificationModalControl = useBoolean();
   const currentUser = useAppSelector((state) => state.user.currentUser);
+  const userEmail = User(currentUser!).getAttributes().email;
+  const [isUserInEvent, setIsUserInEvent] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const checkUserInEvent = async () => {
+      const now = DateTime.now().setZone('Asia/Ho_Chi_Minh');
+      const eventDate = DateTime.fromISO('2025-11-19', {
+        zone: 'Asia/Ho_Chi_Minh',
+      });
+      const eventStartDate = eventDate.startOf('day');
+      const eventEndDate = eventDate.endOf('day');
+
+      if (now < eventStartDate || now > eventEndDate) {
+        if (isMounted) {
+          setIsUserInEvent(false);
+        }
+
+        return;
+      }
+
+      try {
+        const response = await getEmailsApi();
+        if (response.status === HttpStatus.OK) {
+          const emails = response.data?.data || [];
+          if (isMounted) {
+            setIsUserInEvent(emails.includes(userEmail));
+          }
+
+          return;
+        }
+      } catch (error) {
+        console.error('Error in checkUserInEvent:', error);
+      }
+      if (isMounted) {
+        setIsUserInEvent(false);
+      }
+    };
+
+    if (userEmail) {
+      checkUserInEvent();
+    }
+
+    return () => {
+      isMounted = false;
+    };
+  }, [userEmail]);
+
   const orders = useAppSelector(
     (state) => state.ParticipantOrderList.orders,
     shallowEqual,
@@ -849,6 +901,14 @@ const OrderListPage = () => {
 
   return (
     <ParticipantLayout>
+      <RenderWhen condition={isUserInEvent}>
+        <div className="flex justify-end py-2">
+          <Link href="/participant/events/mens-day" className={css.mensDayLink}>
+            <span className={css.mensDayLinkTitle}>Nhận quà</span>
+            <span className={css.mensDayLinkBadge}>19.11</span>
+          </Link>
+        </div>
+      </RenderWhen>
       <OrderListHeaderSection
         openNotificationModal={notificationModalControl.setTrue}
         numberOfUnseenNotifications={numberOfUnseenNotifications}
@@ -859,7 +919,6 @@ const OrderListPage = () => {
         headerWrapperClassName={css.headerWrapperClassName}
         headerClassName={css.tabHeader}
       />
-
       <BottomNavigationBar />
       <LoadingModal isOpen={showLoadingModal} />
     </ParticipantLayout>

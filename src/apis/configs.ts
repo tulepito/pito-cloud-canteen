@@ -82,8 +82,8 @@ export const postApi = <T = any>(
   });
 };
 
-export const putApi = (path: string, body: TObject = {}) => {
-  return axios.put(`${apiBaseUrl()}${path}`, body);
+export const putApi = <T = any>(path: string, body: TObject = {}) => {
+  return axios.put<T>(`${apiBaseUrl()}${path}`, body);
 };
 
 export const deleteApi = (path: string, data: TObject = {}) => {

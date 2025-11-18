@@ -1,4 +1,6 @@
+import type { VoucherInfo } from '@pages/api/participants/events/voucher/receive.api';
 import type { POSTParticipantRating } from '@pages/api/participants/ratings/index.api';
+import type { ApiResponse } from '@src/utils/response';
 
 import { getApi, postApi, putApi } from './configs';
 
@@ -29,3 +31,9 @@ export type TFetchOrdersApiParams = {
 
 export const fetchOrdersApi = (params: TFetchOrdersApiParams) =>
   getApi('/participants/orders/fetch-order-list', params);
+
+export const receiveVoucherApi = () =>
+  putApi<ApiResponse<VoucherInfo>>('/participants/events/voucher/receive', {});
+
+export const getEmailsApi = () =>
+  getApi<ApiResponse<string[]>>('/participants/events/voucher/get-emails', {});

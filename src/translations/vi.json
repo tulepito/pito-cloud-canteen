@@ -1453,6 +1453,8 @@
   "ParticipantChangePasswordRoute.title": "Đổi mật khẩu",
   "ParticipantDashboardRoute.description": "Lịch của tôi",
   "ParticipantDashboardRoute.title": "Lịch của tôi",
+  "ParticipantEventsRoute.description": "Sự kiện",
+  "ParticipantEventsRoute.title": "Sự kiện",
   "ParticipantOrderManagement.tab.personal": "Của tôi",
   "ParticipantOrderManagementRoute.description": "Chi tiết đơn hàng",
   "ParticipantOrderManagementRoute.title": "Chi tiết đơn hàng",

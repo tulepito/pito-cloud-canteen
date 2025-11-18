@@ -432,6 +432,7 @@ export enum ENativeNotificationType {
   PartnerSubOrderNegativeRating = 'PartnerSubOrderNegativeRating',
   AdminReplyReview = 'AdminReplyReview',
   AdminApprovePartnerReplyReview = 'AdminApprovePartnerReplyReview',
+  Events = 'Events',
 }
 
 export enum EBookerNativeNotificationType {
