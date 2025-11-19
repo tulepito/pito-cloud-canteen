@@ -35,5 +35,9 @@ export const fetchOrdersApi = (params: TFetchOrdersApiParams) =>
 export const receiveVoucherApi = () =>
   putApi<ApiResponse<VoucherInfo>>('/participants/events/voucher/receive', {});
 
-export const getEmailsApi = () =>
-  getApi<ApiResponse<string[]>>('/participants/events/voucher/get-emails', {});
+export const getEmailsApi = (options: { signal?: AbortSignal }) =>
+  getApi<ApiResponse<string[]>>(
+    '/participants/events/voucher/get-emails',
+    {},
+    { signal: options.signal },
+  );

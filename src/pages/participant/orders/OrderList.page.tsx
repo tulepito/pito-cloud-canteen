@@ -8,7 +8,6 @@ import { DateTime } from 'luxon';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
-import { getEmailsApi } from '@apis/participantApi';
 import BottomNavigationBar from '@components/BottomNavigationBar/BottomNavigationBar';
 import Button from '@components/Button/Button';
 import CalendarDashboard from '@components/CalendarDashboard/CalendarDashboard';
@@ -24,12 +23,13 @@ import { getItem } from '@helpers/localStorageHelpers';
 import { prepareDaySession } from '@helpers/order/prepareDataHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
+import { useUserInEvent } from '@hooks/useUserInEvent';
 import { useViewport } from '@hooks/useViewport';
 import { buildParticipantSubOrderDocumentId } from '@pages/api/participants/document/document.service';
 import { CalendarActions } from '@redux/slices/Calendar.slice';
 import { participantPaths } from '@src/paths';
 import type { PlanListing } from '@src/types';
-import { CurrentUser, Listing, User } from '@src/utils/data';
+import { CurrentUser, Listing } from '@src/utils/data';
 import {
   getEndDayOfWeek,
   getEndOfMonth,
@@ -47,7 +47,6 @@ import {
   EParticipantOrderStatus,
   ESubOrderTxStatus,
 } from '@src/utils/enums';
-import { HttpStatus } from '@src/utils/response';
 import {
   ETransition,
   TRANSITIONS_TO_STATE_CANCELED,
@@ -111,54 +110,7 @@ const OrderListPage = () => {
   const { isMobileLayout } = useViewport();
   const notificationModalControl = useBoolean();
   const currentUser = useAppSelector((state) => state.user.currentUser);
-  const userEmail = User(currentUser!).getAttributes().email;
-  const [isUserInEvent, setIsUserInEvent] = useState(false);
-
-  useEffect(() => {
-    let isMounted = true;
-
-    const checkUserInEvent = async () => {
-      const now = DateTime.now().setZone('Asia/Ho_Chi_Minh');
-      const eventDate = DateTime.fromISO('2025-11-19', {
-        zone: 'Asia/Ho_Chi_Minh',
-      });
-      const eventStartDate = eventDate.startOf('day');
-      const eventEndDate = eventDate.endOf('day');
-
-      if (now < eventStartDate || now > eventEndDate) {
-        if (isMounted) {
-          setIsUserInEvent(false);
-        }
-
-        return;
-      }
-
-      try {
-        const response = await getEmailsApi();
-        if (response.status === HttpStatus.OK) {
-          const emails = response.data?.data || [];
-          if (isMounted) {
-            setIsUserInEvent(emails.includes(userEmail));
-          }
-
-          return;
-        }
-      } catch (error) {
-        console.error('Error in checkUserInEvent:', error);
-      }
-      if (isMounted) {
-        setIsUserInEvent(false);
-      }
-    };
-
-    if (userEmail) {
-      checkUserInEvent();
-    }
-
-    return () => {
-      isMounted = false;
-    };
-  }, [userEmail]);
+  const { isUserInEvent } = useUserInEvent();
 
   const orders = useAppSelector(
     (state) => state.ParticipantOrderList.orders,
@@ -903,9 +855,13 @@ const OrderListPage = () => {
     <ParticipantLayout>
       <RenderWhen condition={isUserInEvent}>
         <div className="flex justify-end py-2">
-          <Link href="/participant/events/mens-day" className={css.mensDayLink}>
-            <span className={css.mensDayLinkTitle}>Nhận quà</span>
-            <span className={css.mensDayLinkBadge}>19.11</span>
+          <Link
+            href="/participant/events/mens-day"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-br from-[#5ec9ff] to-[#b1e4fe] text-white text-sm font-semibold no-underline shadow-sm transition-all duration-200 ease-in-out hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 active:shadow-sm">
+            <span className="uppercase tracking-[0.02em]">Nhận quà</span>
+            <span className="px-[10px] py-0.5 rounded-full bg-white/15 text-xs leading-4">
+              19.11
+            </span>
           </Link>
         </div>
       </RenderWhen>
