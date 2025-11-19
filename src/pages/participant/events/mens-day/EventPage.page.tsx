@@ -20,6 +20,7 @@ import { buildFullNameFromProfile } from '@src/utils/emailTemplate/participantOr
 import { EUserRole } from '@src/utils/enums';
 import { HttpStatus } from '@src/utils/response';
 
+import pitoxCoolmate from '../../../website/assets/events/pito-coolmate.png';
 import logo from '../../../website/assets/Logo.svg';
 
 const EventPage = () => {
@@ -111,7 +112,7 @@ const EventPage = () => {
           alt="decorator"
           width={150}
           height={150}
-          className="object-contain absolute opacity-30 top-[50px] left-[-120px] w-[800px] h-[800px] rotate-12"
+          className="object-contain absolute opacity-30 top-[120px] left-[-120px] w-[800px] h-[800px] rotate-12"
         />
         <Image
           src="/static/decorator-blue.png"
@@ -157,14 +158,8 @@ const EventPage = () => {
             quality={100}
           />
         </div>
-        {/* HAPPY MEN'S DAY Banner */}
-        <div className="bg-[#62BCEA] px-6 py-4 mb-6 rounded-sm mt-5">
-          <h1 className="md:text-3xl font-[unbounded] text-white text-2xl font-bold text-center">
-            HAPPY MEN&apos;S DAY
-          </h1>
-        </div>
         {/* Hero Video */}
-        <div className="mb-8">
+        <div className="mb-8 mt-4">
           <div className="relative w-full rounded-2xl border border-[#17176026] bg-gradient-to-r from-[#e0f3ff] via-white to-[#ffe2f1] p-[1px] shadow-lg shadow-[#1717601a]">
             <div className="relative overflow-hidden rounded-[18px] bg-black/70">
               <video
@@ -184,10 +179,26 @@ const EventPage = () => {
             </div>
           </div>
         </div>
+        {/* HAPPY MEN'S DAY Banner */}
+        <div className="bg-white px-6 py-4 rounded-sm mt-5">
+          <h1 className="md:text-3xl font-[unbounded] text-black text-2xl font-bold text-center">
+            HAPPY MEN&apos;S DAY
+          </h1>
+        </div>
+        <div className="relative md:hidden w-32 mx-auto aspect-[1415/929]">
+          <Image
+            src={pitoxCoolmate}
+            alt="PITOxCoolmate"
+            fill
+            priority
+            loading="eager"
+            className="object-contain"
+          />
+        </div>
         {/* Introductory Text */}
-        <p className="text-base text-black px-3 py-2 mb-6 rounded-sm mt-2 font-sans font-bold bg-[#b8e7ff]">
-          PITO kết hợp cùng Coolmate dành tặng riêng cho anh {userName} nhân dịp
-          19/11 - Ngày Quốc tế Nam giới
+        <p className="text-base text-black px-3 py-2 mb-6 rounded-sm font-sans font-bold bg-[#b8e7ff]">
+          Dành tặng riêng cho anh {userName} nhân dịp 19/11 - Ngày Quốc tế Nam
+          giới
         </p>
         {/* Voucher Section */}
         <div className="bg-white py-3 rounded-lg border border-[#838383]">

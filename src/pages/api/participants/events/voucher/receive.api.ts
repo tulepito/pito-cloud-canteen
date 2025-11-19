@@ -11,7 +11,7 @@ import { SuccessResponse } from '@src/utils/response';
 
 export type VoucherInfo = {
   email: string;
-  status: 'pending';
+  status: 'pending' | 'success';
   voucherCode: string;
   receivedAt?: Date;
   oneSignalIds: string[];
@@ -41,6 +41,24 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             return res.status(400).json({ message: 'Company not found' });
           }
           const timestamp = new Date();
+          const event = await getDocumentById(
+            companyId.trim(),
+            NEXT_PUBLIC_FIREBASE_EVENT_COLLECTION_NAME!,
+          );
+          if (!event) {
+            return res.status(404).json({ message: 'Event not found' });
+          }
+          const vouchers = (
+            event as unknown as { vouchers: Record<string, VoucherInfo> }
+          ).vouchers as Record<string, VoucherInfo>;
+
+          const userVoucher = vouchers?.[userId];
+
+          if (userVoucher?.status !== 'pending') {
+            return new SuccessResponse(userVoucher, {
+              message: 'Voucher đã được nhận',
+            }).send(res);
+          }
           await updateCollectionDoc(
             companyId.trim(),
             {
@@ -50,20 +68,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             },
             NEXT_PUBLIC_FIREBASE_EVENT_COLLECTION_NAME!,
           );
-          const event = await getDocumentById(
-            companyId,
-            NEXT_PUBLIC_FIREBASE_EVENT_COLLECTION_NAME!,
-          );
-          if (!event) {
-            return res.status(404).json({ message: 'Event not found' });
-          }
-          const vouchers = (
-            event as unknown as { vouchers: Record<string, VoucherInfo> }
-          ).vouchers as Record<string, VoucherInfo>;
-          const userVoucher = vouchers?.[userId];
-          if (!userVoucher) {
-            return res.status(404).json({ message: 'Voucher not found' });
-          }
 
           return new SuccessResponse(userVoucher, {
             message: 'Lấy voucher thành công',
