@@ -480,6 +480,8 @@ export enum ESlackNotificationType {
   PARTICIPANT_RATING = 'participantRating',
   PARTICIPANT_ORDER_PERSISTENCE_FAILED = 'participantOrderPersistenceFailed',
   PARTNER_REPLY_REVIEW = 'partnerReplyReview',
+  ADMIN_REPLY_REVIEW = 'adminReplyReview',
+  ADMIN_APPROVE_PARTNER_REPLY_REVIEW = 'adminApprovePartnerReplyReview',
 }
 
 export enum QuizStep {

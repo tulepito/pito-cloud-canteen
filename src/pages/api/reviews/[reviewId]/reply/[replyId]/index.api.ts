@@ -4,17 +4,19 @@ import { HttpMethod } from '@apis/configs';
 import cookies from '@services/cookie';
 import { denormalisedResponseEntities } from '@services/data';
 import { emailSendingFactory, EmailTemplateTypes } from '@services/email';
-import { fetchListing } from '@services/integrationHelper';
+import { fetchListing, fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { createNativeNotification } from '@services/nativeNotification';
 import { createFirebaseDocNotification } from '@services/notifications';
 import adminChecker from '@services/permissionChecker/admin';
 import { getSdk, handleError } from '@services/sdk';
+import { createSlackNotification } from '@services/slackNotification';
 import type { RatingListing, TReviewReply } from '@src/types';
-import { Listing } from '@src/utils/data';
+import { Listing, User } from '@src/utils/data';
 import {
   ENativeNotificationType,
   ENotificationType,
+  ESlackNotificationType,
   EUserRole,
 } from '@src/utils/enums';
 import { SuccessResponse } from '@src/utils/response';
@@ -111,6 +113,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             const reviewListing = Listing(updatedReview);
             const { foodName, restaurantId, reviewerId } =
               reviewListing.getMetadata();
+            const reviewer = await fetchUser(reviewerId);
+            const reviewerUser = reviewer ? User(reviewer) : null;
+            const reviewerName =
+              reviewerUser?.getProfile()?.displayName || 'Người dùng';
             let partnerName = partnerReply.authorName;
             if (restaurantId) {
               try {
@@ -125,55 +131,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                 console.error('Error fetching restaurant:', error);
               }
             }
-            // try {
-            //   await emailSendingFactory(
-            //     EmailTemplateTypes.PARTICIPANT.PARTICIPANT_REVIEW_REPLY,
-            //     {
-            //       reviewId,
-            //       replyContent: partnerReply.replyContent,
-            //       replyAuthorName: partnerReply.authorName,
-            //       foodName,
-            //       isPartnerReply: true,
-            //       partnerName,
-            //     },
-            //   );
-            // } catch (error) {
-            //   console.error(
-            //     'Error sending email for approved partner reply:',
-            //     error,
-            //   );
-            //   // Don't fail the request if email sending fails
-            // }
-
-            // // Send native notification
-            // try {
-            //   await createNativeNotification(
-            //     ENativeNotificationType.AdminApprovePartnerReplyReview,
-            //     {
-            //       participantId: reviewerId,
-            //       reviewId,
-            //       replyContent: partnerReply.replyContent,
-            //       foodName,
-            //       partnerName,
-            //     },
-            //   );
-            // } catch (error) {
-            //   console.error(
-            //     'Error sending native notification for approved partner reply:',
-            //     error,
-            //   );
-            //   // Don't fail the request if notification fails
-            // }
-
-            // createFirebaseDocNotification(
-            //   ENotificationType.PARTNER_REPLY_REVIEW,
-            //   {
-            //     userId: reviewerId,
-            //     subOrderDate: Number(review.attributes?.metadata?.timestamp),
-            //     foodName,
-            //     planId,
-            //   },
-            // );
 
             const results = await Promise.allSettled([
               emailSendingFactory(
@@ -214,6 +171,21 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                   subOrderDate: Number(review.attributes?.metadata?.timestamp),
                   foodName,
                   planId,
+                },
+              ),
+              createSlackNotification(
+                ESlackNotificationType.ADMIN_APPROVE_PARTNER_REPLY_REVIEW,
+                {
+                  adminApprovePartnerReplyReviewData: {
+                    reviewId,
+                    reviewLink: `${process.env.NEXT_PUBLIC_CANONICAL_URL}/admin/reviews`,
+                    partnerName: partnerReply.authorName || '',
+                    replyContent: partnerReply.replyContent || '',
+                    foodName,
+                    reviewerName,
+                    orderCode: order?.attributes?.title,
+                    threadTs: review?.attributes?.metadata?.slackThreadTs,
+                  },
                 },
               ),
             ]);

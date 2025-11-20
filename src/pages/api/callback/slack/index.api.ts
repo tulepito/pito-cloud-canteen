@@ -14,6 +14,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           event_type: string;
           event_payload: {
             plan_id?: string;
+            rating_id?: string;
           };
         };
       };
@@ -32,6 +33,19 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
           integrationSdk.listings.update({
             id: planId,
+            metadata: {
+              slackThreadTs: event?.ts,
+            },
+          });
+        }
+        break;
+
+      case ESlackNotificationType.PARTICIPANT_RATING:
+        {
+          const ratingId = event?.metadata?.event_payload.rating_id;
+
+          integrationSdk.listings.update({
+            id: ratingId,
             metadata: {
               slackThreadTs: event?.ts,
             },
