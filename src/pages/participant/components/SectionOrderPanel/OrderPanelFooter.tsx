@@ -5,6 +5,7 @@ import Button from '@components/Button/Button';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { useViewport } from '@hooks/useViewport';
 import { verifyAllFoodPickedWithParticipant } from '@pages/participant/helpers';
+import type { TMemberPlan } from '@redux/slices/shoppingCart.slice';
 
 import css from './SectionOrderPanel.module.scss';
 
@@ -16,12 +17,7 @@ type TOrderPanelFooter = {
   handleRemoveAllItem: () => void;
   cartListKeys?: string[];
   orderDetailIds: string[];
-  cartList: {
-    [dayId: number]: {
-      foodId: string;
-      requirement: string;
-    };
-  };
+  cartList: TMemberPlan;
 };
 
 const OrderPanelFooter: React.FC<TOrderPanelFooter> = ({
