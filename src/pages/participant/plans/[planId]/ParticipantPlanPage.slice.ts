@@ -3,8 +3,12 @@ import difference from 'lodash/difference';
 
 import { participantSubOrderAddDocumentApi } from '@apis/firebaseApi';
 import { loadPlanDataApi, updateParticipantOrderApi } from '@apis/index';
+import {
+  pickRandomFood,
+  pickRandomFoodExcludingIds,
+} from '@helpers/foodPickerHelpers';
 import { sleep } from '@helpers/index';
-import { recommendFood } from '@pages/participant/orders/OrderList.slice';
+import { useIsAllowAddSecondFood } from '@hooks/useIsAllowAddSecondFood';
 import { createAsyncThunk } from '@redux/redux.helper';
 import {
   shoppingCartActions,
@@ -54,52 +58,30 @@ const recommendFoodForShoppingCart = ({
   const subOrder = plan[subOrderDate];
   const { foodList } = subOrder;
 
-  const getFoodIdList = (foods: TListing[]) =>
-    foods.map((food: TListing) => Listing(food).getId());
-
+  // get the list of foods with suitable price
   const suitablePriceFoodList = foodList.filter((food: TListing) => {
     return Listing(food).getAttributes().price.amount <= packagePerMember;
   });
 
-  const pickRandomFood = (foods: TListing[]) => {
-    if (!foods.length) {
-      return undefined;
-    }
-
-    return recommendFood({
-      foodList: foods,
-      subOrderFoodIds: getFoodIdList(foods),
-      allergies,
-    });
-  };
-
-  const pickRandomFoodExcludingIds = (
-    foods: TListing[],
-    excludeIds: string[] = [],
-  ) => {
-    const filteredFoods = foods.filter((food: TListing) => {
-      const foodId = Listing(food).getId();
-
-      return !excludeIds.includes(foodId);
-    });
-
-    return pickRandomFood(filteredFoods);
-  };
-
-  let mostSuitableFood = pickRandomFood(suitablePriceFoodList);
+  // pick a random food from the list of foods with suitable price without allergies
+  let mostSuitableFood = pickRandomFood(suitablePriceFoodList, allergies);
 
   if (currentMealId) {
+    // if the current meal id is not in the list of foods with suitable price,
+    // pick a random food from the list of foods with suitable price excluding the current meal id
     const alternativeExcludeIds = [currentMealId];
     const alternativeFood = pickRandomFoodExcludingIds(
       suitablePriceFoodList,
       alternativeExcludeIds,
     );
 
+    // if the alternative food is found, set it as the most suitable food
     if (alternativeFood) {
       mostSuitableFood = alternativeFood;
     }
   }
 
+  // if the most suitable food is not found, return an empty object
   if (!mostSuitableFood) {
     return { foodName: '' };
   }
@@ -119,6 +101,20 @@ const recommendFoodForShoppingCart = ({
     (name) => primaryFoodTitle?.includes(name),
   );
 
+  // remove secondary food if it is a single selection food
+  if (isAllowAddSecondFood && isPrimarySingleSelectionFood) {
+    dispatch(
+      shoppingCartThunks.removeFromCart({
+        planId: plans[0],
+        dayId: subOrderDate,
+        removeSecondFood: true,
+      }),
+    );
+  }
+
+  let secondaryFood;
+  // Check if is allow add second food and the primary food is not a single selection food
+  // and the list of foods with suitable price has more than 1 food
   if (
     isAllowAddSecondFood &&
     !isPrimarySingleSelectionFood &&
@@ -144,7 +140,7 @@ const recommendFoodForShoppingCart = ({
       currentSecondaryMealId,
     ].filter(Boolean) as string[];
 
-    const secondaryFood = pickRandomFoodExcludingIds(
+    secondaryFood = pickRandomFoodExcludingIds(
       secondaryCandidates,
       excludedSecondaryIds,
     );
@@ -162,9 +158,15 @@ const recommendFoodForShoppingCart = ({
       );
     }
   }
+  const secondaryFoodTitle =
+    isAllowAddSecondFood && secondaryFood
+      ? Listing(secondaryFood as TListing).getAttributes().title
+      : '';
 
   return {
-    foodName: primaryFoodTitle,
+    foodName: `${primaryFoodTitle}${
+      secondaryFoodTitle ? ` + ${secondaryFoodTitle}` : ''
+    }`,
   };
 };
 
@@ -204,10 +206,7 @@ const loadData = createAsyncThunk(
     const response = await loadPlanDataApi(planId);
     const { plan, order } = response?.data?.data || {};
     const orderDays = Object.keys(plan);
-    const isAllowAddSecondFood =
-      process.env.NEXT_PUBLIC_COMPANIES_ALLOWING_SECOND_FOOD?.includes(
-        Listing(order as TListing).getMetadata().companyId ?? '',
-      ) ?? false;
+    const isAllowAddSecondFood = useIsAllowAddSecondFood(order as TListing);
 
     orderDays.forEach((day) => {
       const {
