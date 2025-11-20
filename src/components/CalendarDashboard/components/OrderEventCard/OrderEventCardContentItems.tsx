@@ -32,6 +32,7 @@ const EventCardContent: React.FC<TEventCardContentProps> = ({
     expiredTime,
     isOrderStarted = false,
     foodName,
+    secondaryFoodName,
     status,
     pickedFoodDetail,
   } = event?.resource || {};
@@ -44,9 +45,17 @@ const EventCardContent: React.FC<TEventCardContentProps> = ({
     status,
   );
 
-  const image = Listing(pickedFoodDetail).getImages()[0];
+  const pickedFoodListing =
+    pickedFoodDetail && pickedFoodDetail.id?.uuid
+      ? Listing(pickedFoodDetail)
+      : null;
+  const image = pickedFoodListing
+    ? pickedFoodListing.getImages()[0]
+    : undefined;
 
   const showCoverImage = [EParticipantOrderStatus.joined].includes(status);
+  const hasSecondaryFood =
+    status === EParticipantOrderStatus.joined && !!secondaryFoodName;
 
   return (
     <>
@@ -64,6 +73,11 @@ const EventCardContent: React.FC<TEventCardContentProps> = ({
       <RenderWhen condition={status === EParticipantOrderStatus.joined}>
         <OrderEventCardContentItem icon={<IconDish />}>
           <span>{foodName}</span>
+        </OrderEventCardContentItem>
+      </RenderWhen>
+      <RenderWhen condition={hasSecondaryFood}>
+        <OrderEventCardContentItem icon={<IconDish />}>
+          <span>{secondaryFoodName}</span>
         </OrderEventCardContentItem>
       </RenderWhen>
 

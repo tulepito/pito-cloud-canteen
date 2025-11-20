@@ -3,6 +3,7 @@ import difference from 'lodash/difference';
 
 import { participantSubOrderAddDocumentApi } from '@apis/firebaseApi';
 import { loadPlanDataApi, updateParticipantOrderApi } from '@apis/index';
+import { sleep } from '@helpers/index';
 import { recommendFood } from '@pages/participant/orders/OrderList.slice';
 import { createAsyncThunk } from '@redux/redux.helper';
 import {
@@ -261,8 +262,8 @@ const reloadData = createAsyncThunk(
   async (planId: string, { getState, dispatch }) => {
     const { currentUser } = getState().user;
     const currentUserId = currentUser?.id?.uuid;
-    const response: any = await loadPlanDataApi(planId);
-    const plan = response?.data?.data?.plan;
+    const response = await loadPlanDataApi(planId);
+    const { plan } = response?.data?.data || {};
     const orderDays = Object.keys(plan);
 
     dispatch(shoppingCartThunks.removeAllFromPlanCart({ planId }));
@@ -382,6 +383,8 @@ const updateOrder = createAsyncThunk(
     const {
       data: { jobId },
     } = await updateParticipantOrderApi(orderId, updateValues);
+
+    await sleep(2000); // wait for the order to be updated
     await dispatch(reloadData(planId));
     // firebase documents for history sub-orders and rating feature
     await Promise.all(

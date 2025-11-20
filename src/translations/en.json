@@ -1477,6 +1477,7 @@
   "ParticipantSpecialDemandRoute.title": "Special requests",
   "ParticipantSubOrdersRoute.description": "Ordered dishes",
   "ParticipantSubOrdersRoute.title": "Ordered dishes",
+  "OrderEventCardStatus.notPicked": "Not picked",
   "PartnerAccountSettingsRoute.description": "Partner | Account settings",
   "PartnerAccountSettingsRoute.title": "Partner | Account settings",
   "PartnerChangePasswordRoute.description": "Partner | Change password",
