@@ -19,6 +19,10 @@ import {
 import { disableWalkthroughApi } from '@apis/userApi';
 import { getFoodQuery } from '@helpers/listingSearchQuery';
 import { markColorForOrder } from '@helpers/orderHelper';
+import {
+  getIsAllowAddSecondFood,
+  useIsAllowAddSecondFood,
+} from '@hooks/useIsAllowAddSecondFood';
 import type { POSTParticipantRating } from '@pages/api/participants/ratings/index.api';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { ParticipantOrderManagementActions } from '@redux/slices/ParticipantOrderManagementPage.slice';
@@ -269,44 +273,6 @@ const updateRecommendFoodToOrderDetail = ({
   );
 
   return newOrderDetail;
-};
-
-/**
- * Get whether to allow adding a second food
- * @param companyOrId - The company id or the user
- * @returns Whether to allow adding a second food
- */
-const getIsAllowAddSecondFood = (companyOrId?: TUser | string | null) => {
-  if (!companyOrId) return false;
-
-  const companyId =
-    typeof companyOrId === 'string' ? companyOrId : companyOrId?.id?.uuid;
-
-  if (!companyId) return false;
-
-  return (
-    process.env.NEXT_PUBLIC_COMPANIES_ALLOWING_SECOND_FOOD?.includes(
-      companyId,
-    ) ?? false
-  );
-};
-
-/**
- * Get the company id from an order listing
- * @param order - The order listing
- * @returns The company id
- */
-const getCompanyIdFromOrderListing = (order?: TListing | {}) => {
-  if (
-    order &&
-    typeof order === 'object' &&
-    'id' in order &&
-    (order as TListing).id?.uuid
-  ) {
-    return Listing(order as TListing).getMetadata().companyId;
-  }
-
-  return undefined;
 };
 
 /**
@@ -561,25 +527,18 @@ const pickFoodForSubOrders = createAsyncThunk(
     { getState, extra: sdk, dispatch },
   ) => {
     const { recommendFrom, recommendSubOrders } = payload;
-    const {
-      orders: orderListOrders,
-      allPlans: orderListAllPlans,
-      isAllowAddSecondFood: listAllowSecondFood,
-    } = getState().ParticipantOrderList;
+    const { orders: orderListOrders, allPlans: orderListAllPlans } =
+      getState().ParticipantOrderList;
     const { order: detailOrderOrder, plans: detailOrderPlans } =
       getState().ParticipantOrderManagementPage;
     const orders =
       recommendFrom === 'orderList' ? orderListOrders : [detailOrderOrder];
     const allPlans =
       recommendFrom === 'orderList' ? orderListAllPlans : detailOrderPlans;
+
     const { currentUser } = getState().user;
     const currentUserGetter = CurrentUser(currentUser!);
     const { allergies = [] } = currentUserGetter.getPublicData();
-    const detailCompanyId = getCompanyIdFromOrderListing(detailOrderOrder);
-    const isAllowAddSecondFood =
-      recommendFrom === 'orderList'
-        ? listAllowSecondFood
-        : getIsAllowAddSecondFood(detailCompanyId);
 
     const foodIdChunkList = recommendSubOrders.map(
       (item) =>
@@ -613,6 +572,24 @@ const pickFoodForSubOrders = createAsyncThunk(
 
     const groupedFoodBySubOrderDate: TGroupedRecommendedFood =
       recommendSubOrders.reduce((result: any, item, index: number) => {
+        // Find the correct order for this subOrder to get isAllowAddSecondFood
+        const targetOrder = orders.find(
+          (_order: TListing) => _order.id.uuid === item.orderId,
+        );
+
+        if (!targetOrder) {
+          console.error(
+            `pickFoodForSubOrders: Order ${item.orderId} not found for subOrder ${item.subOrderDate}`,
+          );
+
+          return result;
+        }
+
+        // Get isAllowAddSecondFood from the correct order for this subOrder
+        const isAllowAddSecondFood = useIsAllowAddSecondFood(
+          targetOrder as TListing,
+        );
+
         const subOrderFoodIds = foodIdChunkList[index] || [];
         const meals = buildRecommendedMealsForSubOrder({
           foodList: foodsResponse,
@@ -706,26 +683,37 @@ const pickFoodForSpecificSubOrder = createAsyncThunk(
     { getState, extra: sdk, dispatch },
   ) => {
     const { recommendFrom, recommendSubOrder } = payload;
-    const { planId, subOrderDate } = recommendSubOrder;
-    const {
-      orders: orderListOrders,
-      allPlans: orderListAllPlans,
-      isAllowAddSecondFood: listAllowSecondFood,
-    } = getState().ParticipantOrderList;
+    const { planId, subOrderDate, orderId } = recommendSubOrder;
+    const { orders: orderListOrders, allPlans: orderListAllPlans } =
+      getState().ParticipantOrderList;
     const { order: detailOrderOrder, plans: detailOrderPlans } =
       getState().ParticipantOrderManagementPage;
     const orders =
       recommendFrom === 'orderList' ? orderListOrders : [detailOrderOrder];
     const allPlans =
       recommendFrom === 'orderList' ? orderListAllPlans : detailOrderPlans;
+
+    // Find the correct order based on orderId
+    const targetOrder = orders.find(
+      (_order: TListing) => _order.id.uuid === orderId,
+    );
+
+    if (!targetOrder) {
+      console.error(
+        `pickFoodForSpecificSubOrder: Order ${orderId} not found in orders list`,
+      );
+
+      return recommendFrom === 'orderList' ? allPlans : orderListAllPlans;
+    }
+
     const { currentUser } = getState().user;
     const currentUserGetter = CurrentUser(currentUser!);
     const { allergies = [] } = currentUserGetter.getPublicData();
-    const detailCompanyId = getCompanyIdFromOrderListing(detailOrderOrder);
-    const isAllowAddSecondFood =
-      recommendFrom === 'orderList'
-        ? listAllowSecondFood
-        : getIsAllowAddSecondFood(detailCompanyId);
+
+    // Get isAllowAddSecondFood from the correct order, not from detailOrderOrder
+    const isAllowAddSecondFood = useIsAllowAddSecondFood(
+      targetOrder as TListing,
+    );
 
     const foodIdList = getFoodIdListWithSuitablePrice({
       payload: recommendSubOrder,
