@@ -13,7 +13,7 @@ export type TLineItem = {
 export type TCartItem = {
   status?: EParticipantOrderStatus;
   foodId: string;
-  requirement: string;
+  requirement?: string;
   secondaryFoodId?: string;
   secondaryRequirement?: string;
 };

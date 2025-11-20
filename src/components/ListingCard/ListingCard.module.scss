@@ -9,10 +9,6 @@
   display: flex;
   flex-direction: column;
 
-  @include viewportMedium {
-    min-width: 280px;
-  }
-
   @include viewportLarge {
     min-width: unset;
   }

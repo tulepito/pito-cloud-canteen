@@ -151,6 +151,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                 if (foodId) {
                   pickedFoodIds.push(foodId);
                 }
+                const secondaryFoodId =
+                  memberOrders[currentUser.id.uuid]?.secondaryFoodId;
+                if (secondaryFoodId) {
+                  pickedFoodIds.push(secondaryFoodId);
+                }
               }
             });
 

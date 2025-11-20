@@ -26,6 +26,7 @@ import { userThunks } from '@redux/slices/user.slice';
 import type { FoodListing, ParticipantSubOrderDocument } from '@src/types';
 import type { TUpdateParticipantOrderBody } from '@src/types/order';
 import type { Image, VariantKey } from '@src/types/utils';
+import { PICKING_ONLY_ONE_FOOD_NAMES } from '@src/utils/constants';
 import {
   CurrentUser,
   denormalisedResponseEntities,
@@ -85,6 +86,7 @@ type TOrderListState = {
   pickFoodForSpecificSubOrderError: any;
 
   company: TUser | null;
+  isAllowAddSecondFood: boolean;
 };
 const initialState: TOrderListState = {
   updateProfileInProgress: false,
@@ -130,6 +132,7 @@ const initialState: TOrderListState = {
   pickFoodForSpecificSubOrderError: null,
 
   company: null,
+  isAllowAddSecondFood: false,
 };
 
 export const getFoodIdListWithSuitablePrice = ({
@@ -200,6 +203,19 @@ export const recommendFood = ({
   ];
 };
 
+type TGroupedRecommendedFood = Record<
+  string,
+  Record<string, { primary?: FoodListing; secondary?: FoodListing }>
+>;
+
+/**
+ * Update the recommended food to the order detail
+ * @param allPlans - The list of plans
+ * @param planId - The plan id
+ * @param currentUserGetter - The current user getter
+ * @param groupedFood - The grouped food
+ * @returns The updated order detail
+ */
 const updateRecommendFoodToOrderDetail = ({
   allPlans,
   planId,
@@ -209,14 +225,24 @@ const updateRecommendFoodToOrderDetail = ({
   allPlans: TListing[];
   planId: string;
   currentUserGetter: any;
-  groupedFood: any;
+  groupedFood: TGroupedRecommendedFood;
 }) => {
   const plan = allPlans.find((_plan) => _plan.id.uuid === planId);
   const planListing = Listing(plan!);
   const { orderDetail = {} } = planListing.getMetadata();
   const newOrderDetail = Object.keys(orderDetail).reduce(
     (newOrderDetailResult: any, subOrderDate: string) => {
-      if (!groupedFood[planId][subOrderDate]?.id?.uuid)
+      const recommendedFood = groupedFood?.[planId]?.[subOrderDate];
+      const primaryFood = recommendedFood?.primary as TListing | undefined;
+      const secondaryFood = recommendedFood?.secondary as TListing | undefined;
+      const primaryFoodId = primaryFood
+        ? Listing(primaryFood).getId()
+        : undefined;
+      const secondaryFoodId = secondaryFood
+        ? Listing(secondaryFood).getId()
+        : undefined;
+
+      if (!primaryFoodId)
         return {
           ...newOrderDetailResult,
           [subOrderDate]: {
@@ -231,8 +257,9 @@ const updateRecommendFoodToOrderDetail = ({
           memberOrders: {
             ...orderDetail[subOrderDate]?.memberOrders,
             [currentUserGetter.getId()]: {
-              foodId: groupedFood[planId][subOrderDate].id.uuid,
+              foodId: primaryFoodId,
               status: EParticipantOrderStatus.joined,
+              ...(secondaryFoodId && { secondaryFoodId }),
             },
           },
         },
@@ -242,6 +269,138 @@ const updateRecommendFoodToOrderDetail = ({
   );
 
   return newOrderDetail;
+};
+
+/**
+ * Get whether to allow adding a second food
+ * @param companyOrId - The company id or the user
+ * @returns Whether to allow adding a second food
+ */
+const getIsAllowAddSecondFood = (companyOrId?: TUser | string | null) => {
+  if (!companyOrId) return false;
+
+  const companyId =
+    typeof companyOrId === 'string' ? companyOrId : companyOrId?.id?.uuid;
+
+  if (!companyId) return false;
+
+  return (
+    process.env.NEXT_PUBLIC_COMPANIES_ALLOWING_SECOND_FOOD?.includes(
+      companyId,
+    ) ?? false
+  );
+};
+
+/**
+ * Get the company id from an order listing
+ * @param order - The order listing
+ * @returns The company id
+ */
+const getCompanyIdFromOrderListing = (order?: TListing | {}) => {
+  if (
+    order &&
+    typeof order === 'object' &&
+    'id' in order &&
+    (order as TListing).id?.uuid
+  ) {
+    return Listing(order as TListing).getMetadata().companyId;
+  }
+
+  return undefined;
+};
+
+/**
+ * Build recommended meals for a sub order
+ * @param foodList - The list of foods to recommend
+ * @param subOrderFoodIds - The list of food ids for the sub order
+ * @param allergies - The list of allergies for the user
+ * @param isAllowAddSecondFood - Whether to allow adding a second food
+ * @returns The recommended meals for the sub order
+ */
+const buildRecommendedMealsForSubOrder = ({
+  foodList,
+  subOrderFoodIds,
+  allergies,
+  isAllowAddSecondFood,
+}: {
+  foodList: FoodListing[];
+  subOrderFoodIds: string[];
+  allergies: string[];
+  isAllowAddSecondFood: boolean;
+}): { primary?: FoodListing; secondary?: FoodListing } => {
+  const primaryFood = recommendFood({
+    foodList,
+    subOrderFoodIds,
+    allergies,
+  });
+
+  if (!primaryFood) {
+    return {};
+  }
+
+  if (!isAllowAddSecondFood) {
+    return { primary: primaryFood };
+  }
+
+  const primaryListing = Listing(primaryFood as TListing);
+  const primaryFoodId = primaryListing.getId();
+  const primaryTitle = primaryListing.getAttributes().title || '';
+  const isPrimarySingleSelectionFood = PICKING_ONLY_ONE_FOOD_NAMES.some(
+    (name) => primaryTitle?.includes(name),
+  );
+
+  if (isPrimarySingleSelectionFood) {
+    return { primary: primaryFood };
+  }
+
+  const secondaryCandidateIds = subOrderFoodIds.filter(
+    (foodId) => foodId && foodId !== primaryFoodId,
+  );
+
+  if (!secondaryCandidateIds.length) {
+    return { primary: primaryFood };
+  }
+
+  const secondaryCandidates = foodList.filter((food) => {
+    const listing = Listing(food as TListing);
+    const foodId = listing.getId();
+    if (!foodId || !secondaryCandidateIds.includes(foodId)) {
+      return false;
+    }
+
+    const title = listing.getAttributes().title || '';
+    const isSingleSelectionFood = PICKING_ONLY_ONE_FOOD_NAMES.some((name) =>
+      title?.includes(name),
+    );
+
+    return !isSingleSelectionFood;
+  });
+
+  if (!secondaryCandidates.length) {
+    return { primary: primaryFood };
+  }
+
+  const secondaryFood = recommendFood({
+    foodList: secondaryCandidates,
+    subOrderFoodIds: secondaryCandidateIds,
+    allergies,
+  });
+
+  if (!secondaryFood) {
+    return { primary: primaryFood };
+  }
+
+  const secondaryListing = Listing(secondaryFood as TListing);
+  const secondaryFoodId = secondaryListing.getId();
+
+  if (!secondaryFoodId || secondaryFoodId === primaryFoodId) {
+    return { primary: primaryFood };
+  }
+
+  return {
+    primary: primaryFood,
+    secondary: secondaryFood,
+  };
 };
 // ================ Thunk types ================ //
 const DISABLE_WALKTHROUGH = 'app/ParticipantOrderList/DISABLE_WALKTHROUGH';
@@ -402,8 +561,11 @@ const pickFoodForSubOrders = createAsyncThunk(
     { getState, extra: sdk, dispatch },
   ) => {
     const { recommendFrom, recommendSubOrders } = payload;
-    const { orders: orderListOrders, allPlans: orderListAllPlans } =
-      getState().ParticipantOrderList;
+    const {
+      orders: orderListOrders,
+      allPlans: orderListAllPlans,
+      isAllowAddSecondFood: listAllowSecondFood,
+    } = getState().ParticipantOrderList;
     const { order: detailOrderOrder, plans: detailOrderPlans } =
       getState().ParticipantOrderManagementPage;
     const orders =
@@ -413,6 +575,11 @@ const pickFoodForSubOrders = createAsyncThunk(
     const { currentUser } = getState().user;
     const currentUserGetter = CurrentUser(currentUser!);
     const { allergies = [] } = currentUserGetter.getPublicData();
+    const detailCompanyId = getCompanyIdFromOrderListing(detailOrderOrder);
+    const isAllowAddSecondFood =
+      recommendFrom === 'orderList'
+        ? listAllowSecondFood
+        : getIsAllowAddSecondFood(detailCompanyId);
 
     const foodIdChunkList = recommendSubOrders.map(
       (item) =>
@@ -432,7 +599,7 @@ const pickFoodForSubOrders = createAsyncThunk(
       }),
     );
 
-    const foodsResponse: TListing[] = flatten(
+    const foodsResponse: FoodListing[] = flatten(
       await Promise.all(
         foodQueries.map(async (foodQuery) => {
           const response = denormalisedResponseEntities(
@@ -442,27 +609,30 @@ const pickFoodForSubOrders = createAsyncThunk(
           return response;
         }),
       ),
-    );
+    ) as FoodListing[];
 
-    const groupedFoodBySubOrderDate = recommendSubOrders.reduce(
-      (result: any, item, index: number) => {
-        const subOrderFoodIds = foodIdChunkList[index];
-        const mostSuitableFood = recommendFood({
+    const groupedFoodBySubOrderDate: TGroupedRecommendedFood =
+      recommendSubOrders.reduce((result: any, item, index: number) => {
+        const subOrderFoodIds = foodIdChunkList[index] || [];
+        const meals = buildRecommendedMealsForSubOrder({
           foodList: foodsResponse,
           subOrderFoodIds,
           allergies,
+          isAllowAddSecondFood,
         });
+
+        if (!meals.primary) {
+          return result;
+        }
 
         return {
           ...result,
           [item.planId]: {
             ...result[item.planId],
-            [item.subOrderDate]: mostSuitableFood,
+            [item.subOrderDate]: meals,
           },
         };
-      },
-      {},
-    );
+      }, {});
 
     const mappedRecommendFoodToOrderDetail = Object.keys(
       groupedFoodBySubOrderDate,
@@ -537,8 +707,11 @@ const pickFoodForSpecificSubOrder = createAsyncThunk(
   ) => {
     const { recommendFrom, recommendSubOrder } = payload;
     const { planId, subOrderDate } = recommendSubOrder;
-    const { orders: orderListOrders, allPlans: orderListAllPlans } =
-      getState().ParticipantOrderList;
+    const {
+      orders: orderListOrders,
+      allPlans: orderListAllPlans,
+      isAllowAddSecondFood: listAllowSecondFood,
+    } = getState().ParticipantOrderList;
     const { order: detailOrderOrder, plans: detailOrderPlans } =
       getState().ParticipantOrderManagementPage;
     const orders =
@@ -548,6 +721,11 @@ const pickFoodForSpecificSubOrder = createAsyncThunk(
     const { currentUser } = getState().user;
     const currentUserGetter = CurrentUser(currentUser!);
     const { allergies = [] } = currentUserGetter.getPublicData();
+    const detailCompanyId = getCompanyIdFromOrderListing(detailOrderOrder);
+    const isAllowAddSecondFood =
+      recommendFrom === 'orderList'
+        ? listAllowSecondFood
+        : getIsAllowAddSecondFood(detailCompanyId);
 
     const foodIdList = getFoodIdListWithSuitablePrice({
       payload: recommendSubOrder,
@@ -564,7 +742,7 @@ const pickFoodForSpecificSubOrder = createAsyncThunk(
       }),
     );
 
-    const foodsResponse: TListing[] = flatten(
+    const foodsResponse: FoodListing[] = flatten(
       await Promise.all(
         foodQueries.map(async (foodQuery) => {
           const response = denormalisedResponseEntities(
@@ -574,17 +752,22 @@ const pickFoodForSpecificSubOrder = createAsyncThunk(
           return response;
         }),
       ),
-    );
+    ) as FoodListing[];
 
-    const mostSuitableFood = recommendFood({
+    const meals = buildRecommendedMealsForSubOrder({
       foodList: foodsResponse,
-      subOrderFoodIds: foodIdList,
+      subOrderFoodIds: foodIdList || [],
       allergies,
+      isAllowAddSecondFood,
     });
 
-    const groupedFood = {
+    if (!meals.primary) {
+      return recommendFrom === 'orderList' ? allPlans : orderListAllPlans;
+    }
+
+    const groupedFood: TGroupedRecommendedFood = {
       [planId]: {
-        [subOrderDate]: mostSuitableFood,
+        [subOrderDate]: meals,
       },
     };
 
@@ -723,6 +906,7 @@ const OrderListSlice = createSlice({
           ...payload.mappingSubOrderToOrder,
         };
         state.company = payload.company;
+        state.isAllowAddSecondFood = getIsAllowAddSecondFood(payload.company);
         state.foodsInPlans = payload.foodsInPlans;
       })
       .addCase(fetchOrders.rejected, (state, { error }) => {
