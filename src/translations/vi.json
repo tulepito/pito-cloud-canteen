@@ -1525,6 +1525,7 @@
   "ParticipantSpecialDemandRoute.title": "Yêu cầu đặc biệt",
   "ParticipantSubOrdersRoute.description": "Món đã đặt",
   "ParticipantSubOrdersRoute.title": "Món đã đặt",
+  "OrderEventCardStatus.notPicked": "Không chọn món",
   "PartnerAccountSettingsRoute.description": "Đối tác | Cài đặt tài khoản",
   "PartnerAccountSettingsRoute.title": "Đối tác | Cài đặt tài khoản",
   "PartnerChangePasswordRoute.description": "Đối tác | Đổi mật khẩu",

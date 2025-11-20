@@ -150,6 +150,12 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
 
       const alreadyPickFood = !!foodSelection?.foodId;
       const pickedFoodDetail = pickedFoodsMapById.get(foodSelection?.foodId);
+      const pickedSecondaryFoodDetail = pickedFoodsMapById.get(
+        foodSelection?.secondaryFoodId,
+      );
+      const secondaryFoodName = dishes.find(
+        (_dish) => _dish.key === foodSelection?.secondaryFoodId,
+      )?.value;
 
       const expiredTime = deadlineDate
         ? DateTime.fromMillis(+deadlineDate)
@@ -200,11 +206,14 @@ const OrderCalendarView: React.FC<TOrderCalendarViewProps> = (props) => {
           lastTransition,
           foodName: dishes.find((_dish) => _dish.key === foodSelection?.foodId)
             ?.value,
+          secondaryFoodName,
           barcode: foodSelection?.barcode,
           isOrderStarted:
             orderStateHistory.findIndex(
               (history: TObject) => history.state === EOrderStates.inProgress,
             ) !== -1,
+          pickedSecondaryFoodDetail,
+          secondaryDishSelection: foodSelection?.secondaryFoodId,
         },
         title: orderTitle,
         start: DateTime.fromMillis(+planItemKey).toJSDate(),

@@ -71,7 +71,7 @@ const OrderEventCardStatus: React.FC<TOrderEventCardStatusProps> = ({
   if (!!lastTransition && !isFoodPicked) {
     extendStatusData = {
       type: EBadgeType.default,
-      label: intl.formatMessage({ id: 'khong-chon-mon' }),
+      label: intl.formatMessage({ id: 'OrderEventCardStatus.notPicked' }),
     };
   }
 
@@ -81,9 +81,7 @@ const OrderEventCardStatus: React.FC<TOrderEventCardStatusProps> = ({
         <Badge
           className={css.badge}
           type={extendStatusData.type}
-          label={intl.formatMessage({
-            id: extendStatusData.label,
-          })}
+          label={extendStatusData.label}
         />
       </>
     );
