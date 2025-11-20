@@ -41,10 +41,12 @@ const useVerifyPermission = () => {
     (state) => state.user,
   );
 
+  const isEventsRoute = pathName?.startsWith('/participant/events');
+
   const isMatchedPermission = isEmpty(roles)
     ? null
     : currentUser
-    ? isPathMatchedPermission(pathName, userPermission)
+    ? isEventsRoute || isPathMatchedPermission(pathName, userPermission)
     : null;
 
   const isIgnoredPermissionCheck =

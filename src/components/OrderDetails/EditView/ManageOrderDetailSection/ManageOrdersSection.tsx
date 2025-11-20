@@ -79,7 +79,13 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
   const { maxQuantity, minQuantity } = restaurant;
 
   const handleSubmitAddSelection = async (values: TAddOrderFormValues) => {
-    const { participantId, requirement = '', foodId } = values;
+    const {
+      participantId,
+      requirement = '',
+      foodId,
+      secondaryFoodId,
+      secondaryRequirement,
+    } = values;
     const selectParticipantValue = participantId.key;
     const isUsingEmail = EMAIL_RE.test(selectParticipantValue);
 
@@ -100,6 +106,8 @@ const ManageOrdersSection: React.FC<TManageOrdersSectionProps> = (props) => {
       currentViewDate,
       isAdminFlow,
       ...memberInfo,
+      ...(secondaryFoodId && { secondaryFoodId }),
+      ...(secondaryRequirement && { secondaryRequirement }),
     };
 
     if (isDraftEditing) {

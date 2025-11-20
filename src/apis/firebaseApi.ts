@@ -26,6 +26,7 @@ export type ParticipantSubOrderUpdateDocumentApiBody = {
     reviewId?: string;
     status?: string;
     foodId?: string;
+    secondaryFoodId?: string;
   };
 };
 export const participantSubOrderUpdateDocumentApi = async (

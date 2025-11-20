@@ -1,18 +1,21 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 import { createAsyncThunk } from '@redux/redux.helper';
+import type { TCartItem } from '@src/types/order';
 import type { TCurrentUser } from '@utils/types';
 
-type TShoppingCartState = {
+export type TMemberPlan = {
+  [dayId: string]: TCartItem;
+};
+
+export type TMemberPlans = {
+  [planId: string]: TMemberPlan;
+};
+
+export type TShoppingCartState = {
+  isAllowAddSecondFood: boolean;
   orders: {
-    [memberId: string]: {
-      [planId: string]: {
-        [dayId: number]: {
-          foodId: string;
-          requirement: string;
-        };
-      };
-    };
+    [memberId: string]: TMemberPlans;
   };
 };
 
@@ -23,6 +26,7 @@ const REMOVE_ALL_FROM_PLAN_CART = 'app/ShoppingCart/REMOVE_ALL_FROM_PLAN_CART';
 
 const initialState: TShoppingCartState = {
   orders: {},
+  isAllowAddSecondFood: false,
 };
 
 // ================ Slice ================ //
@@ -41,6 +45,7 @@ export const shoppingCartSlice = createSlice({
           dayId: string;
           mealId: string;
           requirement?: string;
+          isSecondFood?: boolean;
         };
       },
     ) => {
@@ -50,8 +55,57 @@ export const shoppingCartSlice = createSlice({
         dayId,
         mealId: foodId,
         requirement = '',
+        isSecondFood = false,
       } = payload || {};
 
+      const currentCartItem = state.orders?.[currentUserId]?.[planId]?.[
+        dayId
+      ] || {
+        foodId: '',
+        requirement: '',
+      };
+
+      if (foodId === 'notJoined') {
+        return {
+          ...state,
+          orders: {
+            ...state.orders,
+            [currentUserId]: {
+              ...(state.orders?.[currentUserId] || {}),
+              [planId]: {
+                ...(state.orders?.[currentUserId]?.[planId] || {}),
+                [dayId]: {
+                  foodId,
+                  requirement: '',
+                },
+              },
+            },
+          },
+        };
+      }
+
+      // Nếu là món thứ 2, thêm vào secondaryFoodId
+      if (isSecondFood) {
+        return {
+          ...state,
+          orders: {
+            ...state.orders,
+            [currentUserId]: {
+              ...(state.orders?.[currentUserId] || {}),
+              [planId]: {
+                ...(state.orders?.[currentUserId]?.[planId] || {}),
+                [dayId]: {
+                  ...currentCartItem,
+                  secondaryFoodId: foodId,
+                  secondaryRequirement: requirement,
+                },
+              },
+            },
+          },
+        };
+      }
+
+      // Nếu là món đầu tiên, thay thế hoàn toàn
       return {
         ...state,
         orders: {
@@ -63,6 +117,11 @@ export const shoppingCartSlice = createSlice({
               [dayId]: {
                 foodId,
                 requirement,
+                // Giữ lại món thứ 2 nếu có
+                ...(currentCartItem.secondaryFoodId && {
+                  secondaryFoodId: currentCartItem.secondaryFoodId,
+                  secondaryRequirement: currentCartItem.secondaryRequirement,
+                }),
               },
             },
           },
@@ -78,11 +137,64 @@ export const shoppingCartSlice = createSlice({
           currentUserId: string;
           planId: string;
           dayId: string;
+          removeSecondFood?: boolean; // Flag để xóa món thứ 2 thay vì món đầu
         };
       },
     ) => {
-      const { currentUserId, planId, dayId } = payload || {};
+      const {
+        currentUserId,
+        planId,
+        dayId,
+        removeSecondFood = false,
+      } = payload || {};
+      const currentCartItem =
+        state.orders?.[currentUserId]?.[planId]?.[dayId] || {};
 
+      // Nếu xóa món thứ 2, chỉ xóa secondaryFoodId
+      if (removeSecondFood) {
+        return {
+          ...state,
+          orders: {
+            ...state.orders,
+            [currentUserId]: {
+              ...(state.orders?.[currentUserId] || {}),
+              [planId]: {
+                ...(state.orders?.[currentUserId]?.[planId] || {}),
+                [dayId]: {
+                  ...currentCartItem,
+                  secondaryFoodId: undefined,
+                  secondaryRequirement: undefined,
+                },
+              },
+            },
+          },
+        };
+      }
+
+      // UX: Nếu xóa món đầu tiên và có món thứ 2, đẩy món thứ 2 lên làm món 1
+      if (currentCartItem.secondaryFoodId) {
+        return {
+          ...state,
+          orders: {
+            ...state.orders,
+            [currentUserId]: {
+              ...(state.orders?.[currentUserId] || {}),
+              [planId]: {
+                ...(state.orders?.[currentUserId]?.[planId] || {}),
+                [dayId]: {
+                  foodId: currentCartItem.secondaryFoodId,
+                  requirement: currentCartItem.secondaryRequirement || '',
+                  // Xóa món thứ 2 sau khi đẩy lên
+                  secondaryFoodId: undefined,
+                  secondaryRequirement: undefined,
+                },
+              },
+            },
+          },
+        };
+      }
+
+      // Xóa toàn bộ nếu không có món thứ 2
       return {
         ...state,
         orders: {
@@ -145,7 +257,14 @@ const addToCartThunk = createAsyncThunk(
       dayId,
       mealId,
       requirement,
-    }: { planId: string; dayId: string; mealId: string; requirement?: string },
+      isSecondFood,
+    }: {
+      planId: string;
+      dayId: string;
+      mealId: string;
+      requirement?: string;
+      isSecondFood?: boolean;
+    },
     { getState, dispatch },
   ) => {
     const { currentUser } = getState().user;
@@ -157,6 +276,7 @@ const addToCartThunk = createAsyncThunk(
         dayId,
         mealId,
         requirement,
+        isSecondFood,
       }),
     );
   },
@@ -165,7 +285,15 @@ const addToCartThunk = createAsyncThunk(
 const removeFromCartThunk = createAsyncThunk(
   REMOVE_FROM_CART,
   async (
-    { planId, dayId }: { planId: string; dayId: string },
+    {
+      planId,
+      dayId,
+      removeSecondFood,
+    }: {
+      planId: string;
+      dayId: string;
+      removeSecondFood?: boolean;
+    },
     { getState, dispatch },
   ) => {
     const { currentUser } = getState().user;
@@ -175,6 +303,7 @@ const removeFromCartThunk = createAsyncThunk(
         currentUserId: (currentUser as TCurrentUser).id.uuid,
         planId,
         dayId,
+        removeSecondFood,
       }),
     );
   },

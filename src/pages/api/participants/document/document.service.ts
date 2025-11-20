@@ -39,7 +39,7 @@ export const addFirebaseDocument = async ({
   const subOrder = orderDetail[timestamp] || {};
   const { memberOrders = {}, transactionId, restaurant = {} } = subOrder;
   const { id: restaurantId, restaurantName, foodList } = restaurant;
-  const { foodId, status } = memberOrders[participantId] || {};
+  const { foodId, status, secondaryFoodId } = memberOrders[participantId] || {};
   const restaurantResponse = await fetchListing(
     restaurantId,
     ['images'],
@@ -102,6 +102,33 @@ export const addFirebaseDocument = async ({
       foodName,
       ...(newFoodImage && { foodImage: newFoodImage }),
       ...(extraParams || {}),
+    };
+  }
+
+  if (status !== EParticipantOrderStatus.notJoined && secondaryFoodId) {
+    const { foodName } = foodList[secondaryFoodId] || {};
+    const foodResponse = await fetchListing(
+      secondaryFoodId,
+      ['images'],
+      [`variants.${EImageVariants.squareSmall2x}`],
+    );
+    const foodListing = Listing(foodResponse);
+    const foodImages = foodListing.getImages();
+
+    const newSecondFoodImage =
+      foodImages.length > 0
+        ? {
+            ...foodImages[0],
+            id: {
+              uuid: foodImages[0].id.uuid,
+            },
+          }
+        : null;
+    subOrderDocument = {
+      ...subOrderDocument,
+      secondaryFoodId,
+      secondaryFoodName: foodName,
+      ...(newSecondFoodImage && { secondaryFoodImage: newSecondFoodImage }),
     };
   }
 

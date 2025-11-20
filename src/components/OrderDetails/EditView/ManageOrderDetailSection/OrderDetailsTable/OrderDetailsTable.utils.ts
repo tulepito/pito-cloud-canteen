@@ -41,8 +41,14 @@ export type TItemData = {
     foodId?: string;
     foodName?: string;
     foodPrice?: string;
-  };
+  } & TSecondFoodData;
   status: EParticipantOrderStatus;
+};
+
+export type TSecondFoodData = {
+  secondaryFoodId?: string;
+  secondFoodName?: string;
+  secondFoodPrice?: string;
 };
 
 export type TAllTabData = TObject<EOrderDetailsTableTab, TItemData[]>;

@@ -235,6 +235,7 @@ type TFoodDataValue = {
   foodName: string;
   foodPrice: number;
   frequency: number;
+  notes?: string[];
 };
 
 type TFoodDataMap = TObject<string, TFoodDataValue>;
@@ -247,24 +248,44 @@ export const getFoodDataMap = ({
 }: any) => {
   if (orderType === EOrderType.group) {
     return Object.entries(memberOrders).reduce<TFoodDataMap>(
-      (foodFrequencyResult, currentMemberOrderEntry) => {
-        const [, memberOrderData] = currentMemberOrderEntry;
-        const { foodId, status } = memberOrderData as TObject;
-        const { foodName, foodPrice } = foodListOfDate[foodId] || {};
+      (foodFrequencyResult, [, memberOrderData]) => {
+        const { foodId, status, secondaryFoodId } = memberOrderData as TObject;
 
-        if (isJoinedPlan(foodId, status)) {
-          const data = foodFrequencyResult[foodId] as TObject;
-          const { frequency } = data || {};
+        const updateFoodFrequency = (
+          result: TFoodDataMap,
+          id: string,
+        ): TFoodDataMap => {
+          if (!isJoinedPlan(id, status) || !id) return result;
+
+          const {
+            foodName,
+            foodPrice,
+            requirement = '',
+          } = foodListOfDate[id] || {};
+          const current = result[id] as TObject;
+          const { notes = [] } = current || {};
+          const nextFrequency = (current?.frequency ?? 0) + 1;
+
+          if (!isEmpty(requirement)) {
+            notes.push(requirement);
+          }
 
           return {
-            ...foodFrequencyResult,
-            [foodId]: data
-              ? { ...data, frequency: frequency + 1 }
-              : { foodId, foodName, foodPrice, frequency: 1 },
+            ...result,
+            [id]: {
+              foodId: id,
+              foodName,
+              foodPrice,
+              notes,
+              frequency: nextFrequency,
+            },
           };
-        }
+        };
 
-        return foodFrequencyResult;
+        let updatedResult = updateFoodFrequency(foodFrequencyResult, foodId);
+        updatedResult = updateFoodFrequency(updatedResult, secondaryFoodId);
+
+        return updatedResult;
       },
       {},
     );

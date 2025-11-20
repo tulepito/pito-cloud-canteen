@@ -142,16 +142,20 @@ const OrderDetailsTableComponent: React.FC<
                 <table>
                   <tbody>
                     {data.map((item) => {
+                      console.log('item', { item });
                       const { isAnonymous, memberData, foodData, status } =
                         item;
-                      const { foodName = '', foodPrice = 0 } = foodData;
+                      const {
+                        foodName = '',
+                        foodPrice = 0,
+                        secondFoodName = '',
+                      } = foodData;
 
                       const {
                         id: memberId,
                         name: memberName,
                         email: memberEmail,
                       } = memberData || {};
-                      // const hasFoodPrice = Number(foodPrice) > 0;
                       const formattedFoodPrice = `${parseThousandNumber(
                         foodPrice,
                       )}đ`;
@@ -186,7 +190,17 @@ const OrderDetailsTableComponent: React.FC<
                         [css.foodNameWithAnonymous]: isAnonymous,
                       });
                       const foodNameComponent = (
-                        <div className={foodNameClasses}>{foodName}</div>
+                        <>
+                          <div className={foodNameClasses}>
+                            {foodName}{' '}
+                            <RenderWhen condition={!!secondFoodName}>
+                              <span className={css.secondFoodName}>
+                                <span className="font-light text-xs"> + </span>{' '}
+                                {secondFoodName}
+                              </span>
+                            </RenderWhen>
+                          </div>
+                        </>
                       );
 
                       const iconEditComponent = (

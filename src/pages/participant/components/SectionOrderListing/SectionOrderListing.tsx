@@ -13,6 +13,7 @@ import Tooltip from '@components/Tooltip/Tooltip';
 import { isOrderOverDeadline as isOverDeadline } from '@helpers/orderHelper';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { useViewport } from '@hooks/useViewport';
+import type { TPlanData } from '@src/types/order';
 import { Listing } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
 import { EOrderStates } from '@src/utils/enums';
@@ -23,7 +24,7 @@ import TabActions from './TabActions';
 import css from './SectionOrderListing.module.scss';
 
 type TSectionOrderListingProps = {
-  plan: any;
+  plan: TPlanData;
   onSelectTab: (restaurant: any) => void;
   orderDay: string;
 };
@@ -125,11 +126,9 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
     const convertedData: any = [];
     Object.keys(plan).forEach((item, oIndex) => {
       const isLast = oIndex === Object.keys(plan).length - 1;
-      const {
-        foodList,
-        restaurant,
-      }: { foodList: any[]; restaurant: any; memberOrder: any } = plan[item];
-      const { foodId: hasDishInCart } = cartList?.[item as any] || {};
+      const { foodList, restaurant } = plan[item];
+      const cartItem = cartList?.[item] || {};
+      const hasDishInCart = cartItem.foodId;
       const planDate = DateTime.fromMillis(Number(item)).toJSDate();
       const itemLabel = (
         <div className={classNames(css.tabTitle, {})}>
@@ -161,19 +160,25 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
         submitDataInprogress ||
         isOrderAlreadyStarted;
 
-      const childrenList = foodList.map((dish, index) => (
-        <ListingCard
-          key={dish?.id?.uuid || index}
-          className={css.listingCard}
-          listing={dish}
-          dayId={item}
-          planId={`${planId}`}
-          isSelected={hasDishInCart === dish?.id?.uuid}
-          selectDisabled={selectDisabled}
-          isOrderAlreadyStarted={isOrderAlreadyStarted}
-          onAddedToCart={onAddedToCart}
-        />
-      ));
+      const childrenList = foodList.map((dish, index) => {
+        const dishId = dish?.id?.uuid;
+        const isFirstSelected = hasDishInCart === dishId;
+        const isSecondSelected = cartItem.secondaryFoodId === dishId;
+
+        return (
+          <ListingCard
+            key={dishId || index}
+            className={css.listingCard}
+            listing={dish}
+            dayId={item}
+            planId={`${planId}`}
+            isSelected={isFirstSelected || isSecondSelected}
+            selectDisabled={selectDisabled}
+            isOrderAlreadyStarted={isOrderAlreadyStarted}
+            onAddedToCart={onAddedToCart}
+          />
+        );
+      });
 
       convertedData.push({
         label: itemLabel,

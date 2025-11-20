@@ -130,17 +130,20 @@ export const FieldDropdownSelectComponent: React.FC<TFieldDropdownSelect> = (
 
       <RenderWhen condition={dropdownController.value}>
         <div className={dropdownWrapperClasses}>
-          {options.map((option: { key: string; label: string }) => (
-            <div
-              key={option.key}
-              onClick={onSelectOption(option.key)}
-              className={classNames(
-                css.dropdownItem,
-                value === option.key && css.selected,
-              )}>
-              <div className="three-line-text">{option.label}</div>
-            </div>
-          ))}
+          {options.map(
+            (option: { key: string; label: string; disabled?: boolean }) => (
+              <div
+                key={option.key}
+                onClick={onSelectOption(option.key)}
+                className={classNames(
+                  css.dropdownItem,
+                  value === option.key && css.selected,
+                  option.disabled && css.fieldDisabled,
+                )}>
+                <div className="three-line-text">{option.label}</div>
+              </div>
+            ),
+          )}
         </div>
       </RenderWhen>
 

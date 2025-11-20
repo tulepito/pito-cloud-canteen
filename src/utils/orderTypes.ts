@@ -29,6 +29,8 @@ export type TPlan = {
           foodId: string;
           status: EParticipantOrderStatus;
           requirement?: string;
+          secondaryFoodId?: string;
+          secondaryRequirement?: string;
         };
       };
 

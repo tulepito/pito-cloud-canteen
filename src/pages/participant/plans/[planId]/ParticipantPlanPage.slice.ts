@@ -4,14 +4,23 @@ import difference from 'lodash/difference';
 import { participantSubOrderAddDocumentApi } from '@apis/firebaseApi';
 import { loadPlanDataApi, updateParticipantOrderApi } from '@apis/index';
 import {
-  OrderListActions,
-  recommendFood,
-} from '@pages/participant/orders/OrderList.slice';
+  pickRandomFood,
+  pickRandomFoodExcludingIds,
+} from '@helpers/foodPickerHelpers';
+import { sleep } from '@helpers/index';
+import { useIsAllowAddSecondFood } from '@hooks/useIsAllowAddSecondFood';
 import { createAsyncThunk } from '@redux/redux.helper';
 import {
   shoppingCartActions,
   shoppingCartThunks,
 } from '@redux/slices/shoppingCart.slice';
+import type {
+  TCartItem,
+  TPlanData,
+  TShoppingCartMemberPlan,
+  TUpdateParticipantOrderBody,
+} from '@src/types/order';
+import { PICKING_ONLY_ONE_FOOD_NAMES } from '@src/utils/constants';
 import { CurrentUser, Listing } from '@src/utils/data';
 import type { TListing } from '@src/utils/types';
 import { EParticipantOrderStatus } from '@utils/enums';
@@ -33,6 +42,8 @@ const recommendFoodForShoppingCart = ({
   plans,
   dispatch,
   currentMealId,
+  currentSecondaryMealId,
+  isAllowAddSecondFood,
 }: {
   plan: any;
   subOrderDate: string;
@@ -41,38 +52,41 @@ const recommendFoodForShoppingCart = ({
   plans: string[];
   dispatch: any;
   currentMealId?: string;
+  currentSecondaryMealId?: string;
+  isAllowAddSecondFood?: boolean;
 }) => {
   const subOrder = plan[subOrderDate];
   const { foodList } = subOrder;
 
-  const suitablePriceFoodList = foodList.filter(
-    (food: TListing) =>
-      Listing(food).getAttributes().price.amount <= packagePerMember,
-  );
-
-  let mostSuitableFood: any = recommendFood({
-    foodList: suitablePriceFoodList,
-    subOrderFoodIds: suitablePriceFoodList.map((food: TListing) =>
-      Listing(food).getId(),
-    ),
-    allergies,
+  // get the list of foods with suitable price
+  const suitablePriceFoodList = foodList.filter((food: TListing) => {
+    return Listing(food).getAttributes().price.amount <= packagePerMember;
   });
 
-  const mostSuitableFoodListing = Listing(mostSuitableFood!);
+  // pick a random food from the list of foods with suitable price without allergies
+  let mostSuitableFood = pickRandomFood(suitablePriceFoodList, allergies);
 
-  while (
-    currentMealId &&
-    suitablePriceFoodList.length > 1 &&
-    mostSuitableFoodListing.getId() === currentMealId
-  ) {
-    mostSuitableFood = recommendFood({
-      foodList: suitablePriceFoodList,
-      subOrderFoodIds: suitablePriceFoodList.map((food: TListing) =>
-        Listing(food).getId(),
-      ),
-      allergies,
-    });
+  if (currentMealId) {
+    // if the current meal id is not in the list of foods with suitable price,
+    // pick a random food from the list of foods with suitable price excluding the current meal id
+    const alternativeExcludeIds = [currentMealId];
+    const alternativeFood = pickRandomFoodExcludingIds(
+      suitablePriceFoodList,
+      alternativeExcludeIds,
+    );
+
+    // if the alternative food is found, set it as the most suitable food
+    if (alternativeFood) {
+      mostSuitableFood = alternativeFood;
+    }
   }
+
+  // if the most suitable food is not found, return an empty object
+  if (!mostSuitableFood) {
+    return { foodName: '' };
+  }
+
+  const mostSuitableFoodListing = Listing(mostSuitableFood as TListing);
 
   dispatch(
     shoppingCartThunks.addToCart({
@@ -82,15 +96,84 @@ const recommendFoodForShoppingCart = ({
     }),
   );
 
+  const primaryFoodTitle = mostSuitableFoodListing.getAttributes().title || '';
+  const isPrimarySingleSelectionFood = PICKING_ONLY_ONE_FOOD_NAMES.some(
+    (name) => primaryFoodTitle?.includes(name),
+  );
+
+  // remove secondary food if it is a single selection food
+  if (isAllowAddSecondFood && isPrimarySingleSelectionFood) {
+    dispatch(
+      shoppingCartThunks.removeFromCart({
+        planId: plans[0],
+        dayId: subOrderDate,
+        removeSecondFood: true,
+      }),
+    );
+  }
+
+  let secondaryFood;
+  // Check if is allow add second food and the primary food is not a single selection food
+  // and the list of foods with suitable price has more than 1 food
+  if (
+    isAllowAddSecondFood &&
+    !isPrimarySingleSelectionFood &&
+    suitablePriceFoodList.length > 1
+  ) {
+    const secondaryCandidates = suitablePriceFoodList.filter(
+      (food: TListing) => {
+        const listing = Listing(food);
+        const title = listing.getAttributes().title || '';
+        const isSingleSelectionFood = PICKING_ONLY_ONE_FOOD_NAMES.some((name) =>
+          title?.includes(name),
+        );
+
+        return (
+          listing.getId() !== mostSuitableFoodListing.getId() &&
+          !isSingleSelectionFood
+        );
+      },
+    );
+
+    const excludedSecondaryIds = [
+      mostSuitableFoodListing.getId(),
+      currentSecondaryMealId,
+    ].filter(Boolean) as string[];
+
+    secondaryFood = pickRandomFoodExcludingIds(
+      secondaryCandidates,
+      excludedSecondaryIds,
+    );
+
+    if (secondaryFood) {
+      const secondaryFoodListing = Listing(secondaryFood as TListing);
+
+      dispatch(
+        shoppingCartThunks.addToCart({
+          planId: plans[0],
+          dayId: subOrderDate,
+          mealId: secondaryFoodListing.getId(),
+          isSecondFood: true,
+        }),
+      );
+    }
+  }
+  const secondaryFoodTitle =
+    isAllowAddSecondFood && secondaryFood
+      ? Listing(secondaryFood as TListing).getAttributes().title
+      : '';
+
   return {
-    foodName: mostSuitableFoodListing.getAttributes().title,
+    foodName: `${primaryFoodTitle}${
+      secondaryFoodTitle ? ` + ${secondaryFoodTitle}` : ''
+    }`,
   };
 };
 
 type TParticipantPlanState = {
   restaurant: any;
   company: any;
-  plan: any;
+  plan: TPlanData;
   order: any;
   loadDataInProgress: boolean;
   loadDataError: any;
@@ -98,6 +181,7 @@ type TParticipantPlanState = {
   reloadDataError: any;
   submitDataInprogress: boolean;
   submitDataError: any;
+  isAllowAddSecondFood: boolean;
 };
 
 const initialState: TParticipantPlanState = {
@@ -111,6 +195,7 @@ const initialState: TParticipantPlanState = {
   reloadDataError: null,
   submitDataInprogress: false,
   submitDataError: null,
+  isAllowAddSecondFood: false,
 };
 
 const loadData = createAsyncThunk(
@@ -118,15 +203,77 @@ const loadData = createAsyncThunk(
   async (planId: string, { getState, dispatch }) => {
     const { currentUser } = getState().user;
     const currentUserId = currentUser?.id?.uuid;
-    const response: any = await loadPlanDataApi(planId);
-    const plan = response?.data?.data?.plan;
+    const response = await loadPlanDataApi(planId);
+    const { plan, order } = response?.data?.data || {};
     const orderDays = Object.keys(plan);
+    const isAllowAddSecondFood = useIsAllowAddSecondFood(order as TListing);
 
     orderDays.forEach((day) => {
       const {
         status,
         foodId,
         requirement = '',
+        secondaryFoodId,
+        secondaryRequirement,
+      } = plan[day].memberOrder[currentUserId];
+
+      if (status !== EParticipantOrderStatus.empty) {
+        dispatch(
+          shoppingCartActions.addToCart({
+            currentUserId,
+            planId,
+            dayId: day,
+            mealId:
+              status === EParticipantOrderStatus.notJoined ? status : foodId,
+            requirement,
+          }),
+        );
+        if (secondaryFoodId) {
+          dispatch(
+            shoppingCartActions.addToCart({
+              currentUserId,
+              planId,
+              dayId: day,
+              mealId:
+                status === EParticipantOrderStatus.notJoined
+                  ? status
+                  : secondaryFoodId,
+              requirement: secondaryRequirement,
+              isSecondFood: true,
+            }),
+          );
+        }
+      }
+    });
+
+    return {
+      ...response?.data?.data,
+      isAllowAddSecondFood,
+    };
+  },
+  {
+    serializeError: storableError,
+  },
+);
+
+const reloadData = createAsyncThunk(
+  RELOAD_DATA,
+  async (planId: string, { getState, dispatch }) => {
+    const { currentUser } = getState().user;
+    const currentUserId = currentUser?.id?.uuid;
+    const response = await loadPlanDataApi(planId);
+    const { plan } = response?.data?.data || {};
+    const orderDays = Object.keys(plan);
+
+    dispatch(shoppingCartThunks.removeAllFromPlanCart({ planId }));
+
+    orderDays.forEach((day) => {
+      const {
+        status,
+        requirement,
+        foodId,
+        secondaryFoodId,
+        secondaryRequirement,
       } = plan?.[day]?.memberOrder?.[currentUserId] || {};
 
       if (status !== EParticipantOrderStatus.empty) {
@@ -140,42 +287,18 @@ const loadData = createAsyncThunk(
             requirement,
           }),
         );
-      }
-    });
-
-    return response?.data?.data;
-  },
-  {
-    serializeError: storableError,
-  },
-);
-
-const reloadData = createAsyncThunk(
-  RELOAD_DATA,
-  async (planId: string, { getState, dispatch }) => {
-    const { currentUser } = getState().user;
-    const currentUserId = currentUser?.id?.uuid;
-    const response: any = await loadPlanDataApi(planId);
-    const plan = response?.data?.data?.plan;
-    const orderDays = Object.keys(plan);
-
-    dispatch(shoppingCartThunks.removeAllFromPlanCart({ planId }));
-
-    orderDays.forEach((day) => {
-      const { status, requirement, foodId } =
-        plan?.[day]?.memberOrder?.[currentUserId] || {};
-
-      if (status !== EParticipantOrderStatus.empty) {
-        dispatch(
-          shoppingCartActions.addToCart({
-            currentUserId,
-            planId,
-            dayId: day,
-            mealId:
-              status === EParticipantOrderStatus.notJoined ? status : foodId,
-            requirement,
-          }),
-        );
+        if (secondaryFoodId) {
+          dispatch(
+            shoppingCartActions.addToCart({
+              currentUserId,
+              planId,
+              dayId: day,
+              mealId: secondaryFoodId,
+              isSecondFood: true,
+              requirement: secondaryRequirement,
+            }),
+          );
+        }
       }
     });
 
@@ -199,33 +322,57 @@ const updateOrder = createAsyncThunk(
     const planData = orders?.[currentUserId]?.[planId] || {};
     const orderDays = Object.keys(planData);
 
-    const updatedPlan = orderDays.reduce((acc: any, curr: any) => {
-      const { foodId = '', requirement = '' } = planData[curr] || {};
+    const buildCartItem = (
+      foodId: string,
+      requirement: string,
+      secondaryFoodId?: string,
+      secondaryRequirement?: string,
+    ) => {
+      const isNotJoined = foodId === EParticipantOrderStatus.notJoined;
+      const status = isNotJoined
+        ? EParticipantOrderStatus.notJoined
+        : foodId?.length > 0
+        ? EParticipantOrderStatus.joined
+        : EParticipantOrderStatus.empty;
 
-      return {
-        ...acc,
-        [curr]: {
-          [currentUserId]:
-            // eslint-disable-next-line no-nested-ternary
-            foodId === EParticipantOrderStatus.notJoined
-              ? {
-                  status: EParticipantOrderStatus.notJoined,
-                  foodId: '',
-                  requirement,
-                }
-              : {
-                  status:
-                    foodId?.length > 0
-                      ? EParticipantOrderStatus.joined
-                      : EParticipantOrderStatus.empty,
-                  foodId,
-                  requirement,
-                },
-        },
+      const baseItem: TCartItem = {
+        status,
+        foodId: isNotJoined ? '' : foodId,
+        requirement,
+        ...(secondaryFoodId && {
+          secondaryFoodId,
+          secondaryRequirement,
+        }),
       };
-    }, {});
 
-    const updateValues = {
+      return baseItem;
+    };
+
+    const updatedPlan = orderDays.reduce<TShoppingCartMemberPlan>(
+      (acc, curr) => {
+        const {
+          foodId = '',
+          requirement = '',
+          secondaryFoodId,
+          secondaryRequirement,
+        } = planData[+curr] || {};
+
+        return {
+          ...acc,
+          [curr]: {
+            [currentUserId]: buildCartItem(
+              foodId,
+              requirement,
+              secondaryFoodId,
+              secondaryRequirement,
+            ),
+          },
+        };
+      },
+      {},
+    );
+
+    const updateValues: TUpdateParticipantOrderBody = {
       orderId,
       orderDays,
       planId,
@@ -233,24 +380,21 @@ const updateOrder = createAsyncThunk(
     };
 
     const {
-      data: { plan: newPlan, jobId },
+      data: { jobId },
     } = await updateParticipantOrderApi(orderId, updateValues);
-    dispatch(OrderListActions.updatePlanDetail(newPlan));
-    orderDays.forEach((timestamp: string) => {
-      participantSubOrderAddDocumentApi({
-        participantId: currentUserId,
-        planId,
-        timestamp: parseInt(`${timestamp}`, 10),
-      });
-    });
+
+    await sleep(2000); // wait for the order to be updated
     await dispatch(reloadData(planId));
-    orderDays.map(async (subOrderDate: string) => {
-      await participantSubOrderAddDocumentApi({
-        participantId: currentUserId,
-        planId,
-        timestamp: parseInt(`${subOrderDate}`, 10),
-      });
-    });
+    // firebase documents for history sub-orders and rating feature
+    await Promise.all(
+      orderDays.map((timestamp: string) =>
+        participantSubOrderAddDocumentApi({
+          participantId: currentUserId,
+          planId,
+          timestamp: parseInt(timestamp, 10),
+        }),
+      ),
+    );
 
     return !!jobId;
   },
@@ -263,14 +407,18 @@ export const recommendFoodSubOrder = createAsyncThunk(
   RECOMMEND_FOOD_SUB_ORDER,
   async (subOrderDate: string, { getState, dispatch }) => {
     const { currentUser } = getState().user;
-    const { plan, order } = getState().ParticipantPlanPage;
+    const { plan, order, isAllowAddSecondFood } =
+      getState().ParticipantPlanPage;
     const { orders } = getState().shoppingCart;
     const currentUserGetter = CurrentUser(currentUser!);
     const { allergies = [] } = currentUserGetter.getPublicData();
-    const orderListing = Listing(order!);
+    const orderListing = Listing(order as TListing);
     const { packagePerMember = 0, plans = [] } = orderListing.getMetadata();
     const currentMealId =
       orders[currentUserGetter.getId()]?.[plans[0]]?.[+subOrderDate]?.foodId;
+    const currentSecondaryMealId =
+      orders[currentUserGetter.getId()]?.[plans[0]]?.[+subOrderDate]
+        ?.secondaryFoodId;
 
     return recommendFoodForShoppingCart({
       plan,
@@ -280,6 +428,8 @@ export const recommendFoodSubOrder = createAsyncThunk(
       plans,
       dispatch,
       currentMealId,
+      currentSecondaryMealId,
+      isAllowAddSecondFood,
     });
   },
   {
@@ -291,12 +441,13 @@ const recommendFoodSubOrders = createAsyncThunk(
   RECOMMEND_FOOD_SUB_ORDERS,
   async (_, { getState, dispatch }) => {
     const { currentUser } = getState().user;
-    const { plan, order } = getState().ParticipantPlanPage;
+    const { plan, order, isAllowAddSecondFood } =
+      getState().ParticipantPlanPage;
     const { orders } = getState().shoppingCart;
     const currentUserGetter = CurrentUser(currentUser!);
     const currentUserId = currentUserGetter.getId();
     const { allergies = [] } = currentUserGetter.getPublicData();
-    const orderListing = Listing(order!);
+    const orderListing = Listing(order as TListing);
     const { packagePerMember = 0, plans = [] } = orderListing.getMetadata();
     const subOrderDates = Object.keys(plan);
     const notJoinedDay = Object.keys(plan).reduce(
@@ -332,6 +483,9 @@ const recommendFoodSubOrders = createAsyncThunk(
     recommendSubOrderDays.forEach((subOrderDate: string) => {
       const currentMealId =
         orders[currentUserGetter.getId()]?.[plans[0]]?.[+subOrderDate]?.foodId;
+      const currentSecondaryMealId =
+        orders[currentUserGetter.getId()]?.[plans[0]]?.[+subOrderDate]
+          ?.secondaryFoodId;
       recommendFoodForShoppingCart({
         plan,
         subOrderDate,
@@ -340,6 +494,8 @@ const recommendFoodSubOrders = createAsyncThunk(
         plans,
         dispatch,
         currentMealId,
+        currentSecondaryMealId,
+        isAllowAddSecondFood,
       });
     });
   },

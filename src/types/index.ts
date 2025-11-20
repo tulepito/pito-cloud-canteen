@@ -142,6 +142,8 @@ export type OrderListing = ListingBuilder<
 
 export type MemberOrderValue = {
   foodId: string;
+  secondaryFoodId?: string;
+  secondaryRequirement?: string;
   requirement: string;
   status: 'empty' | 'joined' | 'notJoined' | 'notAllowed' | 'expired';
   barcode?: string;
@@ -385,6 +387,8 @@ export interface RatingListingMetadata {
   replies?: TReviewReply[];
   generalRatingValue: number[];
   slackThreadTs?: string;
+  secondaryFoodName?: string;
+  secondaryFoodId?: string;
 }
 
 export type RatingListing = ListingBuilder<

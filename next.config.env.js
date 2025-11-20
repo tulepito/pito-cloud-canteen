@@ -90,6 +90,7 @@ module.exports = {
       'NEXT_PUBLIC_MIN_OFFSET_TIME_TO_MODIFY_ORDER_DETAIL_IN_HOUR',
 
       'NEXT_PUBLIC_DELIVERY_INFO_ENABLED',
+      'NEXT_PUBLIC_COMPANIES_ALLOWING_SECOND_FOOD',
     ];
 
     envKeys.forEach((key) => {

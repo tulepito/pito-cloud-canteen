@@ -38,6 +38,8 @@ const EditOrderRowModal: React.FC<TEditOrderRowModalProps> = (props) => {
     foodId: foodData.foodId || '',
     requirement: foodData.requirement || '',
     memberName: memberData.name || '',
+    secondaryFoodId: foodData.secondaryFoodId,
+    secondaryRequirement: foodData.secondaryRequirement,
   };
 
   const modalTitle = intl.formatMessage({

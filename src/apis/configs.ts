@@ -53,12 +53,14 @@ export const apiBaseUrl = () => {
 export const getApi = <T = any>(
   path: string,
   params: TObject = {},
+  options: { signal?: AbortSignal } = {}, // hỗ trợ huỷ bằng AbortController
 ): Promise<AxiosResponse<T>> => {
   // get 'JSONParams' in req.query, remember using JSON.parse()
   // to convert JSONParams into params
 
   return axios.get(`${apiBaseUrl()}${path}`, {
     ...(params ? { params: { JSONParams: JSON.stringify(params) } } : {}),
+    signal: options.signal,
   });
 };
 
@@ -82,8 +84,8 @@ export const postApi = <T = any>(
   });
 };
 
-export const putApi = (path: string, body: TObject = {}) => {
-  return axios.put(`${apiBaseUrl()}${path}`, body);
+export const putApi = <T = any>(path: string, body: TObject = {}) => {
+  return axios.put<T>(`${apiBaseUrl()}${path}`, body);
 };
 
 export const deleteApi = (path: string, data: TObject = {}) => {

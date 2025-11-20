@@ -191,6 +191,20 @@ export const createNativeNotification = async (
       }
       break;
 
+    case ENativeNotificationType.Events: {
+      const url = `${BASE_URL}/participant/events/mens-day`;
+      oneSignalUserIds.forEach((oneSignalUserId: string) => {
+        sendNotification({
+          title: "Happy Men's Day!",
+          content:
+            'Quà tặng voucher 100k dành riêng cho anh. Chạm để mở quà ngay!',
+          url,
+          oneSignalUserId,
+        });
+      });
+      break;
+    }
+
     default:
       break;
   }

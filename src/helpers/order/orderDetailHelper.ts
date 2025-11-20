@@ -1,5 +1,6 @@
 import isEmpty from 'lodash/isEmpty';
 
+import { getFoodDataMap } from '@helpers/orderHelper';
 import { generateScannerBarCode } from '@pages/api/admin/scanner/[planId]/toggle-mode.api';
 import { Listing, User } from '@src/utils/data';
 import { buildFullName } from '@src/utils/emailTemplate/participantOrderPicking';
@@ -30,47 +31,7 @@ const groupFoodForGroupOrder = (
         return result;
       }
 
-      const foodDataMap = Object.entries(memberOrders).reduce(
-        (foodFrequencyResult, currentMemberOrderEntry) => {
-          const [, memberOrderData] = currentMemberOrderEntry;
-          const {
-            foodId,
-            status,
-            requirement = '',
-          } = memberOrderData as TObject;
-          const {
-            foodName,
-            foodPrice,
-            foodUnit = '',
-          } = foodListOfDate[foodId] || {};
-
-          if (status === EParticipantOrderStatus.joined && foodId !== '') {
-            const data = foodFrequencyResult[foodId] as TObject;
-            const { frequency, notes = [] } = data || {};
-
-            if (!isEmpty(requirement)) {
-              notes.push(requirement);
-            }
-
-            return {
-              ...foodFrequencyResult,
-              [foodId]: data
-                ? { ...data, frequency: frequency + 1, notes }
-                : {
-                    foodId,
-                    foodName,
-                    foodUnit,
-                    foodPrice,
-                    notes,
-                    frequency: 1,
-                  },
-            };
-          }
-
-          return foodFrequencyResult;
-        },
-        {} as TObject,
-      );
+      const foodDataMap = getFoodDataMap({ foodListOfDate, memberOrders });
       const foodDataList = Object.values(foodDataMap);
       const summary = foodDataList.reduce(
         (previousResult: TObject, current: TObject) => {
@@ -279,12 +240,9 @@ export const groupPickingOrderByFood = ({
             foodId,
             status,
             requirement = '',
+            secondaryFoodId,
+            secondaryRequirement = '',
           } = memberOrderData as TObject;
-          const {
-            foodName,
-            foodPrice,
-            foodUnit = '',
-          } = foodListOfDate[foodId] || {};
 
           const participantMaybe = participants.find(
             (p) => p?.id?.uuid === memberId,
@@ -296,38 +254,72 @@ export const groupPickingOrderByFood = ({
             (participantMaybe || anonymousUserMaybe) as TUser,
           ).getProfile();
 
-          if (status === EParticipantOrderStatus.joined && foodId !== '') {
-            const data = foodFrequencyResult[foodId] as TObject;
+          const participantName = buildFullName(firstName, lastName, {
+            compareToGetLongerWith: displayName,
+          });
+
+          // Helper function to add food to foodDataMap
+          const addFoodToMap = (
+            currentMap: TObject,
+            targetFoodId: string,
+            foodRequirement: string,
+          ) => {
+            if (!targetFoodId || targetFoodId === '') {
+              return currentMap;
+            }
+
+            const foodInfo = foodListOfDate[targetFoodId] || {};
+            const { foodName, foodPrice, foodUnit = '' } = foodInfo;
+            const data = currentMap[targetFoodId] as TObject;
             const { frequency, notes = [] } = data || {};
             const newNote = {
-              note: requirement,
-              name: buildFullName(firstName, lastName, {
-                compareToGetLongerWith: displayName,
-              }),
+              note: foodRequirement,
+              name: participantName,
               ...(planId && {
                 barcode: generateScannerBarCode(planId, memberId, `${date}`),
               }),
             };
 
-            if (!isEmpty(requirement)) {
-              notes.splice(0, 0, newNote);
+            const updatedNotes = [...notes];
+            if (!isEmpty(foodRequirement)) {
+              updatedNotes.splice(0, 0, newNote);
             } else {
-              notes.push(newNote);
+              updatedNotes.push(newNote);
             }
 
             return {
-              ...foodFrequencyResult,
-              [foodId]: data
-                ? { ...data, frequency: frequency + 1, notes }
+              ...currentMap,
+              [targetFoodId]: data
+                ? { ...data, frequency: frequency + 1, notes: updatedNotes }
                 : {
-                    foodId,
+                    foodId: targetFoodId,
                     foodName,
                     foodUnit,
                     foodPrice,
-                    notes,
+                    notes: updatedNotes,
                     frequency: 1,
                   },
             };
+          };
+
+          if (status === EParticipantOrderStatus.joined) {
+            // Add primary food
+            let updatedMap = addFoodToMap(
+              foodFrequencyResult,
+              foodId,
+              requirement,
+            );
+
+            // Add secondary food if exists
+            if (secondaryFoodId) {
+              updatedMap = addFoodToMap(
+                updatedMap,
+                secondaryFoodId,
+                secondaryRequirement,
+              );
+            }
+
+            return updatedMap;
           }
 
           return foodFrequencyResult;

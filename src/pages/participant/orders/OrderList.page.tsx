@@ -5,6 +5,7 @@ import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import flatten from 'lodash/flatten';
 import { DateTime } from 'luxon';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 
 import BottomNavigationBar from '@components/BottomNavigationBar/BottomNavigationBar';
@@ -22,6 +23,7 @@ import { getItem } from '@helpers/localStorageHelpers';
 import { prepareDaySession } from '@helpers/order/prepareDataHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
+import { useUserInEvent } from '@hooks/useUserInEvent';
 import { useViewport } from '@hooks/useViewport';
 import { buildParticipantSubOrderDocumentId } from '@pages/api/participants/document/document.service';
 import { CalendarActions } from '@redux/slices/Calendar.slice';
@@ -108,6 +110,8 @@ const OrderListPage = () => {
   const { isMobileLayout } = useViewport();
   const notificationModalControl = useBoolean();
   const currentUser = useAppSelector((state) => state.user.currentUser);
+  const { isUserInEvent } = useUserInEvent();
+
   const orders = useAppSelector(
     (state) => state.ParticipantOrderList.orders,
     shallowEqual,
@@ -284,6 +288,12 @@ const OrderListPage = () => {
       const pickedFoodDetail = alreadyPickFood
         ? foodsInPlan?.foodListings[foodSelection?.foodId]
         : {};
+      const pickedSecondaryFoodDetail = foodSelection?.secondaryFoodId
+        ? foodsInPlan?.foodListings[foodSelection.secondaryFoodId]
+        : {};
+      const secondaryFoodName = dishes.find(
+        (_dish) => _dish.key === foodSelection?.secondaryFoodId,
+      )?.value;
 
       const event = {
         resource: {
@@ -311,14 +321,17 @@ const OrderListPage = () => {
           expiredTime: expiredTime.toMillis(),
           deliveryHour,
           dishSelection: { dishSelection: foodSelection?.foodId },
+          secondaryDishSelection: foodSelection?.secondaryFoodId,
           orderState,
           lastTransition,
           foodName: dishes.find((_dish) => _dish.key === foodSelection?.foodId)
             ?.value,
+          secondaryFoodName,
           barcode: foodSelection?.barcode,
           disableSelectFood:
             isOrderAlreadyInProgress && isSubOrderNotAbleToEdit,
           pickedFoodDetail,
+          pickedSecondaryFoodDetail,
         },
         title: orderTitle,
         start: DateTime.fromMillis(+planItemKey).toJSDate(),
@@ -849,6 +862,18 @@ const OrderListPage = () => {
 
   return (
     <ParticipantLayout>
+      <RenderWhen condition={isUserInEvent}>
+        <div className="flex justify-end py-2">
+          <Link
+            href="/participant/events/mens-day"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-br from-[#5ec9ff] to-[#b1e4fe] text-white text-sm font-semibold no-underline shadow-sm transition-all duration-200 ease-in-out hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 active:shadow-sm">
+            <span className="uppercase tracking-[0.02em]">Nhận quà</span>
+            <span className="px-[10px] py-0.5 rounded-full bg-white/15 text-xs leading-4">
+              19.11
+            </span>
+          </Link>
+        </div>
+      </RenderWhen>
       <OrderListHeaderSection
         openNotificationModal={notificationModalControl.setTrue}
         numberOfUnseenNotifications={numberOfUnseenNotifications}
@@ -859,7 +884,6 @@ const OrderListPage = () => {
         headerWrapperClassName={css.headerWrapperClassName}
         headerClassName={css.tabHeader}
       />
-
       <BottomNavigationBar />
       <LoadingModal isOpen={showLoadingModal} />
     </ParticipantLayout>

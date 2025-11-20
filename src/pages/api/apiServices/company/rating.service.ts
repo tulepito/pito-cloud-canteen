@@ -100,6 +100,8 @@ export const postParticipantRatingFn = async ({
   imageUrlList,
   orderCode,
   ratingUserName,
+  secondaryFoodName,
+  secondaryFoodId,
 }: {
   companyName: string;
   companyId: string;
@@ -111,6 +113,8 @@ export const postParticipantRatingFn = async ({
   imageUrlList: string[];
   orderCode: string;
   ratingUserName: string;
+  secondaryFoodName?: string;
+  secondaryFoodId?: string;
 }) => {
   const integrationSdk = getIntegrationSdk();
   const { restaurantId, ...rest } = rating;
@@ -135,6 +139,8 @@ export const postParticipantRatingFn = async ({
       foodName,
       foodId,
       generalRatingValue: [generalRating.toString()],
+      ...(secondaryFoodName && { secondaryFoodName }),
+      ...(secondaryFoodId && { secondaryFoodId }),
     },
   });
 

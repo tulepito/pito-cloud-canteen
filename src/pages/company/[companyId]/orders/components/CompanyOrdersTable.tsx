@@ -278,7 +278,6 @@ const CompanyOrdersTable: React.FC<TCompanyOrdersTableProps> = () => {
 
   const orderStateWarningModalConfirmText =
     orderWarningState === 'expireStartOrder' ? 'Tiếp tục' : 'Đặt Đơn Mới';
-
   const tableData = parseEntitiesToTableData(
     orders,
     plansByOrderIds,

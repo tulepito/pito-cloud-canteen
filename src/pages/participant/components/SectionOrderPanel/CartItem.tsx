@@ -2,7 +2,7 @@ import classNames from 'classnames';
 
 import IconClose from '@components/Icons/IconClose/IconClose';
 import IconRefreshing from '@components/Icons/IconRefreshing/IconRefreshing';
-import { useAppDispatch } from '@hooks/reduxHooks';
+import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { ParticipantPlanThunks } from '@pages/participant/plans/[planId]/ParticipantPlanPage.slice';
 
 import css from './CartItem.module.scss';
@@ -14,6 +14,7 @@ type TCartItemProps = {
   removeDisabled?: boolean;
   subOrderDate?: string;
   onRemove: () => void;
+  foodPosition?: 'first' | 'second';
 };
 
 const CartItem: React.FC<TCartItemProps> = ({
@@ -23,8 +24,12 @@ const CartItem: React.FC<TCartItemProps> = ({
   removeDisabled = false,
   subOrderDate,
   onRemove,
+  foodPosition,
 }) => {
   const dispatch = useAppDispatch();
+  const isAllowAddSecondFood = useAppSelector(
+    (state) => state.ParticipantPlanPage.isAllowAddSecondFood,
+  );
 
   const handleAutoSelect = () => {
     dispatch(ParticipantPlanThunks.recommendFoodSubOrder(subOrderDate!));
@@ -33,11 +38,27 @@ const CartItem: React.FC<TCartItemProps> = ({
   return (
     <div className={classNames(css.root, className)}>
       <div className={css.label}>
-        <span>{label}</span>
+        <span className="flex items-center gap-2">
+          {label && <span>{label}</span>}
+        </span>
         {!removeDisabled && (
           <IconClose onClick={onRemove} className={css.iconClose} />
         )}
       </div>
+      {isAllowAddSecondFood && (
+        <div>
+          {foodPosition === 'first' && (
+            <span className="text-primaryPri2 text-xs font-medium">
+              (Món 1)
+            </span>
+          )}
+          {foodPosition === 'second' && (
+            <span className="text-sematicGreen2 text-xs font-medium">
+              (Món 2)
+            </span>
+          )}
+        </div>
+      )}
       <div className={css.value}>
         <IconRefreshing className={css.icon} onClick={handleAutoSelect} />
         <span>{value}</span>
