@@ -391,12 +391,13 @@ export const groupPickingOrderByFoodLevels = ({
               foodId,
               status,
               requirement = '',
+              secondaryFoodId,
+              secondaryRequirement = '',
             } = memberOrderData as TObject;
-            const {
-              foodName,
-              foodPrice,
-              foodUnit = '',
-            } = foodListOfDate[foodId] || {};
+            const primaryFoodInfo = foodListOfDate[foodId] || {};
+            const secondaryFoodInfo = secondaryFoodId
+              ? foodListOfDate[secondaryFoodId]
+              : {};
 
             const participantMaybe = participants.find(
               (p) => p?.id?.uuid === memberId,
@@ -407,36 +408,75 @@ export const groupPickingOrderByFoodLevels = ({
             const { firstName, lastName, displayName } = User(
               (participantMaybe || anonymousUserMaybe) as TUser,
             ).getProfile();
+            const participantName = buildFullName(firstName, lastName, {
+              compareToGetLongerWith: displayName,
+            });
 
-            if (status === EParticipantOrderStatus.joined && foodId !== '') {
-              const data = foodDataResult[foodId] as TObject;
+            const addFoodToResult = (
+              targetMap: TObject,
+              targetFoodId: string,
+              foodInfo: TObject,
+              foodRequirement: string,
+            ) => {
+              if (!targetFoodId) {
+                return targetMap;
+              }
+
+              const { foodName, foodPrice, foodUnit = '' } = foodInfo || {};
+              const data = targetMap[targetFoodId] as TObject;
               const { frequency = 0, notes = [] } = data || {};
               const newNote = {
-                note: requirement,
-                name: buildFullName(firstName, lastName, {
-                  compareToGetLongerWith: displayName,
-                }),
+                note: foodRequirement,
+                name: participantName,
                 ...(planId && {
                   barcode: generateScannerBarCode(planId, memberId, `${date}`),
                 }),
               };
 
-              if (!isEmpty(requirement)) {
-                notes.splice(0, 0, newNote);
+              const updatedNotes = [...notes];
+              if (!isEmpty(foodRequirement)) {
+                updatedNotes.splice(0, 0, newNote);
               } else {
-                notes.push(newNote);
+                updatedNotes.push(newNote);
               }
 
-              foodDataResult[foodId] = data
-                ? { ...data, frequency: frequency + 1, notes }
-                : {
-                    foodId,
-                    foodName,
-                    foodUnit,
-                    foodPrice,
-                    notes,
-                    frequency: 1,
-                  };
+              return {
+                ...targetMap,
+                [targetFoodId]: data
+                  ? {
+                      ...data,
+                      frequency: frequency + 1,
+                      notes: updatedNotes,
+                    }
+                  : {
+                      foodId: targetFoodId,
+                      foodName,
+                      foodUnit,
+                      foodPrice,
+                      notes: updatedNotes,
+                      frequency: 1,
+                    },
+              };
+            };
+
+            if (status === EParticipantOrderStatus.joined && foodId !== '') {
+              const updatedMap = addFoodToResult(
+                foodDataResult,
+                foodId,
+                primaryFoodInfo,
+                requirement,
+              );
+
+              if (secondaryFoodId) {
+                return addFoodToResult(
+                  updatedMap,
+                  secondaryFoodId,
+                  secondaryFoodInfo,
+                  secondaryRequirement,
+                );
+              }
+
+              return updatedMap;
             }
 
             return foodDataResult;
@@ -469,12 +509,13 @@ export const groupPickingOrderByFoodLevels = ({
               foodId,
               status,
               requirement = '',
+              secondaryFoodId,
+              secondaryRequirement = '',
             } = memberOrderData as TObject;
-            const {
-              foodName,
-              foodPrice,
-              foodUnit = '',
-            } = foodListOfDate[foodId] || {};
+            const primaryFoodInfo = foodListOfDate[foodId] || {};
+            const secondaryFoodInfo = secondaryFoodId
+              ? foodListOfDate[secondaryFoodId]
+              : {};
 
             const participantMaybe = participants.find(
               (p) => p?.id?.uuid === memberId,
@@ -485,33 +526,72 @@ export const groupPickingOrderByFoodLevels = ({
             const { firstName, lastName, displayName } = User(
               (participantMaybe || anonymousUserMaybe) as TUser,
             ).getProfile();
+            const participantName = buildFullName(firstName, lastName, {
+              compareToGetLongerWith: displayName,
+            });
 
-            if (status === EParticipantOrderStatus.joined && foodId !== '') {
-              const data = foodDataResult[foodId] as TObject;
-              const { frequency = 0, notes = [] } = data || {};
-              const newNote = {
-                note: requirement,
-                name: buildFullName(firstName, lastName, {
-                  compareToGetLongerWith: displayName,
-                }),
-              };
-
-              if (!isEmpty(requirement)) {
-                notes.splice(0, 0, newNote);
-              } else {
-                notes.push(newNote);
+            const addFoodToResult = (
+              targetMap: TObject,
+              targetFoodId: string,
+              foodInfo: TObject,
+              foodRequirement: string,
+            ) => {
+              if (!targetFoodId) {
+                return targetMap;
               }
 
-              foodDataResult[foodId] = data
-                ? { ...data, frequency: frequency + 1, notes }
-                : {
-                    foodId,
-                    foodName,
-                    foodUnit,
-                    foodPrice,
-                    notes,
-                    frequency: 1,
-                  };
+              const { foodName, foodPrice, foodUnit = '' } = foodInfo || {};
+              const data = targetMap[targetFoodId] as TObject;
+              const { frequency = 0, notes = [] } = data || {};
+              const newNote = {
+                note: foodRequirement,
+                name: participantName,
+              };
+
+              const updatedNotes = [...notes];
+              if (!isEmpty(foodRequirement)) {
+                updatedNotes.splice(0, 0, newNote);
+              } else {
+                updatedNotes.push(newNote);
+              }
+
+              return {
+                ...targetMap,
+                [targetFoodId]: data
+                  ? {
+                      ...data,
+                      frequency: frequency + 1,
+                      notes: updatedNotes,
+                    }
+                  : {
+                      foodId: targetFoodId,
+                      foodName,
+                      foodUnit,
+                      foodPrice,
+                      notes: updatedNotes,
+                      frequency: 1,
+                    },
+              };
+            };
+
+            if (status === EParticipantOrderStatus.joined && foodId !== '') {
+              const updatedMap = addFoodToResult(
+                foodDataResult,
+                foodId,
+                primaryFoodInfo,
+                requirement,
+              );
+
+              if (secondaryFoodId) {
+                return addFoodToResult(
+                  updatedMap,
+                  secondaryFoodId,
+                  secondaryFoodInfo,
+                  secondaryRequirement,
+                );
+              }
+
+              return updatedMap;
             }
           }
 
