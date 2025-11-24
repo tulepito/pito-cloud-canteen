@@ -213,6 +213,11 @@ const TrackingOrderDetailInfo: React.FC<TTrackingOrderDetailInfoProps> = ({
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead colSpan={4} className="font-bold text-[16px] text-black">
+              Tổng số lượng: {totalFood}
+            </TableHead>
+          </TableRow>
+          <TableRow>
             <TableHead className="w-[48px]">STT</TableHead>
             <TableHead>Danh mục</TableHead>
             <TableHead>SL</TableHead>
@@ -253,6 +258,11 @@ const TrackingOrderDetailInfo: React.FC<TTrackingOrderDetailInfoProps> = ({
   return (
     <Table>
       <TableHeader>
+        <TableRow>
+          <TableHead colSpan={4} className="font-bold text-[16px] text-black">
+            Tổng số lượng: {totalFood}
+          </TableHead>
+        </TableRow>
         <TableRow>
           <TableHead className="w-[48px]">STT</TableHead>
           <TableHead>Danh mục</TableHead>
