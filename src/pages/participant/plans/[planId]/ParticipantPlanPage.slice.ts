@@ -384,6 +384,14 @@ const updateOrder = createAsyncThunk(
     } = await updateParticipantOrderApi(orderId, updateValues);
 
     await sleep(2000); // wait for the order to be updated
+    // dispatch(OrderListActions.updatePlanDetail(newPlan));
+    orderDays.forEach((timestamp: string) => {
+      participantSubOrderAddDocumentApi({
+        participantId: currentUserId,
+        planId,
+        timestamp: parseInt(`${timestamp}`, 10),
+      });
+    });
     await dispatch(reloadData(planId));
     // firebase documents for history sub-orders and rating feature
     await Promise.all(

@@ -85,18 +85,24 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
     Tracker.track('participant:order:place', {
       orderId,
     });
+    console.log(`SectionOrderPanel@handleSubmit@orderID:${orderId}`, {
+      cartList,
+    });
     try {
       const res = await dispatch(
         ParticipantPlanThunks.updateOrder({ orderId, planId }),
       );
       // payload will be true if jobId exists
-      if (res?.payload) {
+      if (
+        res?.payload &&
+        res.type === 'app/ParticipantPlanPage/UPDATE_ORDER/fulfilled'
+      ) {
         setIsSubmitSuccess(true);
       } else {
         toast.error('Đã có lỗi xảy ra trong chọn món. Vui lòng thử lại sau');
       }
     } catch (error) {
-      console.error('Error submitting order:', error);
+      console.error('SectionOrderPanel@handleSubmit@error:', error);
       toast.error('Đã có lỗi xảy ra trong chọn món. Vui lòng thử lại sau');
     }
   };
