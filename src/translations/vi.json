@@ -1703,6 +1703,8 @@
   "ReviewTitleSection.title": "Xem lại thông tin đơn hàng {orderTitle}",
   "RoleSelectModal.role.booker": "Người đặt đơn",
   "RoleSelectModal.role.participant": "Người tham gia",
+  "RoleSelectModal.role.admin": "Quản trị viên",
+  "RoleSelectModal.role.partner": "Đối tác",
   "SearchFilter.menu.cycle-menu": "Menu chu kỳ",
   "SearchFilter.menu.fixed-menu": "Menu cố định",
   "SearchOrderForm.keywordsField.placeholder": "Tìm đơn hàng",

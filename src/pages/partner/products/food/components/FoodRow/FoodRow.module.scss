@@ -36,6 +36,15 @@
   width: 100%;
 }
 
+.row {
+  cursor: pointer;
+
+  &.disabled {
+    cursor: default;
+    opacity: 0.6;
+  }
+}
+
 .contentWrapper {
   @include flexAlign(center, space-between);
   gap: 12px;

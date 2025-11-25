@@ -6,8 +6,10 @@ import classNames from 'classnames';
 import Form from '@components/Form/Form';
 import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
 import Pagination from '@components/Pagination/Pagination';
+import { useAppDispatch } from '@hooks/reduxHooks';
 import type { TListing, TPagination } from '@src/utils/types';
 
+import { partnerFoodSliceThunks } from '../../PartnerFood.slice';
 import FoodCard from '../FoodCard/FoodCard';
 
 import css from './GridFoodListForm.module.scss';
@@ -20,6 +22,7 @@ type TExtraProps = {
   foodList: TListing[];
   pagination: TPagination;
   editableFoodMap: Record<string, boolean>;
+  fetchEditableFoodInProgress: boolean;
   foodApprovalActiveTab: string;
   getGridFoodListFormValues: (values: string[]) => void;
   onPageChange: (page: number) => void;
@@ -46,8 +49,10 @@ const GridFoodListFormComponent: React.FC<TGridFoodListFormComponentProps> = (
     openManipulateFoodModal,
     form,
     editableFoodMap,
+    fetchEditableFoodInProgress,
     foodApprovalActiveTab,
   } = props;
+  const dispatch = useAppDispatch();
 
   const onCheckAllChange = (event: any) => {
     const { checked, value, name } = event.target;
@@ -68,6 +73,28 @@ const GridFoodListFormComponent: React.FC<TGridFoodListFormComponentProps> = (
     getGridFoodListFormValues?.(values.foodId || []);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(values)]);
+
+  const foodIdsString = JSON.stringify(foodList.map((f) => f.id.uuid).sort());
+  useEffect(() => {
+    if (foodList.length > 0 && !fetchEditableFoodInProgress) {
+      const foodIds = foodList.map((food) => food.id.uuid);
+      const missingFoodIds = foodIds.filter(
+        (id) => editableFoodMap?.[id] === undefined,
+      );
+
+      if (missingFoodIds.length > 0) {
+        dispatch(
+          partnerFoodSliceThunks.fetchEditableFoodsBatch(missingFoodIds),
+        );
+      }
+    }
+  }, [
+    foodIdsString,
+    fetchEditableFoodInProgress,
+    foodList,
+    editableFoodMap,
+    dispatch,
+  ]);
 
   return (
     <div>

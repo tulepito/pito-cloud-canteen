@@ -169,8 +169,6 @@ const TABLE_COLUMN: TColumn[] = [
   },
 ];
 
-const IMPORT_FILE = 'IMPORT_FILE';
-const GOOGLE_SHEET_LINK = 'GOOGLE_SHEET_LINK';
 const defaultFoodApprovalTabs = [
   EFoodApprovalState.ACCEPTED,
   EFoodApprovalState.PENDING,
@@ -198,14 +196,15 @@ const ManagePartnerFoods = () => {
   const [idsToAction, setIdsToAction] = useState<string[]>([]);
   const [foodToRemove, setFoodToRemove] = useState<any>(null);
   const [file, setFile] = useState<File | null>();
-  const [googleSheetUrl, setGoogleSheetUrl] = useState<string>();
-  const [importType, setImportType] = useState<string>(IMPORT_FILE);
   const [viewListMode, setViewListMode] = useState<string>('grid');
 
   const [selectedFood, setSelectedFood] = useState<TListing>(null!);
 
-  const { value: isImportModalOpen, setFalse: closeImportModal } =
-    useBoolean(false);
+  const {
+    value: isImportModalOpen,
+    setFalse: closeImportModal,
+    setTrue: openImportModal,
+  } = useBoolean(false);
 
   const {
     value: removeCheckedModalOpen,
@@ -259,6 +258,7 @@ const ManagePartnerFoods = () => {
     totalDeclinedFoods,
     totalDraftFoods,
     editableFoodMap,
+    fetchEditableFoodInProgress,
     acceptedFoods,
     pendingFoods,
     declinedFoods,
@@ -504,13 +504,11 @@ const ManagePartnerFoods = () => {
   }, [page, keywords, foodType, createAtStart, createAtEnd]);
 
   const onImportFoodFromCsv = async () => {
-    const hasValue = importType === IMPORT_FILE ? file : googleSheetUrl;
+    const hasValue = file;
     if (hasValue) {
       const { error } = (await dispatch(
         partnerFoodSliceThunks.createPartnerFoodFromCsv({
-          ...(importType === IMPORT_FILE
-            ? { ...(file ? { file } : {}) }
-            : { googleSheetUrl }),
+          file,
         }),
       )) as any;
 
@@ -606,6 +604,7 @@ const ManagePartnerFoods = () => {
         setSelectedFood={setSelectedFood}
         openManipulateFoodModal={manipulateFoodSlideModalController.setTrue}
         editableFoodMap={editableFoodMap}
+        fetchEditableFoodInProgress={fetchEditableFoodInProgress}
         foodApprovalActiveTab={foodApprovalActiveTab}
         initialValues={foodEnableInitialValues}
       />
@@ -622,6 +621,7 @@ const ManagePartnerFoods = () => {
             setSelectedFood={setSelectedFood}
             openManipulateFoodModal={manipulateFoodSlideModalController.setTrue}
             editableFoodMap={editableFoodMap}
+            fetchEditableFoodInProgress={fetchEditableFoodInProgress}
             foodApprovalActiveTab={foodApprovalActiveTab}
             initialValues={foodEnableInitialValues}
           />
@@ -669,6 +669,10 @@ const ManagePartnerFoods = () => {
 
   const handleEditFood = () => {
     manipulateFoodSlideModalController.setFalse();
+
+    if (!editableFoodMap[selectedFood?.id.uuid]) {
+      return;
+    }
 
     router.push({
       pathname: partnerPaths.EditFood.replace('[foodId]', selectedFood.id.uuid),
@@ -736,8 +740,7 @@ const ManagePartnerFoods = () => {
         partnerFoodSliceThunks.fetchApprovalFoods(EFoodApprovalState.DECLINED),
       );
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, foodApprovalActiveTab, JSON.stringify(foodToRemove)]);
+  }, [dispatch, foodApprovalActiveTab]);
 
   useEffect(() => {
     dispatch(partnerFoodSliceThunks.fetchActiveMenus({}));
@@ -747,6 +750,8 @@ const ManagePartnerFoods = () => {
     <ProductLayout
       currentPage="food"
       shouldHideAddProductButton={false}
+      shouldHideImportProductButton={false}
+      handleImportProduct={openImportModal}
       handleAddProduct={handleAddFood}>
       <div className={css.root}>
         <div className={css.tableActions}>
@@ -895,99 +900,45 @@ const ManagePartnerFoods = () => {
           cancelLabel="Hủy"
           confirmInProgress={createPartnerFoodFromCsvInProgress}
           confirmDisabled={createPartnerFoodFromCsvInProgress}>
-          <div className={css.radioButton}>
-            <div className={css.inputWrapper}>
-              <input
-                id="importFile"
-                type="radio"
-                checked={importType === IMPORT_FILE}
-                onChange={() => setImportType(IMPORT_FILE)}
-              />
-              <label htmlFor="importFile">Nhập file</label>
-            </div>
-            <div className={css.inputWrapper}>
-              <input
-                id="googleSheetLink"
-                type="radio"
-                checked={importType === GOOGLE_SHEET_LINK}
-                onChange={() => setImportType(GOOGLE_SHEET_LINK)}
-              />
-              <label htmlFor="googleSheetLink">Link Google Sheet</label>
-            </div>
-          </div>
           <p className={css.downloadFileHere}>
-            {importType !== GOOGLE_SHEET_LINK ? (
-              <FormattedMessage
-                id="ManagePartnerFoods.downloadFileHere"
-                values={{
-                  link: (
-                    <NamedLink
-                      target="_blank"
-                      path={process.env.NEXT_PUBLIC_IMPORT_FOOD_GUIDE_FILE_URL}>
-                      <FormattedMessage id="ManagePartnerFoods.templateLink" />
-                    </NamedLink>
-                  ),
-                }}
-              />
-            ) : (
-              <FormattedMessage
-                id="ManagePartnerFoods.sampleFileHere"
-                values={{
-                  link: (
-                    <NamedLink
-                      target="_blank"
-                      path={process.env.NEXT_PUBLIC_IMPORT_FOOD_TEMPLATE}>
-                      <FormattedMessage id="ManagePartnerFoods.templateLink" />
-                    </NamedLink>
-                  ),
-                }}
-              />
-            )}
+            <FormattedMessage
+              id="ManagePartnerFoods.downloadFileHere"
+              values={{
+                link: (
+                  <NamedLink
+                    target="_blank"
+                    path="/static/12032025-PCC-TẠO MÓN ĂN TEMPLATE.xlsx">
+                    <FormattedMessage id="ManagePartnerFoods.templateLink" />
+                  </NamedLink>
+                ),
+              }}
+            />
           </p>
-          {importType === GOOGLE_SHEET_LINK ? (
-            <div>
-              <input
-                onChange={({ target }) => setGoogleSheetUrl(target.value)}
-                type="text"
-                name="file"
-                value={googleSheetUrl}
-                id="file"
-                placeholder="Nhập link google sheet"
-                className={css.googleSheetInput}
-              />
-              <p>
-                {
-                  'Vào Google Sheet -> chọn File -> chọn Share -> chọn Publish to the web -> Chọn dạng publish là CSV -> Publish -> Copy pubished link -> Paste vào ô nhập'
-                }
-              </p>
-            </div>
-          ) : (
-            <div className={css.inputWrapper}>
-              <input
-                accept=".xlsx,.xls"
-                onChange={onChangeFile}
-                type="file"
-                className={css.inputFile}
-                name="file"
-                id="file"
-              />
-              <label className={css.importLabel}>
-                <FormattedMessage id="ManagePartnerFoods.importLabel" />
-              </label>
-              <label htmlFor="file">
-                <div className={css.fileLabel}>
-                  {file ? (
-                    file.name
-                  ) : (
-                    <FormattedMessage id="ManagePartnerFoods.inputFile" />
-                  )}
-                </div>
-              </label>
-              {createPartnerFoodFromCsvError && (
-                <ErrorMessage message={createPartnerFoodFromCsvError.message} />
-              )}
-            </div>
-          )}
+          <div className={css.inputWrapper}>
+            <input
+              accept=".xlsx,.xls"
+              onChange={onChangeFile}
+              type="file"
+              className={css.inputFile}
+              name="file"
+              id="file"
+            />
+            <label className={css.importLabel}>
+              <FormattedMessage id="ManagePartnerFoods.importLabel" />
+            </label>
+            <label htmlFor="file">
+              <div className={css.fileLabel}>
+                {file ? (
+                  file.name
+                ) : (
+                  <FormattedMessage id="ManagePartnerFoods.inputFile" />
+                )}
+              </div>
+            </label>
+            {createPartnerFoodFromCsvError && (
+              <ErrorMessage message={createPartnerFoodFromCsvError.message} />
+            )}
+          </div>
         </AlertModal>
         <AlertModal
           title={<FormattedMessage id="ManagePartnerFoods.removeTitle" />}
