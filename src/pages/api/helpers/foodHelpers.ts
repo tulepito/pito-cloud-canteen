@@ -204,6 +204,7 @@ const removeFoodFromDraftOrder = async (
   menuIds: string[],
   deletedFoodId: string,
 ) => {
+  if (menuIds.length === 0) return;
   const integrationSdk = getIntegrationSdk();
 
   const plans = await queryAllListings({

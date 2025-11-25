@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { Field } from 'react-final-form';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
@@ -181,13 +180,6 @@ const FoodCard: React.FC<TFoodCardProps> = (props) => {
     input.onChange(value);
   };
 
-  useEffect(() => {
-    if (!editableFoodMap[foodId]) {
-      dispatch(partnerFoodSliceThunks.fetchEditableFood(foodId));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [foodId, dispatch]);
-
   return (
     <div className={css.cardWrapper}>
       <FieldCheckbox
@@ -236,9 +228,20 @@ const FoodCard: React.FC<TFoodCardProps> = (props) => {
             <>
               <NamedLink
                 path={partnerPaths.EditFood.replace('[foodId]', foodId)}>
-                <div className={css.item}>Chỉnh sửa</div>
+                <div
+                  className={classNames(css.item, {
+                    [css.disabled]: !editableFoodMap[foodId],
+                  })}>
+                  Chỉnh sửa
+                </div>
               </NamedLink>
-              <div className={css.item} onClick={handleRemoveFood}>
+              <div
+                className={classNames(css.item, {
+                  [css.disabled]: !editableFoodMap[foodId],
+                })}
+                onClick={
+                  editableFoodMap[foodId] ? handleRemoveFood : undefined
+                }>
                 Xóa
               </div>
             </>

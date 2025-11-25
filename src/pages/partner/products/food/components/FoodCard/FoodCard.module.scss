@@ -65,6 +65,13 @@
         &:hover {
           background-color: $neutralGray2;
         }
+
+        &.disabled {
+          pointer-events: none;
+          cursor: default;
+          color: $neutralGray5;
+          opacity: 0.6;
+        }
       }
     }
   }

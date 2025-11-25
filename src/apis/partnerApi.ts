@@ -52,6 +52,9 @@ export const removePartnerMultipleFoodApi = (body: TBodyParams) =>
 export const fetchFoodEditableApi = (foodId: string) =>
   getApi(`${BASE_URL}/food/${foodId}/fetch-editable`);
 
+export const fetchFoodEditableBatchApi = (foodIds: string[]) =>
+  postApi(`${BASE_URL}/food/fetch-editables`, { foodIds });
+
 export const fetchFoodDeletableApi = (foodId: string) =>
   getApi(`${BASE_URL}/food/${foodId}/fetch-deletable`);
 

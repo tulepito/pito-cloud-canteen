@@ -1695,6 +1695,8 @@
   "ReviewTitleSection.title": "Review order information {orderTitle}",
   "RoleSelectModal.role.booker": "Booker",
   "RoleSelectModal.role.participant": "Participant",
+  "RoleSelectModal.role.admin": "Admin",
+  "RoleSelectModal.role.partner": "Partner",
   "SearchFilter.menu.cycle-menu": "Cycle menu",
   "SearchFilter.menu.fixed-menu": "Fixed menu",
   "SearchOrderForm.keywordsField.placeholder": "Search for orders",
