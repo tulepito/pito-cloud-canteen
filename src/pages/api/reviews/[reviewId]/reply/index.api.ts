@@ -18,6 +18,7 @@ import { CurrentUser, Listing, User } from '@src/utils/data';
 import {
   ENativeNotificationType,
   ENotificationType,
+  EPartnerReply,
   ESlackNotificationType,
   EUserRole,
 } from '@src/utils/enums';
@@ -128,6 +129,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                 ...(review?.attributes?.metadata?.replies || []),
                 replyObject,
               ],
+              ...(replyRole === EUserRole.partner && {
+                partnerReplyStatus: EPartnerReply.pending,
+              }),
             },
           });
 

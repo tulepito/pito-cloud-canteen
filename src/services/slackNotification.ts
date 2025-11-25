@@ -149,10 +149,6 @@ type SlackNotificationParams = {
     reviewId: string;
     reviewLink: string;
     partnerName: string;
-    replyContent: string;
-    foodName: string;
-    reviewerName: string;
-    orderCode: string;
     threadTs?: string;
   };
 };
@@ -989,15 +985,8 @@ export const createSlackNotification = async (
       case ESlackNotificationType.ADMIN_APPROVE_PARTNER_REPLY_REVIEW: {
         if (!notificationParams.adminApprovePartnerReplyReviewData) return;
 
-        const {
-          reviewLink,
-          partnerName,
-          replyContent,
-          foodName,
-          reviewerName,
-          orderCode,
-          threadTs,
-        } = notificationParams.adminApprovePartnerReplyReviewData;
+        const { reviewLink, partnerName, threadTs } =
+          notificationParams.adminApprovePartnerReplyReviewData;
 
         await axios.post(
           process.env.SLACK_RATING_WEBHOOK_URL,
@@ -1008,14 +997,7 @@ export const createSlackNotification = async (
                 type: 'section',
                 text: {
                   type: 'mrkdwn',
-                  text: `:speech_balloon: *Nhà hàng ${partnerName}* đã phản hồi đánh giá của *${reviewerName}* về món *${foodName}* trong đơn hàng *#${orderCode}*`,
-                },
-              },
-              {
-                type: 'section',
-                text: {
-                  type: 'mrkdwn',
-                  text: `*Nội dung phản hồi:*\n${replyContent}`,
+                  text: `:speech_balloon: *Admin đã duyệt phản hồi của nhà hàng ${partnerName}*`,
                 },
               },
               {
