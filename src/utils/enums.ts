@@ -529,3 +529,9 @@ export enum EAppLocale {
   VI = 'vi',
   EN = 'en',
 }
+
+export enum EPartnerReply {
+  pending = 'pending',
+  approved = 'approved',
+  rejected = 'rejected',
+}

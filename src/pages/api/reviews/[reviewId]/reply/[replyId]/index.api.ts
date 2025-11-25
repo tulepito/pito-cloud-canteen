@@ -4,7 +4,7 @@ import { HttpMethod } from '@apis/configs';
 import cookies from '@services/cookie';
 import { denormalisedResponseEntities } from '@services/data';
 import { emailSendingFactory, EmailTemplateTypes } from '@services/email';
-import { fetchListing, fetchUser } from '@services/integrationHelper';
+import { fetchListing } from '@services/integrationHelper';
 import { getIntegrationSdk } from '@services/integrationSdk';
 import { createNativeNotification } from '@services/nativeNotification';
 import { createFirebaseDocNotification } from '@services/notifications';
@@ -12,7 +12,7 @@ import adminChecker from '@services/permissionChecker/admin';
 import { getSdk, handleError } from '@services/sdk';
 import { createSlackNotification } from '@services/slackNotification';
 import type { RatingListing, TReviewReply } from '@src/types';
-import { Listing, User } from '@src/utils/data';
+import { Listing } from '@src/utils/data';
 import {
   ENativeNotificationType,
   ENotificationType,
@@ -99,6 +99,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             metadata: {
               ...review?.attributes?.metadata,
               replies: updatedReplies,
+              ...(partnerReply.replyRole === EUserRole.partner && {
+                partnerReplyStatus: status,
+              }),
             },
           });
 
@@ -113,10 +116,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             const reviewListing = Listing(updatedReview);
             const { foodName, restaurantId, reviewerId } =
               reviewListing.getMetadata();
-            const reviewer = await fetchUser(reviewerId);
-            const reviewerUser = reviewer ? User(reviewer) : null;
-            const reviewerName =
-              reviewerUser?.getProfile()?.displayName || 'Người dùng';
             let partnerName = partnerReply.authorName;
             if (restaurantId) {
               try {
@@ -180,10 +179,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                     reviewId,
                     reviewLink: `${process.env.NEXT_PUBLIC_CANONICAL_URL}/admin/reviews`,
                     partnerName: partnerReply.authorName || '',
-                    replyContent: partnerReply.replyContent || '',
-                    foodName,
-                    reviewerName,
-                    orderCode: order?.attributes?.title,
                     threadTs: review?.attributes?.metadata?.slackThreadTs,
                   },
                 },

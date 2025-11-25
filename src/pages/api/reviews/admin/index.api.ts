@@ -4,7 +4,7 @@ import { HttpMethod } from '@apis/configs';
 import cookies from '@services/cookie';
 import { denormalisedResponseEntities } from '@services/data';
 import { getIntegrationSdk, getSdk, handleError } from '@services/sdk';
-import type { RatingListing } from '@src/types';
+import type { RatingListing, TReviewReplyStatus } from '@src/types';
 import { buildFullNameFromProfile } from '@src/utils/emailTemplate/participantOrderPicking';
 import { EListingType, EUserRole } from '@src/utils/enums';
 import { SuccessResponse } from '@src/utils/response';
@@ -23,12 +23,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             page = 1,
             perPage = 10,
             orderCode = undefined,
+            partnerReplyStatus,
             ratings = [1, 2, 3, 4, 5],
           } = JSON.parse(req.query.JSONParams as string) as {
             page: number;
             perPage: number;
             orderCode: string | undefined;
             ratings: number[] | undefined;
+            partnerReplyStatus?: TReviewReplyStatus;
           };
           const ratingString = ratings?.join(',');
           const response = await sdk.listings.query({
@@ -37,6 +39,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             perPage: Number(perPage),
             meta_orderCode: orderCode,
             meta_generalRatingValue: `has_any:${ratingString}`,
+            ...(partnerReplyStatus
+              ? { meta_partnerReplyStatus: partnerReplyStatus }
+              : {}),
             include: ['images', 'author'],
           });
 

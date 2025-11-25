@@ -47,6 +47,7 @@ const ReviewCard = ({
   const [processingReplyId, setProcessingReplyId] = useState<string | null>(
     null,
   );
+
   const MAX_IMAGES_TO_SHOW = 4;
   const currentUser = useAppSelector(currentUserSelector);
 
@@ -287,7 +288,7 @@ const ReviewCard = ({
               id: 'ReviewCard.replyPlaceholder',
             })}
             className="w-full p-2 border border-gray-300 bg-gray-50 rounded text-sm resize-none focus:ring-1 focus:ring-black focus:border-black"
-            rows={2}
+            rows={3}
             disabled={isSubmittingReply}
           />
           <div className="flex justify-end gap-2 mt-2">

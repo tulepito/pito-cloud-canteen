@@ -6,13 +6,14 @@ import {
   postReplyReviewApi,
 } from '@apis/reviewApi';
 import { createAsyncThunk } from '@redux/redux.helper';
-import type { RatingListing } from '@src/types';
+import type { RatingListing, TReviewReplyStatus } from '@src/types';
 import type { EUserRole } from '@src/utils/enums';
 import type { TPagination } from '@src/utils/types';
 import { storableError } from '@utils/errors';
 
 // ================ Async thunks ================ //
 const FETCH_ADMIN_REVIEWS = 'app/Reviews/FETCH_ADMIN_REVIEWS';
+const FETCH_PENDING_REPLY_REVIEWS = 'app/Reviews/FETCH_PENDING_REPLY_REVIEWS';
 const SUBMIT_REPLY = 'app/Reviews/SUBMIT_REPLY';
 const PROCESS_REPLY = 'app/Reviews/PROCESS_REPLY';
 
@@ -28,20 +29,44 @@ export const fetchReviews = createAsyncThunk(
   ) => {
     const { page = 1, limit = 10 } = params;
 
-    const queryParams = new URLSearchParams({
-      page: page.toString(),
-      pageSize: limit.toString(),
-    });
-
-    if (params.orderCode) {
-      queryParams.append('orderCode', params.orderCode);
-    }
-    if (params.ratings) {
-      queryParams.append('rating', params.ratings.join(','));
-    }
     const response = await getAdminReviewsApi(page, limit, {
       orderCode: params.orderCode,
       ratings: params.ratings,
+    });
+
+    const data = response.data.data;
+
+    return {
+      reviews: data || [],
+      pagination: response.data.pagination || {
+        totalItems: 0,
+        totalPages: 0,
+        page: 1,
+        perPage: limit,
+      },
+    };
+  },
+  {
+    serializeError: storableError,
+  },
+);
+
+export const fetchPendingReplyReviews = createAsyncThunk(
+  FETCH_PENDING_REPLY_REVIEWS,
+  async (
+    params: {
+      page?: number;
+      limit?: number;
+      orderCode?: string;
+      ratings?: number[];
+    } = {},
+  ) => {
+    const { page = 1, limit = 10 } = params;
+
+    const response = await getAdminReviewsApi(page, limit, {
+      orderCode: params.orderCode,
+      ratings: params.ratings,
+      partnerReplyStatus: 'pending' as TReviewReplyStatus,
     });
 
     const data = response.data.data;
@@ -201,14 +226,18 @@ export const processReply = createAsyncThunk<
 type TReviewsState = {
   // Data
   reviews: (RatingListing & { authorName: string })[];
+  partnerReplyPendingReviews: (RatingListing & { authorName: string })[];
+  partnerReplyPendingPagination: TPagination;
   pagination: TPagination;
 
   // Loading states
   fetchReviewsInProgress: boolean;
+  fetchPendingReplyReviewsInProgress: boolean;
   submitReplyInProgress: boolean;
 
   // Error states
   fetchReviewsError: any;
+  fetchPendingReplyReviewsError: any;
   submitReplyError: any;
 
   // UI states
@@ -220,6 +249,13 @@ type TReviewsState = {
 
 const initialState: TReviewsState = {
   reviews: [] as (RatingListing & { authorName: string })[],
+  partnerReplyPendingReviews: [] as (RatingListing & { authorName: string })[],
+  partnerReplyPendingPagination: {
+    totalItems: 0,
+    totalPages: 0,
+    page: 1,
+    perPage: 10,
+  },
   pagination: {
     totalItems: 0,
     totalPages: 1,
@@ -227,8 +263,10 @@ const initialState: TReviewsState = {
     perPage: 10,
   },
   fetchReviewsInProgress: false,
+  fetchPendingReplyReviewsInProgress: false,
   submitReplyInProgress: false,
   fetchReviewsError: null,
+  fetchPendingReplyReviewsError: null,
   submitReplyError: null,
   filters: {
     orderCode: undefined,
@@ -249,6 +287,7 @@ const reviewsSlice = createSlice({
     },
     clearErrors: (state) => {
       state.fetchReviewsError = null;
+      state.fetchPendingReplyReviewsError = null;
       state.submitReplyError = null;
     },
 
@@ -307,6 +346,20 @@ const reviewsSlice = createSlice({
         state.fetchReviewsInProgress = false;
         state.fetchReviewsError = action.payload;
       })
+      .addCase(fetchPendingReplyReviews.pending, (state) => {
+        state.fetchPendingReplyReviewsInProgress = true;
+        state.fetchPendingReplyReviewsError = null;
+      })
+      .addCase(fetchPendingReplyReviews.fulfilled, (state, action) => {
+        state.fetchPendingReplyReviewsInProgress = false;
+        const newReviews = action.payload.reviews;
+        state.partnerReplyPendingReviews = newReviews;
+        state.partnerReplyPendingPagination = action.payload.pagination;
+      })
+      .addCase(fetchPendingReplyReviews.rejected, (state, action) => {
+        state.fetchPendingReplyReviewsInProgress = false;
+        state.fetchPendingReplyReviewsError = action.payload;
+      })
       .addCase(fetchReviewsSilent.fulfilled, (state, action) => {
         const newReviews = action.payload.reviews;
 
@@ -354,27 +407,33 @@ const reviewsSlice = createSlice({
         state.submitReplyError = action.payload;
       });
 
-    builder
-      .addCase(processReply.fulfilled, (state, action) => {
-        const { reviewId, updatedReview } = action.payload;
+    builder.addCase(processReply.fulfilled, (state, action) => {
+      const { reviewId, updatedReview } = action.payload;
 
-        const reviewIndex = state.reviews.findIndex(
-          (r) => r.id?.uuid === reviewId,
-        );
-        console.log('reviewIndex', reviewIndex);
-        console.log('updatedReview', updatedReview);
+      // Update in reviews list
+      const reviewIndex = state.reviews.findIndex(
+        (r) => r.id?.uuid === reviewId,
+      );
 
-        if (reviewIndex !== -1) {
-          const existingReview = state.reviews[reviewIndex];
-          state.reviews[reviewIndex] = {
-            authorName: existingReview.authorName,
-            ...updatedReview,
-          };
-        }
-      })
-      .addCase(processReply.rejected, (_state) => {
-        // Error handling is done in the component
+      if (reviewIndex !== -1) {
+        const existingReview = state.reviews[reviewIndex];
+        state.reviews[reviewIndex] = {
+          authorName: existingReview.authorName,
+          ...updatedReview,
+        };
+      }
+
+      // Update in pending reply reviews list
+      const newPendingReview = state.partnerReplyPendingReviews.filter((r) => {
+        return r.id?.uuid !== reviewId;
       });
+
+      state.partnerReplyPendingReviews = newPendingReview;
+      state.partnerReplyPendingPagination = {
+        ...state.partnerReplyPendingPagination,
+        totalItems: state.partnerReplyPendingPagination.totalItems - 1,
+      };
+    });
   },
 });
 

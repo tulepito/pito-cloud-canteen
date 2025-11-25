@@ -421,7 +421,7 @@ export type ParticipantSubOrderDocument = DeepPartial<{
   id: string;
 }>;
 
-export type TReviewStatus = 'pending' | 'approved' | 'rejected';
+export type TReviewReplyStatus = 'pending' | 'approved' | 'rejected';
 
 export type TReviewReply = {
   id?: string;
@@ -430,7 +430,7 @@ export type TReviewReply = {
   replyRole: EUserRole;
   replyContent: string;
   repliedAt: number;
-  status?: TReviewStatus;
+  status?: TReviewReplyStatus;
   approvedAt?: number;
   approvedBy?: string;
 };
