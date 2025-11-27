@@ -777,6 +777,10 @@ const partnerFoodSlice = createSlice({
     setInitialStates: () => ({
       ...initialState,
     }),
+    setCreateCsvError: (state, { payload }) => ({
+      ...state,
+      createPartnerFoodFromCsvError: payload,
+    }),
   },
   extraReducers: (builder) => {
     builder

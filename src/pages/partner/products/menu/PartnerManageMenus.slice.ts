@@ -380,7 +380,7 @@ const publishDraftMenu = createAsyncThunk(
         menuName,
         startDate,
         endDate,
-        foodByDate = {},
+        draftFoodByDate = {},
         mealTypes = [],
         daysOfWeek = [],
       } = getState().PartnerManageMenus.draftMenu || {};
@@ -398,7 +398,7 @@ const publishDraftMenu = createAsyncThunk(
           startDate,
           endDate,
           mealTypes,
-          draftFoodByDate: foodByDate,
+          draftFoodByDate,
           mealType: mealTypes[0],
           daysOfWeek,
           restaurantId: restaurantListingId,
@@ -437,6 +437,9 @@ const PartnerManageMenusSlice = createSlice({
   reducers: {
     saveDraft: (state, { payload }) => {
       state.draftMenu = payload;
+    },
+    clearDraft: (state) => {
+      state.draftMenu = {};
     },
     addPickedFood: (state, { payload }) => {
       state.pickedFood = uniqBy([...state.pickedFood, ...payload], 'id.uuid');

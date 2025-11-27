@@ -5,6 +5,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { shallowEqual } from 'react-redux';
+import { toast } from 'react-toastify';
 import classNames from 'classnames';
 import intersection from 'lodash/intersection';
 import { useRouter } from 'next/router';
@@ -39,10 +40,13 @@ import {
 } from '@helpers/food';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
+import { useFoodImportPreview } from '@hooks/useFoodImportPreview';
 import { useViewport } from '@hooks/useViewport';
+import { getFoodImportPreviewColumns } from '@pages/admin/partner/[restaurantId]/settings/food/getFoodImportPreviewColumns';
+import { PreviewTable } from '@pages/admin/partner/[restaurantId]/settings/food/PreviewTable';
 import KeywordSearchForm from '@pages/admin/partner/components/KeywordSearchForm/KeywordSearchForm';
 import { partnerPaths } from '@src/paths';
-import { Listing } from '@src/utils/data';
+import { CurrentUser, Listing } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
 import { EFoodApprovalState } from '@utils/enums';
 import type { TListing } from '@utils/types';
@@ -54,7 +58,10 @@ import MoveFoodToMenuModal from './components/MoveFoodToMenuModal/MoveFoodToMenu
 import RowFoodListForm from './components/RowFoodListForm/RowFoodListForm';
 import FilterForm from './FilterForm/FilterForm';
 import { NEW_FOOD_ID } from './helpers/editFood';
-import { partnerFoodSliceThunks } from './PartnerFood.slice';
+import {
+  partnerFoodSliceActions,
+  partnerFoodSliceThunks,
+} from './PartnerFood.slice';
 
 import css from './ManagePartnerFoods.module.scss';
 
@@ -195,10 +202,28 @@ const ManagePartnerFoods = () => {
 
   const [idsToAction, setIdsToAction] = useState<string[]>([]);
   const [foodToRemove, setFoodToRemove] = useState<any>(null);
-  const [file, setFile] = useState<File | null>();
   const [viewListMode, setViewListMode] = useState<string>('grid');
 
   const [selectedFood, setSelectedFood] = useState<TListing>(null!);
+
+  const currentUser = useAppSelector((state) => state.user.currentUser);
+  const currentUserGetter = currentUser ? CurrentUser(currentUser) : null;
+  const restaurantId = currentUserGetter?.getMetadata()?.restaurantListingId;
+
+  const {
+    previewRecords,
+    setPreviewRecords,
+    isCreatingModeOn,
+    isCreatingModeCompletedOneWayFlag,
+    numberOfCreatedRecords,
+    totalRecords,
+    handleFileChange,
+    onImportFoodFromCsv,
+    resetImportState,
+  } = useFoodImportPreview({
+    restaurantId,
+    packagingOptions,
+  });
 
   const {
     value: isImportModalOpen,
@@ -503,22 +528,6 @@ const ManagePartnerFoods = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, keywords, foodType, createAtStart, createAtEnd]);
 
-  const onImportFoodFromCsv = async () => {
-    const hasValue = file;
-    if (hasValue) {
-      const { error } = (await dispatch(
-        partnerFoodSliceThunks.createPartnerFoodFromCsv({
-          file,
-        }),
-      )) as any;
-
-      if (!error) {
-        closeImportModal();
-        setFile(null);
-      }
-    }
-  };
-
   const makeExcelFile = () => {
     const foodsToExport = parseEntitiesToExportCsv(
       foods,
@@ -533,17 +542,8 @@ const ManagePartnerFoods = () => {
   };
 
   const onChangeFile = (e: any) => {
-    e.stopPropagation();
-    e.preventDefault();
-    const files =
-      e.dataTransfer && e.dataTransfer.files.length > 0
-        ? [...e.dataTransfer.files]
-        : [...e.target.files];
-
-    if (files[0]) {
-      setFile(files[0]);
-      e.target.value = '';
-    }
+    dispatch(partnerFoodSliceActions.setCreateCsvError(null));
+    handleFileChange(e);
   };
 
   const onSetViewListMode = (mode: string) => () => {
@@ -700,6 +700,12 @@ const ManagePartnerFoods = () => {
     }
   };
 
+  const handleCloseImportModal = () => {
+    dispatch(partnerFoodSliceActions.setCreateCsvError(null));
+    resetImportState();
+    closeImportModal();
+  };
+
   useEffect(() => {
     if (tabFromQuery) {
       const tabIndexMaybe =
@@ -745,6 +751,27 @@ const ManagePartnerFoods = () => {
   useEffect(() => {
     dispatch(partnerFoodSliceThunks.fetchActiveMenus({}));
   }, [dispatch]);
+
+  const handleConfirmImportModal = async () => {
+    if (isCreatingModeCompletedOneWayFlag) {
+      router.push(partnerPaths.CreateMenu);
+
+      return;
+    }
+
+    if (!restaurantId) {
+      toast.error('Không tìm thấy thông tin nhà hàng');
+
+      return;
+    }
+
+    await onImportFoodFromCsv();
+  };
+
+  const columns = useMemo(
+    () => getFoodImportPreviewColumns(setPreviewRecords),
+    [setPreviewRecords],
+  );
 
   return (
     <ProductLayout
@@ -892,14 +919,28 @@ const ManagePartnerFoods = () => {
         {queryFoodsInProgress ? <LoadingContainer /> : viewModeContentRendered}
         <AlertModal
           isOpen={isImportModalOpen}
-          handleClose={closeImportModal}
-          confirmLabel="Nhập"
-          onCancel={closeImportModal}
-          onConfirm={onImportFoodFromCsv}
+          handleClose={handleCloseImportModal}
+          containerClassName={
+            previewRecords.length > 0 ? '!min-w-[80vw] !w-full' : undefined
+          }
+          confirmLabel={
+            isCreatingModeCompletedOneWayFlag
+              ? 'Tạo menu'
+              : isCreatingModeOn
+              ? `Đang tạo ${numberOfCreatedRecords}/${totalRecords}...`
+              : 'Tạo'
+          }
+          onCancel={handleCloseImportModal}
+          onConfirm={handleConfirmImportModal}
           title={<FormattedMessage id="ManagePartnerFoods.importTitle" />}
           cancelLabel="Hủy"
           confirmInProgress={createPartnerFoodFromCsvInProgress}
-          confirmDisabled={createPartnerFoodFromCsvInProgress}>
+          confirmDisabled={
+            previewRecords.some((record) => record.imageBase64Loading) ||
+            createPartnerFoodFromCsvInProgress ||
+            !previewRecords.length ||
+            (isCreatingModeOn && numberOfCreatedRecords !== totalRecords)
+          }>
           <p className={css.downloadFileHere}>
             <FormattedMessage
               id="ManagePartnerFoods.downloadFileHere"
@@ -914,7 +955,15 @@ const ManagePartnerFoods = () => {
               }}
             />
           </p>
-          <div className={css.inputWrapper}>
+          <a className={classNames(css.inputWrapper, 'inline-block')}>
+            <label
+              htmlFor="file"
+              className={classNames(
+                css.importLabel,
+                '!text-blue-500 underline !cursor-pointer !m-0',
+              )}>
+              <FormattedMessage id="ManagePartnerFoods.importLabel" />
+            </label>
             <input
               accept=".xlsx,.xls"
               onChange={onChangeFile}
@@ -923,22 +972,21 @@ const ManagePartnerFoods = () => {
               name="file"
               id="file"
             />
-            <label className={css.importLabel}>
-              <FormattedMessage id="ManagePartnerFoods.importLabel" />
-            </label>
-            <label htmlFor="file">
-              <div className={css.fileLabel}>
-                {file ? (
-                  file.name
-                ) : (
-                  <FormattedMessage id="ManagePartnerFoods.inputFile" />
-                )}
-              </div>
-            </label>
+
             {createPartnerFoodFromCsvError && (
               <ErrorMessage message={createPartnerFoodFromCsvError.message} />
             )}
-          </div>
+          </a>
+          {!!previewRecords.length && (
+            <PreviewTable columns={columns} data={previewRecords} />
+          )}
+          {isCreatingModeCompletedOneWayFlag && (
+            <div className="flex justify-center items-center">
+              <p className="font-bold text-black text-sm">
+                {numberOfCreatedRecords}/{totalRecords} món ăn đã tải lên
+              </p>
+            </div>
+          )}
         </AlertModal>
         <AlertModal
           title={<FormattedMessage id="ManagePartnerFoods.removeTitle" />}
