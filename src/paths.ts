@@ -479,6 +479,18 @@ export const partnerRoutes = {
     path: partnerPaths.ManageReviews,
     label: 'Đánh giá',
   },
+  ManageMenus: {
+    path: partnerPaths.ManageMenus,
+    label: 'Thực đơn',
+  },
+  CreateMenu: {
+    path: partnerPaths.CreateMenu,
+    label: 'Tạo thực đơn',
+  },
+  EditMenu: {
+    path: partnerPaths.EditMenu,
+    label: 'Chỉnh sửa thực đơn',
+  },
 };
 
 export const thankYouPaths =
