@@ -10,15 +10,25 @@ const getLabelByKey = (options, key) => {
   return get(option, 'label', '');
 };
 
-exports.recommendFood = (foodListings, subOrderFoodIds, allergies) => {
-  const subOrderFoodList = foodListings.filter(
-    (food) =>
-      food.id?.uuid &&
-      subOrderFoodIds.includes(food.id.uuid) &&
-      !food?.attributes?.publicData?.foodType
-        ?.toLowerCase()
-        .includes('vegetarian'),
-  );
+exports.recommendFood = (
+  foodListings,
+  subOrderFoodIds,
+  allergies,
+  isVegetarianOnly = false,
+) => {
+  const subOrderFoodList = foodListings.filter((food) => {
+    if (!food.id?.uuid || !subOrderFoodIds.includes(food.id.uuid)) {
+      return false;
+    }
+
+    const foodType =
+      food?.attributes?.publicData?.foodType?.toLowerCase() || '';
+    const isVegetarian = foodType.includes('vegetarian');
+
+    // If isVegetarianOnly = true, only pick vegetarian food
+    // If isVegetarianOnly = false, remove vegetarian food (old logic)
+    return isVegetarianOnly ? isVegetarian : !isVegetarian;
+  });
 
   const filteredFoodListByAllergies = subOrderFoodList.filter((food) => {
     const parsedFoodAllergies =
