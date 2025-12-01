@@ -8,8 +8,8 @@ import { findClassDays } from '@utils/dates';
 import type { TIntegrationListing } from '@utils/types';
 
 import {
-  type TMenuSnapshot,
-  buildMenuSnapshot,
+  type TDraftMenu,
+  type TFoodByDateToRender,
   createSyntheticMenu,
 } from '../utils';
 
@@ -20,18 +20,18 @@ type TUseMenuDataMergeProps = {
 };
 
 type TUseMenuDataMergeReturn = {
-  snapshot: TMenuSnapshot;
+  draftMenu: TDraftMenu | null;
   syntheticMenu: TIntegrationListing;
   menuPickedFoods: TIntegrationListing[];
   listDates: number[];
   minDate: number;
   anchorDate: Date;
-  foodByDateToRender: any;
+  foodByDateToRender: TFoodByDateToRender;
 };
 
 /**
  * Custom hook to merge menu data from different sources
- * Handles the complex logic of combining currentMenu and draftMenu
+ * Uses draftMenu directly instead of snapshot
  */
 export const useMenuDataMerge = ({
   currentMenu,
@@ -42,16 +42,10 @@ export const useMenuDataMerge = ({
     (state) => state.PartnerManageMenus.draftMenu,
   );
 
-  // Build snapshot from current menu or draft menu
-  const snapshot = useMemo(
-    () => buildMenuSnapshot(currentMenu, draftMenu),
-    [currentMenu, draftMenu],
-  );
-
   // Create synthetic menu for form rendering
   const syntheticMenu = useMemo(
-    () => createSyntheticMenu(snapshot, menuId, restaurantId, currentMenu),
-    [snapshot, menuId, restaurantId, currentMenu],
+    () => createSyntheticMenu(draftMenu, menuId, restaurantId, currentMenu),
+    [draftMenu, menuId, restaurantId, currentMenu],
   );
 
   // Get menu listing helper
@@ -71,17 +65,16 @@ export const useMenuDataMerge = ({
 
   // Calculate list of dates based on start/end date and days of week
   // findClassDays returns timestamps (number[])
-  const listDates = useMemo(
-    () =>
-      snapshot.startDate && snapshot.endDate
-        ? findClassDays(
-            snapshot.daysOfWeek,
-            new Date(snapshot.startDate),
-            new Date(snapshot.endDate),
-          )
-        : [],
-    [snapshot.daysOfWeek, snapshot.startDate, snapshot.endDate],
-  );
+  const startDate = draftMenu?.startDate;
+  const endDate = draftMenu?.endDate;
+
+  const listDates = useMemo(() => {
+    const daysOfWeek = draftMenu?.daysOfWeek || [];
+
+    return startDate && endDate
+      ? findClassDays(daysOfWeek, new Date(startDate), new Date(endDate))
+      : [];
+  }, [draftMenu?.daysOfWeek, startDate, endDate]);
 
   // Find minimum date (listDates contains timestamps)
   const minDate = useMemo(
@@ -98,18 +91,14 @@ export const useMenuDataMerge = ({
   const anchorDate = useMemo(() => new Date(minDate), [minDate]);
 
   // Render foods by date for form
-  const foodByDateToRender = useMemo(
-    () =>
-      renderValuesForFoodsByDate(
-        snapshot.foodsByDate,
-        anchorDate,
-        menuPickedFoods,
-      ),
-    [snapshot.foodsByDate, anchorDate, menuPickedFoods],
-  );
+  const foodByDateToRender = useMemo(() => {
+    const foodsByDate = draftMenu?.foodsByDate || {};
+
+    return renderValuesForFoodsByDate(foodsByDate, anchorDate, menuPickedFoods);
+  }, [draftMenu?.foodsByDate, anchorDate, menuPickedFoods]);
 
   return {
-    snapshot,
+    draftMenu,
     syntheticMenu,
     menuPickedFoods,
     listDates,
