@@ -14,6 +14,7 @@ import {
   sendRemindPickingNativeNotificationToBookerScheduler,
   updateScheduler,
   upsertAutomaticStartOrderScheduler,
+  upsertPickFoodForEmptyMembersScheduler,
 } from '@services/awsEventBrigdeScheduler';
 import {
   adminQueryListings,
@@ -50,6 +51,7 @@ const updateOrder = async ({
     startDate,
     deliveryHour,
     orderType = EOrderType.group,
+    isAutoPickFood,
   } = Listing(orderListing).getMetadata();
   const companyAccount = await fetchUser(companyId);
 
@@ -113,6 +115,16 @@ const updateOrder = async ({
         } catch {
           // ignore error
         }
+      }
+      // update scheduler for auto picking food for empty members
+      if (isGroupOrder && isAutoPickFood && updateDeadlineDate) {
+        await upsertPickFoodForEmptyMembersScheduler({
+          orderId,
+          deadlineDate: updateDeadlineDate,
+          params: {
+            orderId,
+          },
+        });
       }
     }
 
