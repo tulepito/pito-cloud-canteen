@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import * as XLSX from 'xlsx';
 
 import { partnerFoodApi } from '@apis/foodApi';
+import { createPartnerFoodApi } from '@apis/partnerApi';
 import { sleep } from '@helpers/index';
 import { remoteImageUrlToBase64 } from '@pages/admin/partner/[restaurantId]/settings/food/remoteImageUrlToBase64';
 import { getImportDataFromCsv } from '@pages/partner/products/food/utils';
@@ -55,6 +56,7 @@ type UseFoodImportPreviewOptions = {
   packagingOptions: any;
   onImportSuccess?: () => void;
   onImportError?: (error: unknown) => void;
+  isPartner?: boolean;
 };
 
 const dataUrlToFile = (dataUrl: string, filename: string) => {
@@ -81,6 +83,7 @@ export const useFoodImportPreview = ({
   packagingOptions,
   onImportError,
   onImportSuccess,
+  isPartner = false,
 }: UseFoodImportPreviewOptions) => {
   const [previewRecords, setPreviewRecords] = useState<FoodImportRecord[]>([]);
   const [isCreatingModeOn, setIsCreatingModeOn] = useState(false);
@@ -308,12 +311,20 @@ export const useFoodImportPreview = ({
         const queryParams = {
           expand: true,
         };
-
-        // eslint-disable-next-line no-await-in-loop
-        await partnerFoodApi.createFood({
-          dataParams,
-          queryParams,
-        });
+        if (!isPartner) {
+          // for admin endpoint
+          // eslint-disable-next-line no-await-in-loop
+          await partnerFoodApi.createFood({
+            dataParams,
+            queryParams,
+          });
+        } else {
+          // eslint-disable-next-line no-await-in-loop
+          await createPartnerFoodApi({
+            dataParams,
+            queryParams,
+          });
+        }
 
         // eslint-disable-next-line no-await-in-loop
         await sleep(500);

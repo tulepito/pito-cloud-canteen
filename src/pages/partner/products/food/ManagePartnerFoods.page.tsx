@@ -223,6 +223,7 @@ const ManagePartnerFoods = () => {
   } = useFoodImportPreview({
     restaurantId,
     packagingOptions,
+    isPartner: true,
   });
 
   const {

@@ -23,10 +23,7 @@ import { MENU_MEAL_TYPE_OPTIONS } from '@src/utils/options';
 import type { TListing } from '@src/utils/types';
 
 import MenuCard from './components/MenuCard';
-import {
-  PartnerManageMenusActions,
-  PartnerManageMenusThunks,
-} from './PartnerManageMenus.slice';
+import { PartnerManageMenusThunks } from './PartnerManageMenus.slice';
 
 import css from './PartnerManageMenusPage.module.scss';
 
@@ -75,7 +72,6 @@ const PartnerManageMenusPage: React.FC<TPartnerManageMenusPageProps> = ({
   };
 
   const handleNavigateToCreateMenuPage = () => {
-    dispatch(PartnerManageMenusActions.clearDraft());
     router.push(partnerPaths.CreateMenu);
   };
 

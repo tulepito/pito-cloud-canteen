@@ -1,3 +1,4 @@
+import type { NextRouter } from 'next/router';
 import { useRouter } from 'next/router';
 
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
@@ -6,6 +7,7 @@ import {
   createSubmitMenuValues,
   EDIT_PARTNER_MENU_TABS,
   MENU_COMPLETE_TAB,
+  MENU_PRICING_TAB,
 } from '@pages/admin/partner/[restaurantId]/settings/menu/components/EditPartnerMenuWizard/utils';
 import { partnerPaths } from '@src/paths';
 import { IntegrationMenuListing } from '@src/utils/data';
@@ -16,14 +18,12 @@ import {
   PartnerManageMenusActions,
   PartnerManageMenusThunks,
 } from '../../../PartnerManageMenus.slice';
-import type { TMenuSnapshot } from '../utils';
 import { buildDraftMenuPayload } from '../utils';
 
 type TUseMenuSubmitProps = {
   activeTab: string;
   menuId?: string;
   restaurantId: string;
-  snapshot: TMenuSnapshot;
   currentMenu?: TIntegrationListing | null;
 };
 
@@ -34,7 +34,7 @@ const redirectAfterDraftUpdate = (
   id: string,
   tab: string,
   tabs: string[],
-  router: any,
+  router: NextRouter,
 ) => {
   const tabIndex = tabs.findIndex((cur) => cur === tab);
   const nextTab = tabs[tabIndex + 1];
@@ -52,7 +52,6 @@ export const useMenuSubmit = ({
   activeTab,
   menuId,
   restaurantId,
-  snapshot,
 }: TUseMenuSubmitProps) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
@@ -64,26 +63,16 @@ export const useMenuSubmit = ({
     values: TEditMenuFormValues,
     setSubmittedValues: (values: TEditMenuFormValues | null) => void,
   ): Promise<void> => {
-    console.log('handleSubmit@values:', values);
     // Prepare submit values based on tab and mode
     const submitValues = createSubmitMenuValues(
       { ...values, restaurantId },
       activeTab,
     );
-
-    setSubmittedValues(null);
-    console.log('handleSubmit@submitValues:', submitValues);
-    console.log('handleSubmit@draftMenu:', draftMenu);
-    console.log('handleSubmit@snapshot:', snapshot);
-
     // Build draft menu payload
     const draftMenuData = buildDraftMenuPayload({
       submitValues,
       draftMenu,
-      snapshot,
     });
-    console.log('handleSubmit@draftMenuData:', draftMenuData);
-
     // Save draft to Redux
     dispatch(PartnerManageMenusActions.saveDraft(draftMenuData));
 
@@ -99,6 +88,7 @@ export const useMenuSubmit = ({
       );
       if (meta.requestStatus === 'fulfilled') {
         listing = payload;
+        setSubmittedValues(null);
       } else {
         error = meta;
       }
@@ -114,7 +104,7 @@ export const useMenuSubmit = ({
           `${partnerPaths.EditMenu.replace(
             '[menuId]',
             payload.id.uuid,
-          )}?tab=${activeTab}`,
+          )}?tab=${MENU_PRICING_TAB}`,
         );
       } else {
         error = meta;

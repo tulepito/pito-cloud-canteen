@@ -64,7 +64,7 @@ const PartnerMenuTab = (props: TPartnerMenuTabProps) => {
   } = props;
 
   // Use custom hook to merge menu data
-  const { snapshot, syntheticMenu, anchorDate, foodByDateToRender } =
+  const { draftMenu, syntheticMenu, anchorDate, foodByDateToRender } =
     useMenuDataMerge({
       currentMenu: currentMenu ?? null,
       menuId,
@@ -76,7 +76,6 @@ const PartnerMenuTab = (props: TPartnerMenuTabProps) => {
     activeTab,
     menuId,
     restaurantId,
-    snapshot,
     currentMenu: currentMenu ?? null,
   });
 
@@ -85,13 +84,13 @@ const PartnerMenuTab = (props: TPartnerMenuTabProps) => {
     switch (activeTab) {
       case MENU_INFORMATION_TAB:
         return {
-          title: snapshot.title,
-          menuType: snapshot.menuType,
-          mealType: snapshot.mealType,
-          startDate: snapshot.startDate,
-          daysOfWeek: snapshot.daysOfWeek,
-          numberOfCycles: snapshot.numberOfCycles,
-          endDate: snapshot.endDate,
+          title: draftMenu?.menuName,
+          menuType: draftMenu?.menuType,
+          mealType: draftMenu?.mealType,
+          startDate: draftMenu?.startDate,
+          daysOfWeek: draftMenu?.daysOfWeek || [],
+          numberOfCycles: draftMenu?.numberOfCycles,
+          endDate: draftMenu?.endDate,
         };
       case MENU_PRICING_TAB:
         return {
@@ -100,12 +99,12 @@ const PartnerMenuTab = (props: TPartnerMenuTabProps) => {
       case MENU_COMPLETE_TAB:
         return {
           foodsByDate: foodByDateToRender,
-          daysOfWeek: snapshot.daysOfWeek,
+          daysOfWeek: draftMenu?.daysOfWeek || [],
         };
       default:
         return {} as TEditMenuFormValues;
     }
-  }, [activeTab, snapshot, foodByDateToRender]) as TEditMenuFormValues;
+  }, [activeTab, draftMenu, foodByDateToRender]) as TEditMenuFormValues;
 
   const onSubmit = (values: Record<string, unknown>): Promise<void> => {
     return handleSubmit(values as TEditMenuFormValues, setSubmittedValues);
@@ -264,7 +263,15 @@ const PartnerMenuWizard = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (restaurantId && router.query.restaurantId !== restaurantId) {
+    const isCreateMenuPage = pathname === partnerPaths.CreateMenu;
+    if (!menuId && isCreateMenuPage && restaurantId) {
+      dispatch(PartnerManageMenusActions.clearDraft());
+    }
+  }, [dispatch, menuId, pathname, restaurantId]);
+
+  useEffect(() => {
+    const queryRestaurantId = router.query.restaurantId as string | undefined;
+    if (restaurantId && queryRestaurantId !== restaurantId) {
       router.replace(
         {
           pathname: router.pathname,
@@ -277,26 +284,19 @@ const PartnerMenuWizard = () => {
         { shallow: true },
       );
     }
-  }, [restaurantId, router]);
+  }, [restaurantId, router.query.restaurantId, router.pathname, router]);
 
   useEffect(() => {
     setSubmittedValues(null);
   }, [tab]);
 
+  // Merge duplicate loadMenuData effects into one
   useEffect(() => {
     if (!menuId || !restaurantId) return;
     dispatch(
       PartnerManageMenusThunks.loadMenuData({ menuId: menuId as string }),
     );
   }, [dispatch, menuId, restaurantId]);
-
-  useEffect(() => {
-    if (!menuId) return;
-
-    dispatch(
-      PartnerManageMenusThunks.loadMenuData({ menuId: menuId as string }),
-    );
-  }, [dispatch, menuId]);
 
   useEffect(() => {
     dispatch(PartnerManageMenusActions.clearCreateOrUpdateMenuError());
