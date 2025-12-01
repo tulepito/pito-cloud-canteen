@@ -19,6 +19,7 @@ const getIntegrationSdk = require('./utils/integrationSdk');
 const createParticipantSubOrderFirebase = require('./services/createParticipantSubOrderFirebase');
 const sendEmailToParticipants = require('./services/sendEmailToParticipants');
 const sendNativeNotificationToParticipants = require('./services/sendNativeNotificationToParticipants');
+const { VEGETARIAN_ONLY_USER_IDS } = require('./utils/constants');
 
 exports.handler = async (_event) => {
   try {
@@ -169,10 +170,19 @@ exports.handler = async (_event) => {
               'attributes.publicData.allergies',
               [],
             );
+            // Check if user is in vegetarian-only list
+            const isVegetarianOnly =
+              VEGETARIAN_ONLY_USER_IDS.includes(memberId);
+            if (isVegetarianOnly) {
+              console.log(
+                `LOG ~ User ${memberId} for order ${orderId} is in vegetarian-only list, will pick vegetarian food only`,
+              );
+            }
             const suitableFood = recommendFood(
               foodResponses,
               groupFoodIdsBySubOrder[subOrderDate].foodIds,
               allergies,
+              isVegetarianOnly,
             );
 
             if (suitableFood) {
@@ -186,6 +196,7 @@ exports.handler = async (_event) => {
                 `LOG ~ Pick food for user`,
                 memberId,
                 suitableFood?.id?.uuid,
+                isVegetarianOnly ? '(vegetarian)' : '(non-vegetarian)',
                 'at',
                 new Date(+subOrderDate).toLocaleString('en-US', {
                   timeZone: 'Asia/Ho_Chi_Minh',
