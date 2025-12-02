@@ -136,10 +136,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           memberOrders: any;
           orderDay: string;
         };
-      console.log('handler@@planData:', {
-        planData: JSON.stringify(planData),
-      });
-
       try {
         console.info('[TRACK] step=api_receive start', {
           orderId,

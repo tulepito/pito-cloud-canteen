@@ -235,7 +235,7 @@ type TOrderManagementState = {
   toggleScannerModeInProgress: boolean;
   toggleScannerModeError: string;
 
-  isAllowAddSecondFood: boolean;
+  isAllowAddSecondaryFood: boolean;
 };
 
 const initialState: TOrderManagementState = {
@@ -284,7 +284,7 @@ const initialState: TOrderManagementState = {
 
   toggleScannerModeInProgress: false,
   toggleScannerModeError: '',
-  isAllowAddSecondFood: false,
+  isAllowAddSecondaryFood: false,
 };
 
 // ================ Thunk types ================ //
@@ -303,8 +303,6 @@ const queryTransactions = createAsyncThunk(
       Object.entries(orderDetail).map(async (entry) => {
         const [subOrderDate, subOrderDateData] = entry;
         const { transactionId } = (subOrderDateData as TObject) || {};
-
-        console.log('transactionId', transactionId);
 
         if (transactionId) {
           const txResponse = await fetchTxApi(transactionId);
@@ -325,7 +323,7 @@ const loadData = createAsyncThunk(
     const response: any = await getBookerOrderDataApi(orderId);
     dispatch(SystemAttributesThunks.fetchVATPercentageByOrderId(orderId));
     // Check if company is allowing add second food
-    const isAllowAddSecondFood = useIsAllowAddSecondFood(
+    const isAllowAddSecondaryFood = useIsAllowAddSecondFood(
       response.data.orderListing as TListing,
     );
     if (isAdminFlow) {
@@ -339,7 +337,7 @@ const loadData = createAsyncThunk(
       dispatch(AdminManageOrderActions.saveOrderDetail(orderDetail));
     }
 
-    return { ...response.data, isAllowAddSecondFood };
+    return { ...response.data, isAllowAddSecondaryFood };
   },
 );
 
@@ -1824,7 +1822,7 @@ const OrderManagementSlice = createSlice({
       };
     },
     setIsAllowAddSecondFood: (state, { payload }) => {
-      state.isAllowAddSecondFood = payload;
+      state.isAllowAddSecondaryFood = payload;
     },
   },
   extraReducers: (builder) => {
@@ -1858,7 +1856,7 @@ const OrderManagementSlice = createSlice({
           const {
             orderListing: orderData,
             planListing: planData,
-            isAllowAddSecondFood,
+            isAllowAddSecondaryFood,
             // eslint-disable-next-line unused-imports/no-unused-vars
             statusCode,
             ...restPayload
@@ -1881,7 +1879,7 @@ const OrderManagementSlice = createSlice({
             draftOrderDetail: orderDetail,
             orderValidationsInProgressState,
             isAdminFlow,
-            isAllowAddSecondFood,
+            isAllowAddSecondaryFood,
             fetchOrderInProgress: false,
             ...restPayload,
           };

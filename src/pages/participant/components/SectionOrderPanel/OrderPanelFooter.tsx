@@ -33,8 +33,8 @@ const OrderPanelFooter: React.FC<TOrderPanelFooter> = ({
 
   const plan = useAppSelector((state) => state.ParticipantPlanPage.plan);
 
-  const isAllowAddSecondFood = useAppSelector(
-    (state) => state.ParticipantPlanPage.isAllowAddSecondFood,
+  const isAllowAddSecondaryFood = useAppSelector(
+    (state) => state.ParticipantPlanPage.isAllowAddSecondaryFood,
   );
   const isRequireSecondFood = true; // TODO: need to handle this flag after second food feature is applied to all companies
   const submitDisabled =
@@ -45,7 +45,7 @@ const OrderPanelFooter: React.FC<TOrderPanelFooter> = ({
       orderDetailIds,
       cartList,
       plan,
-      isAllowAddSecondFood,
+      isAllowAddSecondaryFood,
       isRequireSecondFood,
     );
 

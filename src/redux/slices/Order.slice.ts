@@ -38,7 +38,11 @@ import { queryRestaurantListingsApi } from '@apis/restaurant';
 import { queryAllPages } from '@helpers/apiHelpers';
 import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
 import { getMenuQueryInSpecificDay } from '@helpers/listingSearchQuery';
-import { mergeRecommendOrderDetailWithCurrentOrderDetail } from '@helpers/orderHelper';
+import {
+  adjustRecommendOrderDetailWithFoodListPrice,
+  mergeRecommendOrderDetailWithCurrentOrderDetail,
+} from '@helpers/orderHelper';
+import { getIsAllowAddSecondFood } from '@hooks/useIsAllowAddSecondFood';
 import { createAsyncThunk } from '@redux/redux.helper';
 import config from '@src/configs';
 import { CompanyPermissions } from '@src/types/UserPermission';
@@ -475,6 +479,16 @@ const recommendRestaurants = createAsyncThunk(
       recommendParams,
     });
 
+    // // Adjust the food list price if the company is allowed to add a second food
+    const companyId = Listing(order).getMetadata().companyId;
+    const isCompanyAllowDualSelection = getIsAllowAddSecondFood(companyId);
+    if (isCompanyAllowDualSelection) {
+      const adjustedRecommendOrderDetail =
+        adjustRecommendOrderDetailWithFoodListPrice(orderDetail, companyId);
+
+      return adjustedRecommendOrderDetail;
+    }
+
     return orderDetail;
   },
 );
@@ -492,6 +506,8 @@ const recommendRestaurantForSpecificDay = createAsyncThunk(
     const { order, draftEditOrderData } = getState().Order;
 
     const orderId = Listing(order).getId();
+    const companyId = Listing(order).getMetadata().companyId;
+    const isCompanyAllowDualSelection = getIsAllowAddSecondFood(companyId);
 
     const { plans = [] } = Listing(order).getMetadata();
 
@@ -503,16 +519,21 @@ const recommendRestaurantForSpecificDay = createAsyncThunk(
       recommendParams,
     });
 
+    // Adjust the food list price if the company is allowed to add a second food
+    const adjustedOrderDetail = isCompanyAllowDualSelection
+      ? adjustRecommendOrderDetailWithFoodListPrice(newOrderDetail, companyId)
+      : newOrderDetail;
+
     if (shouldUpdatePlanOrderOrderDetail) {
-      updateOrderDetail = newOrderDetail;
+      updateOrderDetail = adjustedOrderDetail;
       updatePlanDetailsApi(orderId, {
-        orderDetail: newOrderDetail,
+        orderDetail: adjustedOrderDetail,
         planId: plans[0],
       });
     } else {
       updateOrderDetail = mergeRecommendOrderDetailWithCurrentOrderDetail(
         draftEditOrderData?.orderDetail!,
-        newOrderDetail,
+        adjustedOrderDetail,
         dateTime,
       );
 
@@ -845,8 +866,6 @@ const fetchOrder = createAsyncThunk(
     const { data: selectedCompany } = await fetchUserApi(companyId);
 
     dispatch(SystemAttributesThunks.fetchVATPercentageByOrderId(orderId));
-
-    console.log('fetchOrder@fetchOrder: ', response);
 
     return {
       order: response,
