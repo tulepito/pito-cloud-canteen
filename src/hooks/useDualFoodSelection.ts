@@ -1,11 +1,15 @@
 import { useRef } from 'react';
+import { useIntl } from 'react-intl';
+import { toast } from 'react-toastify';
 
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { shoppingCartThunks } from '@redux/slices/shoppingCart.slice';
 import type { FoodListing } from '@src/types';
 import type { TCartItem } from '@src/types/order';
-import { PICKING_ONLY_ONE_FOOD_NAMES } from '@src/utils/constants';
+import { SINGLE_PICK_FOOD_NAMES } from '@src/utils/constants';
 import { CurrentUser } from '@utils/data';
+
+import { useViewport } from './useViewport';
 
 type TUseDualFoodSelectionParams = {
   mealId: string;
@@ -45,7 +49,7 @@ type TUseDualFoodSelectionReturn = {
 };
 
 /**
- * Kiểm tra xem có chỉ được chọn 1 món không (dựa trên PICKING_ONLY_ONE_FOOD_NAMES)
+ * Kiểm tra xem có chỉ được chọn 1 món không (dựa trên SINGLE_PICK_FOOD_NAMES)
  */
 const isOnlyAllowPickOneFood = (
   cartItem: TCartItem | null | undefined,
@@ -61,7 +65,7 @@ const isOnlyAllowPickOneFood = (
   const { foodId, secondaryFoodId } = cartItem;
   const food = foodList.find((f) => f.id?.uuid === foodId);
   const secondaryFood = foodList.find((f) => f.id?.uuid === secondaryFoodId);
-  const hasRestrictedSelected = PICKING_ONLY_ONE_FOOD_NAMES.some((name) => {
+  const hasRestrictedSelected = SINGLE_PICK_FOOD_NAMES.some((name) => {
     if (food?.attributes?.title?.includes(name)) {
       return true;
     }
@@ -71,7 +75,7 @@ const isOnlyAllowPickOneFood = (
 
     return false;
   });
-  const isPickingRestricted = PICKING_ONLY_ONE_FOOD_NAMES.some((name) => {
+  const isPickingRestricted = SINGLE_PICK_FOOD_NAMES.some((name) => {
     if (pickingFoodName?.includes(name)) {
       return true;
     }
@@ -87,7 +91,7 @@ const isOnlyAllowPickOneFood = (
 
 /**
  * Hook cho logic chọn món mới - cho phép chọn món thứ 2
- * Sử dụng khi isAllowAddSecondFood = true
+ * Sử dụng khi isAllowAddSecondaryFood = true
  */
 export const useDualFoodSelection = ({
   mealId,
@@ -100,6 +104,8 @@ export const useDualFoodSelection = ({
   mealTitle,
   onAddedToCart: _onAddedToCart,
 }: TUseDualFoodSelectionParams): TUseDualFoodSelectionReturn => {
+  const intl = useIntl();
+  const { isMobileLayout } = useViewport();
   const requirementRef = useRef<string | undefined>();
   const orders = useAppSelector((state) => state.shoppingCart.orders);
   const currentUser = useAppSelector((state) => state.user.currentUser);
@@ -204,6 +210,19 @@ export const useDualFoodSelection = ({
         foodName: `${firstFoodName} + ${mealTitle}`,
         timestamp: dayId,
       });
+    } else {
+      toast.success(
+        intl.formatMessage({
+          id: 'tiep-tuc-chon-mon-thu-hai',
+        }),
+        {
+          position: isMobileLayout ? 'top-center' : 'bottom-center',
+          toastId: 'add-to-cart',
+          updateId: 'add-to-cart',
+          pauseOnHover: false,
+          autoClose: 3000,
+        },
+      );
     }
   };
 

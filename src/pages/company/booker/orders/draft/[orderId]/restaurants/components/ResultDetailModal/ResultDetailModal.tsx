@@ -12,8 +12,10 @@ import SlideModal from '@components/SlideModal/SlideModal';
 import { calculateDistance } from '@helpers/mapHelpers';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
+import { getIsAllowAddSecondFood } from '@hooks/useIsAllowAddSecondFood';
 import { useViewport } from '@hooks/useViewport';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
+import { SINGLE_PICK_FOOD_NAMES } from '@src/utils/constants';
 import { Listing } from '@utils/data';
 import { EImageVariants, EOrderType } from '@utils/enums';
 import type { TListing } from '@utils/types';
@@ -84,6 +86,7 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
   );
   const { restaurant: preselectedRestaurant } = useGetRestaurant();
   const { orderId, planId, planDetail, orderType } = useGetPlanDetails();
+  const order = useAppSelector((state) => state.BookerSelectRestaurant.order);
   const { orderDetail } = Listing(planDetail).getMetadata();
   const initialFoodIds = useMemo(() => {
     const detail =
@@ -195,14 +198,29 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
       return;
     }
 
+    const orderListing = Listing(order as TListing);
+    const { companyId } = orderListing.getMetadata();
+    const isSecondaryFoodAllowedCompany = getIsAllowAddSecondFood(companyId);
+
     const updateFoodList = selectedFoods.reduce((acc: any, foodId: string) => {
       const food = foodList?.find((item) => item.id?.uuid === foodId);
       if (food) {
         const foodListingGetter = Listing(food).getAttributes();
+        const originalPrice = foodListingGetter.price?.amount || 0;
+        const foodName = foodListingGetter.title || '';
+
+        const isSinglePickFood = SINGLE_PICK_FOOD_NAMES.some((name) =>
+          foodName.toLowerCase()?.includes(name.toLowerCase()),
+        );
+
+        const finalPrice =
+          isSecondaryFoodAllowedCompany && !isSinglePickFood
+            ? originalPrice / 2
+            : originalPrice;
 
         acc[foodId] = {
-          foodName: foodListingGetter.title,
-          foodPrice: foodListingGetter.price?.amount || 0,
+          foodName,
+          foodPrice: finalPrice,
           foodUnit: foodListingGetter.publicData?.unit || '',
         };
       }

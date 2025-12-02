@@ -30,7 +30,7 @@ import { userThunks } from '@redux/slices/user.slice';
 import type { FoodListing, ParticipantSubOrderDocument } from '@src/types';
 import type { TUpdateParticipantOrderBody } from '@src/types/order';
 import type { Image, VariantKey } from '@src/types/utils';
-import { PICKING_ONLY_ONE_FOOD_NAMES } from '@src/utils/constants';
+import { SINGLE_PICK_FOOD_NAMES } from '@src/utils/constants';
 import {
   CurrentUser,
   denormalisedResponseEntities,
@@ -90,7 +90,7 @@ type TOrderListState = {
   pickFoodForSpecificSubOrderError: any;
 
   company: TUser | null;
-  isAllowAddSecondFood: boolean;
+  isAllowAddSecondaryFood: boolean;
 };
 const initialState: TOrderListState = {
   updateProfileInProgress: false,
@@ -136,7 +136,7 @@ const initialState: TOrderListState = {
   pickFoodForSpecificSubOrderError: null,
 
   company: null,
-  isAllowAddSecondFood: false,
+  isAllowAddSecondaryFood: false,
 };
 
 export const getFoodIdListWithSuitablePrice = ({
@@ -280,19 +280,19 @@ const updateRecommendFoodToOrderDetail = ({
  * @param foodList - The list of foods to recommend
  * @param subOrderFoodIds - The list of food ids for the sub order
  * @param allergies - The list of allergies for the user
- * @param isAllowAddSecondFood - Whether to allow adding a second food
+ * @param isAllowAddSecondaryFood - Whether to allow adding a second food
  * @returns The recommended meals for the sub order
  */
 const buildRecommendedMealsForSubOrder = ({
   foodList,
   subOrderFoodIds,
   allergies,
-  isAllowAddSecondFood,
+  isAllowAddSecondaryFood,
 }: {
   foodList: FoodListing[];
   subOrderFoodIds: string[];
   allergies: string[];
-  isAllowAddSecondFood: boolean;
+  isAllowAddSecondaryFood: boolean;
 }): { primary?: FoodListing; secondary?: FoodListing } => {
   const primaryFood = recommendFood({
     foodList,
@@ -304,15 +304,15 @@ const buildRecommendedMealsForSubOrder = ({
     return {};
   }
 
-  if (!isAllowAddSecondFood) {
+  if (!isAllowAddSecondaryFood) {
     return { primary: primaryFood };
   }
 
   const primaryListing = Listing(primaryFood as TListing);
   const primaryFoodId = primaryListing.getId();
   const primaryTitle = primaryListing.getAttributes().title || '';
-  const isPrimarySingleSelectionFood = PICKING_ONLY_ONE_FOOD_NAMES.some(
-    (name) => primaryTitle?.includes(name),
+  const isPrimarySingleSelectionFood = SINGLE_PICK_FOOD_NAMES.some((name) =>
+    primaryTitle?.includes(name),
   );
 
   if (isPrimarySingleSelectionFood) {
@@ -335,7 +335,7 @@ const buildRecommendedMealsForSubOrder = ({
     }
 
     const title = listing.getAttributes().title || '';
-    const isSingleSelectionFood = PICKING_ONLY_ONE_FOOD_NAMES.some((name) =>
+    const isSingleSelectionFood = SINGLE_PICK_FOOD_NAMES.some((name) =>
       title?.includes(name),
     );
 
@@ -572,7 +572,7 @@ const pickFoodForSubOrders = createAsyncThunk(
 
     const groupedFoodBySubOrderDate: TGroupedRecommendedFood =
       recommendSubOrders.reduce((result: any, item, index: number) => {
-        // Find the correct order for this subOrder to get isAllowAddSecondFood
+        // Find the correct order for this subOrder to get isAllowAddSecondaryFood
         const targetOrder = orders.find(
           (_order: TListing) => _order.id.uuid === item.orderId,
         );
@@ -585,8 +585,8 @@ const pickFoodForSubOrders = createAsyncThunk(
           return result;
         }
 
-        // Get isAllowAddSecondFood from the correct order for this subOrder
-        const isAllowAddSecondFood = useIsAllowAddSecondFood(
+        // Get isAllowAddSecondaryFood from the correct order for this subOrder
+        const isAllowAddSecondaryFood = useIsAllowAddSecondFood(
           targetOrder as TListing,
         );
 
@@ -595,7 +595,7 @@ const pickFoodForSubOrders = createAsyncThunk(
           foodList: foodsResponse,
           subOrderFoodIds,
           allergies,
-          isAllowAddSecondFood,
+          isAllowAddSecondaryFood,
         });
 
         if (!meals.primary) {
@@ -710,8 +710,8 @@ const pickFoodForSpecificSubOrder = createAsyncThunk(
     const currentUserGetter = CurrentUser(currentUser!);
     const { allergies = [] } = currentUserGetter.getPublicData();
 
-    // Get isAllowAddSecondFood from the correct order, not from detailOrderOrder
-    const isAllowAddSecondFood = useIsAllowAddSecondFood(
+    // Get isAllowAddSecondaryFood from the correct order, not from detailOrderOrder
+    const isAllowAddSecondaryFood = useIsAllowAddSecondFood(
       targetOrder as TListing,
     );
 
@@ -746,7 +746,7 @@ const pickFoodForSpecificSubOrder = createAsyncThunk(
       foodList: foodsResponse,
       subOrderFoodIds: foodIdList || [],
       allergies,
-      isAllowAddSecondFood,
+      isAllowAddSecondaryFood,
     });
 
     if (!meals.primary) {
@@ -894,7 +894,9 @@ const OrderListSlice = createSlice({
           ...payload.mappingSubOrderToOrder,
         };
         state.company = payload.company;
-        state.isAllowAddSecondFood = getIsAllowAddSecondFood(payload.company);
+        state.isAllowAddSecondaryFood = getIsAllowAddSecondFood(
+          payload.company,
+        );
         state.foodsInPlans = payload.foodsInPlans;
       })
       .addCase(fetchOrders.rejected, (state, { error }) => {

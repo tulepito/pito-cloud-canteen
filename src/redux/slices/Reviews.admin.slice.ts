@@ -410,7 +410,6 @@ const reviewsSlice = createSlice({
     builder.addCase(processReply.fulfilled, (state, action) => {
       const { reviewId, updatedReview } = action.payload;
 
-      // Update in reviews list
       const reviewIndex = state.reviews.findIndex(
         (r) => r.id?.uuid === reviewId,
       );
