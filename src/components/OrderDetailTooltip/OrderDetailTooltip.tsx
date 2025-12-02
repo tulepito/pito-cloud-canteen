@@ -14,7 +14,6 @@ const OrderDetailTooltip = ({
   const orderDetails = subOrders.reduce(
     (prev: any, subOrder: TIntegrationListing) => {
       const { orderDetail = {} } = subOrder?.attributes?.metadata || {};
-      console.log('orderDetail', orderDetail);
       const subOrderDetails = Object.keys(orderDetail).map((key) => {
         const {
           lastTransition,

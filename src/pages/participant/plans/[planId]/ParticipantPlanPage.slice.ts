@@ -20,7 +20,7 @@ import type {
   TShoppingCartMemberPlan,
   TUpdateParticipantOrderBody,
 } from '@src/types/order';
-import { PICKING_ONLY_ONE_FOOD_NAMES } from '@src/utils/constants';
+import { SINGLE_PICK_FOOD_NAMES } from '@src/utils/constants';
 import { CurrentUser, Listing } from '@src/utils/data';
 import type { TListing } from '@src/utils/types';
 import { EParticipantOrderStatus } from '@utils/enums';
@@ -43,7 +43,7 @@ const recommendFoodForShoppingCart = ({
   dispatch,
   currentMealId,
   currentSecondaryMealId,
-  isAllowAddSecondFood,
+  isAllowAddSecondaryFood,
 }: {
   plan: any;
   subOrderDate: string;
@@ -53,7 +53,7 @@ const recommendFoodForShoppingCart = ({
   dispatch: any;
   currentMealId?: string;
   currentSecondaryMealId?: string;
-  isAllowAddSecondFood?: boolean;
+  isAllowAddSecondaryFood?: boolean;
 }) => {
   const subOrder = plan[subOrderDate];
   const { foodList } = subOrder;
@@ -97,12 +97,12 @@ const recommendFoodForShoppingCart = ({
   );
 
   const primaryFoodTitle = mostSuitableFoodListing.getAttributes().title || '';
-  const isPrimarySingleSelectionFood = PICKING_ONLY_ONE_FOOD_NAMES.some(
-    (name) => primaryFoodTitle?.includes(name),
+  const isPrimarySingleSelectionFood = SINGLE_PICK_FOOD_NAMES.some((name) =>
+    primaryFoodTitle?.toLowerCase()?.includes(name.toLowerCase()),
   );
 
   // remove secondary food if it is a single selection food
-  if (isAllowAddSecondFood && isPrimarySingleSelectionFood) {
+  if (isAllowAddSecondaryFood && isPrimarySingleSelectionFood) {
     dispatch(
       shoppingCartThunks.removeFromCart({
         planId: plans[0],
@@ -116,7 +116,7 @@ const recommendFoodForShoppingCart = ({
   // Check if is allow add second food and the primary food is not a single selection food
   // and the list of foods with suitable price has more than 1 food
   if (
-    isAllowAddSecondFood &&
+    isAllowAddSecondaryFood &&
     !isPrimarySingleSelectionFood &&
     suitablePriceFoodList.length > 1
   ) {
@@ -124,8 +124,8 @@ const recommendFoodForShoppingCart = ({
       (food: TListing) => {
         const listing = Listing(food);
         const title = listing.getAttributes().title || '';
-        const isSingleSelectionFood = PICKING_ONLY_ONE_FOOD_NAMES.some((name) =>
-          title?.includes(name),
+        const isSingleSelectionFood = SINGLE_PICK_FOOD_NAMES.some((name) =>
+          title?.toLowerCase()?.includes(name.toLowerCase()),
         );
 
         return (
@@ -159,7 +159,7 @@ const recommendFoodForShoppingCart = ({
     }
   }
   const secondaryFoodTitle =
-    isAllowAddSecondFood && secondaryFood
+    isAllowAddSecondaryFood && secondaryFood
       ? Listing(secondaryFood as TListing).getAttributes().title
       : '';
 
@@ -181,7 +181,7 @@ type TParticipantPlanState = {
   reloadDataError: any;
   submitDataInprogress: boolean;
   submitDataError: any;
-  isAllowAddSecondFood: boolean;
+  isAllowAddSecondaryFood: boolean;
 };
 
 const initialState: TParticipantPlanState = {
@@ -195,7 +195,7 @@ const initialState: TParticipantPlanState = {
   reloadDataError: null,
   submitDataInprogress: false,
   submitDataError: null,
-  isAllowAddSecondFood: false,
+  isAllowAddSecondaryFood: false,
 };
 
 const loadData = createAsyncThunk(
@@ -206,7 +206,7 @@ const loadData = createAsyncThunk(
     const response = await loadPlanDataApi(planId);
     const { plan, order } = response?.data?.data || {};
     const orderDays = Object.keys(plan);
-    const isAllowAddSecondFood = useIsAllowAddSecondFood(order as TListing);
+    const isAllowAddSecondaryFood = useIsAllowAddSecondFood(order as TListing);
 
     orderDays.forEach((day) => {
       const {
@@ -248,7 +248,7 @@ const loadData = createAsyncThunk(
 
     return {
       ...response?.data?.data,
-      isAllowAddSecondFood,
+      isAllowAddSecondaryFood,
     };
   },
   {
@@ -415,7 +415,7 @@ export const recommendFoodSubOrder = createAsyncThunk(
   RECOMMEND_FOOD_SUB_ORDER,
   async (subOrderDate: string, { getState, dispatch }) => {
     const { currentUser } = getState().user;
-    const { plan, order, isAllowAddSecondFood } =
+    const { plan, order, isAllowAddSecondaryFood } =
       getState().ParticipantPlanPage;
     const { orders } = getState().shoppingCart;
     const currentUserGetter = CurrentUser(currentUser!);
@@ -437,7 +437,7 @@ export const recommendFoodSubOrder = createAsyncThunk(
       dispatch,
       currentMealId,
       currentSecondaryMealId,
-      isAllowAddSecondFood,
+      isAllowAddSecondaryFood,
     });
   },
   {
@@ -449,7 +449,7 @@ const recommendFoodSubOrders = createAsyncThunk(
   RECOMMEND_FOOD_SUB_ORDERS,
   async (_, { getState, dispatch }) => {
     const { currentUser } = getState().user;
-    const { plan, order, isAllowAddSecondFood } =
+    const { plan, order, isAllowAddSecondaryFood } =
       getState().ParticipantPlanPage;
     const { orders } = getState().shoppingCart;
     const currentUserGetter = CurrentUser(currentUser!);
@@ -503,7 +503,7 @@ const recommendFoodSubOrders = createAsyncThunk(
         dispatch,
         currentMealId,
         currentSecondaryMealId,
-        isAllowAddSecondFood,
+        isAllowAddSecondaryFood,
       });
     });
   },

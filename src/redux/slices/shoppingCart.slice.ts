@@ -13,7 +13,7 @@ export type TMemberPlans = {
 };
 
 export type TShoppingCartState = {
-  isAllowAddSecondFood: boolean;
+  isAllowAddSecondaryFood: boolean;
   orders: {
     [memberId: string]: TMemberPlans;
   };
@@ -26,7 +26,7 @@ const REMOVE_ALL_FROM_PLAN_CART = 'app/ShoppingCart/REMOVE_ALL_FROM_PLAN_CART';
 
 const initialState: TShoppingCartState = {
   orders: {},
-  isAllowAddSecondFood: false,
+  isAllowAddSecondaryFood: false,
 };
 
 // ================ Slice ================ //

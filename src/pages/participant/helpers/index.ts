@@ -1,12 +1,12 @@
 import type { TCartFoodList } from '@src/types/cartFoodList';
 import type { TPlanData } from '@src/types/order';
-import { PICKING_ONLY_ONE_FOOD_NAMES } from '@src/utils/constants';
+import { SINGLE_PICK_FOOD_NAMES } from '@src/utils/constants';
 
 export function verifyAllFoodPickedWithParticipant(
   orderDetailIds: string[],
   cartFoodList: TCartFoodList,
   plan: TPlanData,
-  isAllowAddSecondFood: boolean,
+  isAllowAddSecondaryFood: boolean,
   isRequireSecondFood: boolean = false,
 ) {
   if (!orderDetailIds.length || !cartFoodList) {
@@ -24,7 +24,7 @@ export function verifyAllFoodPickedWithParticipant(
     }
 
     if (
-      isAllowAddSecondFood &&
+      isAllowAddSecondaryFood &&
       isRequireSecondFood &&
       !cart.secondaryFoodId &&
       cart.foodId !== 'notJoined'
@@ -34,7 +34,7 @@ export function verifyAllFoodPickedWithParticipant(
       );
 
       const isSingleSelectionFood = primaryFood
-        ? PICKING_ONLY_ONE_FOOD_NAMES.some((name) =>
+        ? SINGLE_PICK_FOOD_NAMES.some((name) =>
             primaryFood.attributes?.title?.includes(name),
           )
         : false;

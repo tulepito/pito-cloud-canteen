@@ -20,7 +20,7 @@ import {
   orderDetailsAnyActionsInProgress,
   OrderManagementsAction,
 } from '@redux/slices/OrderManagement.slice';
-import { PICKING_ONLY_ONE_FOOD_NAMES } from '@src/utils/constants';
+import { SINGLE_PICK_FOOD_NAMES } from '@src/utils/constants';
 import type { TObject } from '@src/utils/types';
 import { EMAIL_RE, VALID } from '@src/utils/validators';
 
@@ -80,8 +80,8 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
     currentViewDate,
   } = props;
 
-  const isAllowAddSecondFood = useAppSelector(
-    (state) => state.OrderManagement.isAllowAddSecondFood,
+  const isAllowAddSecondaryFood = useAppSelector(
+    (state) => state.OrderManagement.isAllowAddSecondaryFood,
   );
 
   const fieldSelectMemberDisable = isLoading || !ableToUpdateOrder;
@@ -98,7 +98,7 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
   const isPrimarySingleSelectionFood = useMemo(() => {
     if (!selectedPrimaryFoodName) return false;
 
-    return PICKING_ONLY_ONE_FOOD_NAMES.some((name) =>
+    return SINGLE_PICK_FOOD_NAMES.some((name) =>
       selectedPrimaryFoodName?.includes(name),
     );
   }, [selectedPrimaryFoodName]);
@@ -112,7 +112,7 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
   }, [isPrimarySingleSelectionFood, values?.secondaryFoodId, form]);
 
   const isRequireSecondFood =
-    Boolean(isAllowAddSecondFood) &&
+    Boolean(isAllowAddSecondaryFood) &&
     Boolean(values?.foodId) &&
     values?.foodId !== 'notJoined' &&
     !values?.secondaryFoodId &&
@@ -285,8 +285,8 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
   const parsedFoodOptionsForSecondaryFood = useMemo(
     () =>
       foodOptions?.map((f) => {
-        const isSingleSelectOnlyOneFood = PICKING_ONLY_ONE_FOOD_NAMES.some(
-          (name) => f.foodName?.includes(name),
+        const isSingleSelectOnlyOneFood = SINGLE_PICK_FOOD_NAMES.some((name) =>
+          f.foodName?.includes(name),
         );
         const disabled = isSingleSelectOnlyOneFood && values?.foodId !== '';
 
@@ -398,7 +398,7 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
               fieldWrapperClassName={css.fieldSelectWrapper}
             />
           </div>
-          <RenderWhen condition={isAllowAddSecondFood}>
+          <RenderWhen condition={isAllowAddSecondaryFood}>
             <div className={css.fieldContainer}>
               <FieldDropdownSelect
                 className={css.fieldSelect}
@@ -468,7 +468,7 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
 
       <RenderWhen
         condition={
-          isAllowAddSecondFood &&
+          isAllowAddSecondaryFood &&
           Boolean(values?.secondaryFoodId) &&
           !isPrimarySingleSelectionFood
         }>

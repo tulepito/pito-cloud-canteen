@@ -7,7 +7,9 @@ import { useRouter } from 'next/router';
 
 import AddMorePlan from '@components/CalendarDashboard/components/MealPlanCard/components/AddMorePlan';
 import IconCheckWithBackground from '@components/Icons/IconCheckWithBackground/IconCheckWithBackground';
+import { adjustFoodListPrice } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { getIsAllowAddSecondFood } from '@hooks/useIsAllowAddSecondFood';
 import { useViewport } from '@hooks/useViewport';
 import {
   orderAsyncActions,
@@ -67,7 +69,7 @@ export const useGetCalendarExtraResources = ({
 
   const orderData = Listing(order as TListing);
   const planId = orderData.getMetadata().plans?.[0];
-  const { dayInWeek = [], deliveryHour } = orderData.getMetadata();
+  const { dayInWeek = [], deliveryHour, companyId } = orderData.getMetadata();
 
   const onSearchRestaurant = useCallback(
     (date: Date) => {
@@ -112,6 +114,8 @@ export const useGetCalendarExtraResources = ({
           ),
         );
 
+        const isCompanyAllowDualSelection = getIsAllowAddSecondFood(companyId);
+
         const newOrderDetail = totalDates.reduce((result, curr) => {
           if (
             selectedDates.includes(
@@ -148,13 +152,18 @@ export const useGetCalendarExtraResources = ({
                 {},
               );
 
+              // Adjust the food list price if the company is allowed to add a second food
+              const adjustedFoodList = isCompanyAllowDualSelection
+                ? adjustFoodListPrice(foodList, companyId)
+                : foodList;
+
               return {
                 ...result,
                 [curr]: {
                   ...orderDetail?.[date],
                   restaurant: {
                     ...orderDetail?.[date]?.restaurant,
-                    foodList,
+                    foodList: adjustedFoodList,
                   },
                 },
               };
@@ -179,7 +188,7 @@ export const useGetCalendarExtraResources = ({
         setIsApplyingOtherDays(false);
       }
     },
-    [startDate, endDate, orderDetail, dispatch, orderId, planId],
+    [startDate, endDate, orderDetail, dispatch, orderId, planId, companyId],
   );
 
   const onRecommendRestaurantForSpecificDay = useCallback(
@@ -395,7 +404,7 @@ export const useGetCalendarComponentProps = ({
   const componentsProps = useMemo(() => {
     return {
       toolbar: toolbarComponent,
-      contentEnd: false ? () => null : contentEndComponent,
+      contentEnd: contentEndComponent,
     };
   }, [shouldHideDayItems, toolbarComponent, contentEndComponent]);
 

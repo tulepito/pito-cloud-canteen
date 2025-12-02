@@ -1,3 +1,4 @@
+import { SECONDARY_FOOD_ALLOWED_COMPANIES } from '@src/utils/constants';
 import { Listing } from '@src/utils/data';
 import type { TListing } from '@src/utils/types';
 
@@ -12,9 +13,7 @@ export const useIsAllowAddSecondFood = (orderListing: TListing) => {
   const { companyId } = Listing(orderListing).getMetadata();
 
   return companyId
-    ? process.env.NEXT_PUBLIC_COMPANIES_ALLOWING_SECOND_FOOD?.includes(
-        companyId,
-      ) ?? false
+    ? SECONDARY_FOOD_ALLOWED_COMPANIES.includes(companyId) ?? false
     : false;
 };
 
@@ -26,9 +25,5 @@ export const useIsAllowAddSecondFood = (orderListing: TListing) => {
 export const getIsAllowAddSecondFood = (companyId: string) => {
   if (!companyId) return false;
 
-  return (
-    process.env.NEXT_PUBLIC_COMPANIES_ALLOWING_SECOND_FOOD?.includes(
-      companyId,
-    ) ?? false
-  );
+  return SECONDARY_FOOD_ALLOWED_COMPANIES.includes(companyId) ?? false;
 };

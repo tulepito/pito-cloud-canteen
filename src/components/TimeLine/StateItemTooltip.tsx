@@ -48,13 +48,6 @@ const StateItemTooltip: React.FC<TStateItemTooltipProps> = ({
   const { processVersion = CHANGE_STRUCTURE_TX_PROCESS_VERSION - 1 } =
     Transaction(transaction).getAttributes();
 
-  console.log('transactionId', transactionId);
-  console.log('transaction', transaction);
-  console.log('processVersion', processVersion);
-  console.log(
-    'CHANGE_STRUCTURE_TX_PROCESS_VERSION',
-    CHANGE_STRUCTURE_TX_PROCESS_VERSION,
-  );
   const isNewStructureTxVersion =
     processVersion >= CHANGE_STRUCTURE_TX_PROCESS_VERSION;
   const shouldShowPartnerActions = isNewStructureTxVersion;
@@ -91,12 +84,10 @@ const StateItemTooltip: React.FC<TStateItemTooltipProps> = ({
     if (transitInProgress) {
       return;
     }
-    console.log('lastTransition', lastTransition);
     if (lastTransition === ETransition.INITIATE_TRANSACTION) {
       canceledController.setTrue();
 
       if (isNewStructureTxVersion) {
-        console.log('isNewStructureTxVersion', isNewStructureTxVersion);
         partnerConfirmController.setTrue();
         partnerRejectController.setTrue();
       } else {

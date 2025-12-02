@@ -55,8 +55,8 @@ export const QUERY_REFS = {
   INVITATION_LINK: 'invitation-link' as const,
 };
 
-export const PICKING_ONLY_ONE_FOOD_NAMES = (() => {
-  const envValue = process.env.NEXT_PUBLIC_PICKING_ONLY_ONE_FOOD_NAMES;
+export const SINGLE_PICK_FOOD_NAMES = (() => {
+  const envValue = process.env.NEXT_PUBLIC_SINGLE_PICK_FOOD_NAMES;
   if (!envValue) return [];
 
   try {
@@ -65,6 +65,27 @@ export const PICKING_ONLY_ONE_FOOD_NAMES = (() => {
       return parsed;
     }
   } catch {
+    return [];
+  }
+
+  return [];
+})();
+
+export const SECONDARY_FOOD_ALLOWED_COMPANIES = (() => {
+  const envValue = process.env.NEXT_PUBLIC_SECONDARY_FOOD_ALLOWED_COMPANIES;
+  if (!envValue) return [];
+
+  try {
+    const parsed = JSON.parse(envValue);
+    if (Array.isArray(parsed)) {
+      return parsed;
+    }
+  } catch (error) {
+    console.error(
+      'Error parsing NEXT_PUBLIC_SECONDARY_FOOD_ALLOWED_COMPANIES',
+      error,
+    );
+
     return [];
   }
 

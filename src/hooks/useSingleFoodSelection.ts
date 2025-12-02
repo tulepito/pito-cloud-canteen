@@ -35,7 +35,7 @@ type TUseSingleFoodSelectionReturn = {
 
 /**
  * Hook cho logic chọn món cũ - chỉ cho phép chọn 1 món duy nhất
- * Sử dụng khi isAllowAddSecondFood = false
+ * Sử dụng khi isAllowAddSecondaryFood = false
  */
 export const useSingleFoodSelection = ({
   mealId,
