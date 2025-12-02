@@ -348,9 +348,11 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
         }),
       );
 
-      const isAllDatesHaveNoRestaurants = Object.values(newOrderDetail).every(
-        ({ hasNoRestaurants = false }: any) => hasNoRestaurants,
-      );
+      const isAllDatesHaveNoRestaurants = newOrderDetail
+        ? Object.values(newOrderDetail).every(
+            ({ hasNoRestaurants = false }: any) => hasNoRestaurants,
+          )
+        : true;
 
       if (
         isAllDatesHaveNoRestaurantsCurrentOrder &&

@@ -142,7 +142,6 @@ const OrderDetailsTableComponent: React.FC<
                 <table>
                   <tbody>
                     {data.map((item) => {
-                      console.log('item', { item });
                       const { isAnonymous, memberData, foodData, status } =
                         item;
                       const {

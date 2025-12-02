@@ -9,7 +9,7 @@
 .label {
   @include textTemplate(14px, 700, 24px, '');
   color: $neutralGray7;
-  margin-bottom: 12px;
+  margin-bottom: 7px;
   @include flexAlign(center, space-between);
 }
 

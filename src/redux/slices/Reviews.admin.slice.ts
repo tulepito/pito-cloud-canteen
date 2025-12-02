@@ -361,8 +361,6 @@ const reviewsSlice = createSlice({
         const reviewIndex = state.reviews.findIndex(
           (r) => r.id?.uuid === reviewId,
         );
-        console.log('reviewIndex', reviewIndex);
-        console.log('updatedReview', updatedReview);
 
         if (reviewIndex !== -1) {
           const existingReview = state.reviews[reviewIndex];

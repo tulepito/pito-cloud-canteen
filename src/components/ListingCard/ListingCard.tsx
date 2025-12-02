@@ -44,8 +44,8 @@ const ListingCard: React.FC<TListCardProps> = ({
   onAddedToCart,
 }) => {
   const detailModalController = useBoolean();
-  const isAllowAddSecondFood = useAppSelector(
-    (state) => state.ParticipantPlanPage.isAllowAddSecondFood,
+  const isAllowAddSecondaryFood = useAppSelector(
+    (state) => state.ParticipantPlanPage.isAllowAddSecondaryFood,
   );
 
   const plan = useAppSelector((state) => state.ParticipantPlanPage.plan);
@@ -83,7 +83,7 @@ const ListingCard: React.FC<TListCardProps> = ({
     onAddedToCart,
   });
 
-  const selection = isAllowAddSecondFood
+  const selection = isAllowAddSecondaryFood
     ? dualFoodSelection
     : singleFoodSelection;
 
@@ -98,7 +98,10 @@ const ListingCard: React.FC<TListCardProps> = ({
   };
 
   const handleSelectFoodInModal = () => {
-    if (isAllowAddSecondFood && dualFoodSelection.isRestrictedForThisListing) {
+    if (
+      isAllowAddSecondaryFood &&
+      dualFoodSelection.isRestrictedForThisListing
+    ) {
       detailModalController.setFalse();
 
       return;
@@ -106,7 +109,7 @@ const ListingCard: React.FC<TListCardProps> = ({
 
     selection.handleAddToCart();
 
-    if (isAllowAddSecondFood) {
+    if (isAllowAddSecondaryFood) {
       detailModalController.setFalse();
     }
   };
@@ -130,7 +133,7 @@ const ListingCard: React.FC<TListCardProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-2 mb-1">
             <h6 className={css.title}>{title}</h6>
             <div className="flex items-center md:justify-end justify-start">
-              {isAllowAddSecondFood &&
+              {isAllowAddSecondaryFood &&
                 dualFoodSelection.isFirstFoodSelected && (
                   <Badge
                     className="flex-shrink-0 text-[11px] px-2 py-0.5 rounded-xl"
@@ -138,7 +141,7 @@ const ListingCard: React.FC<TListCardProps> = ({
                     type={EBadgeType.success}
                   />
                 )}
-              {isAllowAddSecondFood &&
+              {isAllowAddSecondaryFood &&
                 dualFoodSelection.isSecondFoodSelected && (
                   <Badge
                     className="flex-shrink-0 text-[11px] px-2 py-0.5 rounded-xl"
@@ -170,7 +173,7 @@ const ListingCard: React.FC<TListCardProps> = ({
                 <IconCheckmarkWithCircle className="items-center" />
               </span>
             )}
-            {isAllowAddSecondFood && (
+            {isAllowAddSecondaryFood && (
               <>
                 {dualFoodSelection.canShowAddAsSecondFood &&
                   !dualFoodSelection.isSecondaryAddDisabled && (
@@ -237,22 +240,23 @@ const ListingCard: React.FC<TListCardProps> = ({
               </>
             )}
             {/* Logic cho single food selection */}
-            {!isAllowAddSecondFood && singleFoodSelection.canShowAddButton && (
-              <span
-                className={classNames(css.addDish)}
-                onClick={
-                  singleFoodSelection.isAddDisabled
-                    ? undefined
-                    : singleFoodSelection.handleAddToCart
-                }
-                title={
-                  singleFoodSelection.isAddDisabled
-                    ? 'Không thể chọn món này'
-                    : 'Thêm món'
-                }>
-                <IconPlusDish />
-              </span>
-            )}
+            {!isAllowAddSecondaryFood &&
+              singleFoodSelection.canShowAddButton && (
+                <span
+                  className={classNames(css.addDish)}
+                  onClick={
+                    singleFoodSelection.isAddDisabled
+                      ? undefined
+                      : singleFoodSelection.handleAddToCart
+                  }
+                  title={
+                    singleFoodSelection.isAddDisabled
+                      ? 'Không thể chọn món này'
+                      : 'Thêm món'
+                  }>
+                  <IconPlusDish />
+                </span>
+              )}
           </div>
         </div>
       </div>
@@ -263,7 +267,7 @@ const ListingCard: React.FC<TListCardProps> = ({
         onClose={handleCloseListingDetailModal}
         onChangeRequirement={selection.handleChangeRequirement}
         requirement={
-          isAllowAddSecondFood
+          isAllowAddSecondaryFood
             ? dualFoodSelection.isSecondFoodSelected
               ? dualFoodSelection.storedSecondRequirement
               : dualFoodSelection.storedRequirement

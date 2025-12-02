@@ -547,7 +547,7 @@ export const parseAvailabilityEntries = (time: Date) => {
 };
 
 export const validFoodTitle = (message: string) => (value: string) => {
-  const format = /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
+  const format = /[`!@#$%^&*_+\-=\[\]{};':"\\|,.<>\/?~]/;
 
   return format.test(value) ? message : VALID;
 };

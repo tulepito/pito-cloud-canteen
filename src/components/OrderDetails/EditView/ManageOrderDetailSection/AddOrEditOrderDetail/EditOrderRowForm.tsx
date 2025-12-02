@@ -13,7 +13,7 @@ import IconMinus from '@components/Icons/IconMinus/IconMinus';
 import IconPlusWithoutBorder from '@components/Icons/IconPlusWithoutBorder/IconPlusWithoutBorder';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppSelector } from '@hooks/reduxHooks';
-import { PICKING_ONLY_ONE_FOOD_NAMES } from '@src/utils/constants';
+import { SINGLE_PICK_FOOD_NAMES } from '@src/utils/constants';
 
 import css from './EditOrderRowForm.module.scss';
 
@@ -48,8 +48,8 @@ const EditOrderRowFormComponent: React.FC<TEditOrderRowFormComponentProps> = (
   const { requirement, secondaryRequirement } = initialValues;
 
   // Flag to check if the user is allowed to add a second food
-  const isAllowAddSecondFood = useAppSelector(
-    (state) => state.OrderManagement.isAllowAddSecondFood,
+  const isAllowAddSecondaryFood = useAppSelector(
+    (state) => state.OrderManagement.isAllowAddSecondaryFood,
   );
 
   const selectedFoodName = useMemo(() => {
@@ -63,13 +63,13 @@ const EditOrderRowFormComponent: React.FC<TEditOrderRowFormComponentProps> = (
   const isSingleSelectionFood = useMemo(() => {
     if (!selectedFoodName) return false;
 
-    return PICKING_ONLY_ONE_FOOD_NAMES.some((name) =>
+    return SINGLE_PICK_FOOD_NAMES.some((name) =>
       selectedFoodName?.includes(name),
     );
   }, [selectedFoodName]);
 
   const isRequireSecondFood =
-    Boolean(isAllowAddSecondFood) &&
+    Boolean(isAllowAddSecondaryFood) &&
     Boolean(values?.foodId) &&
     values?.foodId !== 'notJoined' &&
     !values?.secondaryFoodId &&
@@ -177,8 +177,8 @@ const EditOrderRowFormComponent: React.FC<TEditOrderRowFormComponentProps> = (
   const parsedFoodOptionsForSecondaryFood = useMemo(
     () =>
       foodOptions?.map((f) => {
-        const isSingleSelectOnlyOneFood = PICKING_ONLY_ONE_FOOD_NAMES.some(
-          (name) => f.foodName?.includes(name),
+        const isSingleSelectOnlyOneFood = SINGLE_PICK_FOOD_NAMES.some((name) =>
+          f.foodName?.includes(name),
         );
         const disabled = isSingleSelectOnlyOneFood && values?.foodId !== '';
 
@@ -245,7 +245,7 @@ const EditOrderRowFormComponent: React.FC<TEditOrderRowFormComponentProps> = (
   ]);
 
   const shouldShowSecondaryRequirement =
-    isAllowAddSecondFood === true && Boolean(values?.secondaryFoodId);
+    isAllowAddSecondaryFood === true && Boolean(values?.secondaryFoodId);
 
   // Clear secondaryFoodId and secondaryRequirement when primary food is single selection
   useEffect(() => {
@@ -269,7 +269,7 @@ const EditOrderRowFormComponent: React.FC<TEditOrderRowFormComponentProps> = (
             })}
             options={parsedFoodOptions}
           />
-          <RenderWhen condition={isAllowAddSecondFood}>
+          <RenderWhen condition={isAllowAddSecondaryFood}>
             <FieldDropdownSelect
               disabled={isSingleSelectionFood}
               id="secondaryFoodId"
