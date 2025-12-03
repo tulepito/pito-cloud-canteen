@@ -7,13 +7,17 @@
   overflow: hidden;
   border: 1px solid $neutralGray3;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+
+  width: 100%;
+
+  @include viewportMedium {
+    flex-direction: column;
+  }
 
   @include viewportLarge {
     min-width: unset;
   }
-
-  width: 100%;
   .listingCardContent {
     padding: 12px;
     display: flex;
@@ -25,8 +29,8 @@
 
 .listingImage {
   cursor: pointer;
-  height: 146px;
-  width: 100%;
+  width: 80px;
+  height: 100%;
   overflow: hidden;
   position: relative;
 
@@ -35,19 +39,30 @@
     height: 100%;
     object-fit: cover;
   }
+
+  @include viewportMedium {
+    width: 100%;
+    height: 146px;
+  }
 }
 
 .listingCardInfo {
   cursor: pointer;
   flex: 1;
-  margin-bottom: 12px;
-  padding-bottom: 8px;
+
+  .headerRow {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+  }
 
   .title {
     @include textTemplate(14px, 600, 18px, '');
     color: $neutralGray7;
     margin: 0 0 4px 0;
     justify-self: start;
+    flex: 1;
   }
 
   .categories {

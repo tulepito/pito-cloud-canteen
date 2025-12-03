@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from 'react';
 import { useIntl } from 'react-intl';
+import { MessageCircleIcon } from 'lucide-react';
 import { useRouter } from 'next/router';
 
 import BottomNavigationBar from '@components/BottomNavigationBar/BottomNavigationBar';
@@ -17,6 +18,7 @@ import { useRoleSelectModalController } from '@hooks/useRoleSelectModalControlle
 import { useViewport } from '@hooks/useViewport';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { participantPaths } from '@src/paths';
+import Gleap from '@src/utils/gleap';
 
 import AvatarForm from './components/AvatarForm/AvatarForm';
 
@@ -50,6 +52,10 @@ const AccountPage = () => {
 
   const handleOpenSpecialDemandModal = () => {
     router.push(participantPaths.AccountSpecialDemand);
+  };
+
+  const handleOpenSupport = () => {
+    Gleap.openChat();
   };
 
   return (
@@ -113,6 +119,14 @@ const AccountPage = () => {
             <span>{intl.formatMessage({ id: 'ngon-ngu' })}</span>
           </div>
           <LanguageSwitchButton />
+        </div>
+        <div className={css.navigationItem} onClick={handleOpenSupport}>
+          <div className="flex gap-4">
+            <MessageCircleIcon className="text-[#a6acb6]" />
+            <span className="text-black font-semibold">
+              {intl.formatMessage({ id: 'ho-tro' })}
+            </span>
+          </div>
         </div>
         <div className={css.navigationItem} onClick={handleLogout}>
           <div className={css.iconGroup}>

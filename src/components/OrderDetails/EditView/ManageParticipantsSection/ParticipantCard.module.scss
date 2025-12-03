@@ -69,4 +69,25 @@
       }
     }
   }
+
+  .restoreIconContainer {
+    width: 16px;
+    height: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  .addIcon {
+    width: 10px;
+    height: 10px;
+    opacity: 0.8;
+
+    &:hover {
+      * {
+        fill: $primaryPri2;
+      }
+    }
+  }
 }

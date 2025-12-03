@@ -20,7 +20,7 @@
   border-right: 1px solid $neutralGray4;
   .option {
     @include textTemplate(14px, $fontWeightRegular, 20px);
-    color: $neutralGray5;
+    color: #262626;
     margin-bottom: 16px;
     cursor: pointer;
     white-space: nowrap;
@@ -28,6 +28,7 @@
     &.selected {
       color: #262626;
       font-weight: $fontWeightBold;
+      text-decoration: underline;
     }
   }
 }
