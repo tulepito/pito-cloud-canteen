@@ -161,6 +161,7 @@ const updateOrder = async ({
                 }
               : {}),
             orderStateHistory: newOrderStateHistoryMaybe,
+            removedParticipants: [],
           },
         },
         { expand: true },

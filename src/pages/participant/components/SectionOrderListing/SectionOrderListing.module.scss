@@ -52,10 +52,14 @@
   }
   .sectionMainOrderListings {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
     column-gap: 16px;
     row-gap: 16px;
     align-items: stretch;
+
+    @include viewportMedium {
+      grid-template-columns: repeat(2, 1fr);
+    }
 
     @include viewportLarge {
       grid-template-columns: repeat(3, 1fr);
@@ -75,6 +79,39 @@
 
 .tabTitleIcon {
   margin-left: 7px;
+}
+
+.tabTitleMobile {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.tabDateWrapper {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 2px;
+  margin-bottom: 2px;
+}
+
+.tabDate {
+  @include textTemplate(16px, 700, 20px, '');
+}
+
+.tabMonth {
+  @include textTemplate(12px, 400, 16px, '');
+  color: $neutralGray6;
+}
+
+.tabWeekday {
+  @include textTemplate(12px, 500, 16px, '');
+  color: $neutralGray7;
+}
+
+.tabDateActive {
+  color: $neutralGray7;
 }
 
 .dishSelectionButtons {
@@ -101,8 +138,15 @@
 
 .tabActions {
   display: flex;
-  justify-content: flex-end;
-  margin-bottom: 24px;
+  flex-direction: column;
+  row-gap: 8px;
+
+  @include viewportMedium {
+    flex-direction: row;
+    justify-content: flex-end;
+    row-gap: 0;
+    margin-bottom: 24px;
+  }
 }
 
 .autoSelect,
@@ -116,7 +160,13 @@
   min-height: 44px;
   height: 44px;
   flex: 1;
-  max-width: 180px;
+  width: 100%;
+  max-width: none;
+
+  @include viewportMedium {
+    width: auto;
+    max-width: 180px;
+  }
 
   &:hover {
     background-color: $neutralGray5;
@@ -126,7 +176,11 @@
 .autoSelect {
   border: 1px solid $neutralGray7 !important;
   color: $neutralGray7 !important;
-  margin-right: 16px;
+  margin-right: 0;
+
+  @include viewportMedium {
+    margin-right: 16px;
+  }
 
   .iconRefresh {
     min-width: 20px;
@@ -138,11 +192,32 @@
   }
 }
 
-.iconNotJoined {
-  min-width: 16px;
-  min-height: 16px;
+.notJoinThisDay {
+  flex: 0 0 auto;
+  width: auto;
+  max-width: none;
+  min-height: 32px;
+  height: 32px;
+  padding-top: 6px;
+  padding-bottom: 6px;
 
-  & > path {
-    fill: $neutralGray7;
+  @include viewportMedium {
+    flex: 1;
+    width: auto;
+    max-width: 180px;
+    align-self: auto;
+    min-height: 44px;
+    height: 44px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  .iconNotJoined {
+    min-width: 16px;
+    min-height: 16px;
+
+    & > path {
+      fill: $neutralGray7;
+    }
   }
 }

@@ -2,6 +2,7 @@ import React from 'react';
 import classNames from 'classnames';
 
 import Avatar from '@components/Avatar/Avatar';
+import IconAdd from '@components/Icons/IconAdd/IconAdd';
 import IconCheckWithBackground from '@components/Icons/IconCheckWithBackground/IconCheckWithBackground';
 import IconClose from '@components/Icons/IconClose/IconClose';
 import type { TDefaultProps, TUser } from '@utils/types';
@@ -19,6 +20,8 @@ type TParticipantCardProps = TDefaultProps & {
   participant?: TUser;
   onClickDeleteIcon?: () => void;
   ableToRemove?: boolean;
+  hasRestoreIcon?: boolean;
+  onRestoreParticipant?: (participant: TUser) => void;
 };
 
 const ParticipantCard: React.FC<TParticipantCardProps> = (props) => {
@@ -33,8 +36,15 @@ const ParticipantCard: React.FC<TParticipantCardProps> = (props) => {
     hasCheckIcon,
     participant,
     ableToRemove,
+    onRestoreParticipant,
+    hasRestoreIcon = false,
   } = props;
   const rootClasses = classNames(rootClassName || css.root, className);
+
+  const handleRestoreParticipant = () => {
+    if (!participant) return;
+    onRestoreParticipant?.(participant);
+  };
 
   return (
     <div className={rootClasses}>
@@ -58,6 +68,13 @@ const ParticipantCard: React.FC<TParticipantCardProps> = (props) => {
       {hasDeleteIcon && ableToRemove && (
         <div className={css.closeIconContainer} onClick={onClickDeleteIcon}>
           <IconClose className={css.closeIcon} />
+        </div>
+      )}
+      {hasRestoreIcon && (
+        <div
+          className={css.restoreIconContainer}
+          onClick={handleRestoreParticipant}>
+          <IconAdd className={css.addIcon} />
         </div>
       )}
     </div>

@@ -3,8 +3,11 @@
 import { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 
+import { useViewport } from '@hooks/useViewport';
+
 function GleapCSSInjector() {
   const pathname = usePathname();
+  const { isMobileLayout } = useViewport();
 
   useEffect(() => {
     if (!pathname) return;
@@ -12,12 +15,12 @@ function GleapCSSInjector() {
       document.body.classList.add('no-gleap');
     }
 
-    if (window.innerWidth < 768) {
-      document.body.classList.add('mobile-gleap');
+    if (isMobileLayout) {
+      document.body.classList.add('no-gleap');
     } else {
-      document.body.classList.remove('mobile-gleap');
+      document.body.classList.remove('no-gleap');
     }
-  }, [pathname]);
+  }, [pathname, isMobileLayout]);
 
   return null;
 }

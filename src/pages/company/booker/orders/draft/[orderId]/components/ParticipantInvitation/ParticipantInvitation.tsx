@@ -172,11 +172,16 @@ const ParticipantInvitation: React.FC<TParticipantInvitationProps> = ({
               confirmLabel={intl.formatMessage({ id: 'gui-loi-moi' })}
               shouldFullScreenInMobile={false}
               confirmDisabled={shouldDisabledSubmitPublishOrder}
-              onCancel={onGoBack}
+              onCancel={confirmPublishOrderControl.setFalse}
               onConfirm={handleConfirmPublishOrder}>
-              {intl.formatMessage({
-                id: 'sau-khi-gui-ban-se-khong-the-chinh-sua-thuc-don-cua-tuan-an',
-              })}
+              <span className="text-black">
+                {intl.formatMessage({
+                  id: 'sau-khi-gui-ban-se-khong-the-chinh-sua-thuc-don-cua-tuan-an',
+                })}
+                <br />
+                {intl.formatMessage({ id: 'so-luong-thanh-vien' })}:{' '}
+                {participantData.length}
+              </span>
             </AlertModal>
             <ParticipantManagement />
           </div>

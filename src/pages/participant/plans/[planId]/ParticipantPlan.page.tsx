@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import classNames from 'classnames';
 import isEmpty from 'lodash/isEmpty';
+import { ShoppingCartIcon } from 'lucide-react';
 import type { Duration } from 'luxon';
 import { DateTime } from 'luxon';
 import { useRouter } from 'next/router';
@@ -12,8 +13,10 @@ import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import IconArrowFull from '@components/Icons/IconArrow/IconArrowFull';
 import ParticipantLayout from '@components/ParticipantLayout/ParticipantLayout';
 import { prepareOrderDeadline } from '@helpers/order/prepareDataHelper';
+import { isOrderOverDeadline } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
+import { useViewport } from '@hooks/useViewport';
 import { UIActions } from '@redux/slices/UI.slice';
 import type { RootState } from '@redux/store';
 import { participantPaths } from '@src/paths';
@@ -22,6 +25,7 @@ import { Listing } from '@utils/data';
 
 import SectionCountdown from '../../components/SectionCountdown/SectionCountdown';
 import SectionOrderListing from '../../components/SectionOrderListing/SectionOrderListing';
+import TabActions from '../../components/SectionOrderListing/TabActions';
 import SectionOrderPanel from '../../components/SectionOrderPanel/SectionOrderPanel';
 import SectionRestaurantHero from '../../components/SectionRestaurantHero/SectionRestaurantHero';
 
@@ -40,6 +44,7 @@ const ParticipantPlan = () => {
   const router = useRouter();
   const isRouterReady = router.isReady;
   const { planId, from = 'orderList' } = router.query;
+  const { isMobileLayout } = useViewport();
 
   const { loadDataInProgress, order, plan } = useLoadData();
   const { orderDayState, selectedRestaurant, handleSelectRestaurant } =
@@ -55,7 +60,7 @@ const ParticipantPlan = () => {
 
   const orderDays = Object.keys(plan);
   const cartListKeys = Object.keys(cartList || []).filter(
-    (cartKey) => !!cartList[Number(cartKey)],
+    (cartKey) => !!cartList[Number(cartKey)]?.foodId,
   );
 
   const {
@@ -64,6 +69,7 @@ const ParticipantPlan = () => {
     orderType = EOrderType.group,
   } = Listing(order).getMetadata();
   const isGroupOrder = orderType === EOrderType.group;
+  const isOrderDeadlineOver = isOrderOverDeadline(order);
 
   const orderDeadline = prepareOrderDeadline(deadlineDate, deadlineHour);
 
@@ -162,9 +168,30 @@ const ParticipantPlan = () => {
     !!Object.keys(plan).length &&
     Object.keys(plan).every((timestamp) => cartList?.[+timestamp]?.foodId);
 
+  const selectedDayDate =
+    orderDayState && Number(orderDayState)
+      ? DateTime.fromMillis(Number(orderDayState)).toJSDate()
+      : null;
+  const selectedDayLabel = selectedDayDate
+    ? `${intl.formatMessage({
+        id: `Calendar.week.dayHeader.${selectedDayDate.getDay()}`,
+      })}, ${selectedDayDate.getDate()}/${selectedDayDate.getMonth() + 1}`
+    : '';
+
   return (
     <ParticipantLayout>
       <div className={css.root}>
+        {isMobileLayout && (
+          <button
+            type="button"
+            className={css.cartCornerButton}
+            onClick={showMobileInfoSection}>
+            <ShoppingCartIcon className="w-4 h-4" />
+            <span className={css.cartCornerBadge}>
+              {cartListKeys.length}/{orderDays.length}
+            </span>
+          </button>
+        )}
         <div className={css.leftSection}>
           <div className={css.goBack} onClick={handleGoBack}>
             <IconArrow direction="left" />
@@ -204,25 +231,44 @@ const ParticipantPlan = () => {
                 },
               )}
             </div>
+            {selectedDayLabel && (
+              <div className={css.currentDayText}>
+                {intl.formatMessage({
+                  id: 'ParticipantPlan.summary.currentDayText',
+                })}
+                <span className={css.currentDayHighlight}>
+                  {selectedDayLabel}
+                </span>
+              </div>
+            )}
           </div>
-          <Button
-            className={classNames(css.viewCartMobile, {
-              [css.ctaBtn]: isAllDaysHaveDishInCart,
-            })}
-            onClick={showMobileInfoSection}>
-            <div>
-              {intl.formatMessage({ id: 'ParticipantPlan.summary.cart' })}
-            </div>
-            <div className={css.selections}>
-              {intl.formatMessage(
-                { id: 'ParticipantPlan.summary.selections' },
-                {
-                  selectedDays: cartListKeys.length,
-                  totalDays: orderDays.length,
-                },
-              )}
-            </div>
-          </Button>
+          {isAllDaysHaveDishInCart ? (
+            <Button
+              className={classNames(css.viewCartMobile, {
+                [css.ctaBtn]: isAllDaysHaveDishInCart,
+              })}
+              onClick={showMobileInfoSection}>
+              <div>
+                {intl.formatMessage({ id: 'ParticipantPlan.summary.cart' })}
+              </div>
+              <div className={css.selections}>
+                {intl.formatMessage(
+                  { id: 'ParticipantPlan.summary.selections' },
+                  {
+                    selectedDays: cartListKeys.length,
+                    totalDays: orderDays.length,
+                  },
+                )}
+              </div>
+            </Button>
+          ) : (
+            <TabActions
+              planId={`${planId}`}
+              orderId={orderId}
+              orderDay={`${orderDayState}`}
+              isOrderDeadlineOver={isOrderDeadlineOver}
+            />
+          )}
         </div>
 
         <div className={infoSectionClasses}>

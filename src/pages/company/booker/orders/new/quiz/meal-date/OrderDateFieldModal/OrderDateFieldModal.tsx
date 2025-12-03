@@ -108,24 +108,29 @@ const OrderDateFieldModal: React.FC<TOrderDateFieldModalProps> = (props) => {
           minDate={props.noMinMax ? undefined : newMinDate || new Date()}
           maxDate={props.noMinMax ? undefined : maxDate}
         />
-        <div className={css.bottomBtns}>
-          <Button variant="inline" type="button" onClick={onClose}>
-            {intl.formatMessage({ id: 'huy' })}
-          </Button>
-          {allowClear && (
-            <Button
-              variant="inline"
-              type="button"
-              onClick={handleClearDateRange}>
-              {intl.formatMessage({ id: 'xoa' })}
+        <div className="flex gap-2 items-center">
+          <p className="font-bold text-xs flex-1 ms-2 text-gray-700">
+            {intl.formatMessage({ id: 'QuizMealDate.note' })}
+          </p>
+          <div className={css.bottomBtns}>
+            <Button variant="inline" type="button" onClick={onClose}>
+              {intl.formatMessage({ id: 'huy' })}
             </Button>
-          )}
-          <Button
-            type="button"
-            disabled={!startDate || !endDate}
-            onClick={handleUpdateDateRange}>
-            {intl.formatMessage({ id: 'ap-dung' })}
-          </Button>
+            {allowClear && (
+              <Button
+                variant="inline"
+                type="button"
+                onClick={handleClearDateRange}>
+                {intl.formatMessage({ id: 'xoa' })}
+              </Button>
+            )}
+            <Button
+              type="button"
+              disabled={!startDate || !endDate}
+              onClick={handleUpdateDateRange}>
+              {intl.formatMessage({ id: 'ap-dung' })}
+            </Button>
+          </div>
         </div>
       </div>
     </div>
