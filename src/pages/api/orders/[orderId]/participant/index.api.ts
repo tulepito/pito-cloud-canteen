@@ -34,8 +34,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
             id: orderId,
           }),
         );
-        const { participants = [], anonymous = [] } =
-          Listing(orderListing).getMetadata();
+        const {
+          participants = [],
+          anonymous = [],
+          removedParticipants = [],
+        } = Listing(orderListing).getMetadata();
 
         const needUpdateNoAccountEmails =
           typeof nonAccountEmails !== 'undefined';
@@ -105,6 +108,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                   }
                 : {}),
               ...(needUpdateNoAccountEmails ? { nonAccountEmails } : {}),
+              ...(removedParticipants.length > 0
+                ? {
+                    removedParticipants: difference(
+                      removedParticipants,
+                      userIds,
+                    ),
+                  }
+                : {}),
             },
           });
         }
@@ -187,10 +198,17 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           },
         } = req;
 
+        const orderListing = await integrationSdk.listings.show({
+          id: orderId,
+        });
+        const { removedParticipants = [] } =
+          Listing(orderListing).getMetadata();
+
         await integrationSdk.listings.update({
           id: orderId,
           metadata: {
             participants,
+            removedParticipants: uniq([...removedParticipants, participantId]),
           },
         });
 

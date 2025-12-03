@@ -10,6 +10,66 @@
 }
 
 .root {
+  .cartCornerButton {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 10px;
+    border-radius: 999px;
+    border: none;
+    background-color: black;
+    color: $neutralGray1;
+    cursor: pointer;
+    animation: btnEffect 1.5s infinite;
+
+    @include viewportMedium {
+      display: none;
+    }
+
+    .cartCornerIcon {
+      width: 18px;
+      height: 18px;
+      border-radius: 3px;
+      border: 2px solid $neutralGray1;
+      border-bottom-width: 4px;
+      position: relative;
+
+      &::before {
+        content: '';
+        position: absolute;
+        top: -4px;
+        left: 2px;
+        right: 2px;
+        height: 2px;
+        border-radius: 999px;
+        background-color: $neutralGray1;
+      }
+    }
+
+    .cartCornerBadge {
+      @include textTemplate(12px, 600, 16px);
+    }
+
+    &::after {
+      content: '';
+      display: flex;
+      height: 100%;
+      width: 100%;
+      border-radius: 999px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: -1;
+      background-color: #000;
+      animation: btnAfterEffect 1.5s infinite;
+    }
+  }
+
   .leftSection {
     display: flex;
     flex-direction: column;
@@ -73,13 +133,23 @@
     }
 
     .orderEndAt {
-      margin-bottom: 8px;
+      margin-bottom: 4px;
       @include textTemplate(12px, 400, 20px);
       color: $neutralGray6;
 
       .orderEndAtTime {
         @include textTemplate(12px, 600, 24px);
         color: $neutralGray7;
+      }
+    }
+
+    .currentDayText {
+      margin-bottom: 8px;
+      @include textTemplate(12px, 400, 20px);
+      color: $neutralGray7;
+
+      .currentDayHighlight {
+        font-weight: 600;
       }
     }
 

@@ -1,3 +1,4 @@
+import type { MouseEvent } from 'react';
 import { useRef } from 'react';
 import classNames from 'classnames';
 
@@ -7,6 +8,7 @@ import IconPlusDish from '@components/Icons/IconPlusDish/IconPlusDish';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
+import { useViewport } from '@hooks/useViewport';
 import { shoppingCartThunks } from '@redux/slices/shoppingCart.slice';
 import { EImageVariants } from '@src/utils/enums';
 import { getLabelByKey, useFoodTypeOptionsByLocale } from '@src/utils/options';
@@ -60,8 +62,10 @@ const ListingCard: React.FC<TListCardProps> = ({
     Listing(listing).getPublicData();
   const listingImage = Listing(listing).getImages()[0];
   const dispatch = useAppDispatch();
+  const { isMobileLayout } = useViewport();
 
-  const handleAddToCard = () => {
+  const handleAddToCard = (e: MouseEvent<HTMLSpanElement>) => {
+    e.stopPropagation();
     if (!selectDisabled) {
       dispatch(
         shoppingCartThunks.addToCart({ planId, dayId, mealId, requirement }),
@@ -72,7 +76,8 @@ const ListingCard: React.FC<TListCardProps> = ({
       });
     }
   };
-  const handleRemoveFromCard = () => {
+  const handleRemoveFromCard = (e: MouseEvent<HTMLSpanElement>) => {
+    e.stopPropagation();
     if (isOrderAlreadyStarted) return;
     dispatch(shoppingCartThunks.removeFromCart({ planId, dayId }));
   };
@@ -110,7 +115,25 @@ const ListingCard: React.FC<TListCardProps> = ({
       </div>
       <div className={css.listingCardContent}>
         <div className={css.listingCardInfo} onClick={viewListingDetail}>
-          <h6 className={css.title}>{title}</h6>
+          <div className={css.headerRow}>
+            <h6 className={css.title}>{title}</h6>
+            {isMobileLayout &&
+              (isSelected ? (
+                <span
+                  className={classNames(css.removeDish, css.flip)}
+                  onClick={handleRemoveFromCard}>
+                  <IconCheckmarkWithCircle />
+                </span>
+              ) : (
+                <span
+                  className={classNames(css.addDish, {
+                    [css.selectDisabled]: selectDisabled,
+                  })}
+                  onClick={handleAddToCard}>
+                  <IconPlusDish />
+                </span>
+              ))}
+          </div>
           <div className={css.categories} style={{ marginTop: '8px' }}>
             <Badge
               className={css.badge}
@@ -120,26 +143,31 @@ const ListingCard: React.FC<TListCardProps> = ({
           </div>
           <p className={css.description}>{description}</p>
         </div>
-        <div className={css.listingCardFooter}>
-          <p className={css.allergiesLabel}>
-            {allergicIngredients.map((item: string) => `Có ${item}`).join(', ')}
-          </p>
-          {isSelected ? (
-            <span
-              className={classNames(css.removeDish, css.flip)}
-              onClick={handleRemoveFromCard}>
-              <IconCheckmarkWithCircle />
-            </span>
-          ) : (
-            <span
-              className={classNames(css.addDish, {
-                [css.selectDisabled]: selectDisabled,
-              })}
-              onClick={handleAddToCard}>
-              <IconPlusDish />
-            </span>
-          )}
-        </div>
+        {(!isMobileLayout || allergicIngredients.length > 0) && (
+          <div className={css.listingCardFooter}>
+            <p className={css.allergiesLabel}>
+              {allergicIngredients
+                .map((item: string) => `Có ${item}`)
+                .join(', ')}
+            </p>
+            {!isMobileLayout &&
+              (isSelected ? (
+                <span
+                  className={classNames(css.removeDish, css.flip)}
+                  onClick={handleRemoveFromCard}>
+                  <IconCheckmarkWithCircle />
+                </span>
+              ) : (
+                <span
+                  className={classNames(css.addDish, {
+                    [css.selectDisabled]: selectDisabled,
+                  })}
+                  onClick={handleAddToCard}>
+                  <IconPlusDish />
+                </span>
+              ))}
+          </div>
+        )}
       </div>
       <ListingDetailModal
         listing={listing}

@@ -22,7 +22,7 @@ type TBookerDraftOrderPageState = {
 
   fetchOrderParticipantsInProgress: boolean;
   participantData: TObject[];
-
+  removedParticipantData: TObject[];
   addOrderParticipantsInProgress: boolean;
   toastShowedAfterSuccessfullyCreatingOrder: boolean;
   walkthroughStep: number;
@@ -38,7 +38,7 @@ const initialState: TBookerDraftOrderPageState = {
 
   fetchOrderParticipantsInProgress: false,
   participantData: [],
-
+  removedParticipantData: [],
   addOrderParticipantsInProgress: false,
   toastShowedAfterSuccessfullyCreatingOrder: false,
   walkthroughStep: -1,
@@ -78,10 +78,16 @@ const fetchOrderParticipants = createAsyncThunk(
     if (orderType === EOrderType.group) {
       const { data } = await getBookerOrderDataApi(orderGetter.getId());
 
-      return data.participantData;
+      return {
+        participantData: data.participantData,
+        removedParticipantData: data.removedParticipantData,
+      };
     }
 
-    return [];
+    return {
+      participantData: [],
+      removedParticipantData: [],
+    };
   },
 );
 
@@ -186,6 +192,10 @@ const BookerDraftOrderPageSlice = createSlice({
       ...state,
       walkthroughStep: payload,
     }),
+    setRemovedParticipantData: (state, { payload }) => ({
+      ...state,
+      removedParticipantData: [...state.removedParticipantData, payload],
+    }),
   },
   extraReducers: (builder) => {
     builder
@@ -207,7 +217,8 @@ const BookerDraftOrderPageSlice = createSlice({
       })
       .addCase(fetchOrderParticipants.fulfilled, (state, { payload }) => {
         state.fetchOrderParticipantsInProgress = false;
-        state.participantData = payload;
+        state.participantData = payload.participantData;
+        state.removedParticipantData = payload.removedParticipantData;
       })
       .addCase(fetchOrderParticipants.rejected, (state) => {
         state.fetchOrderParticipantsInProgress = false;
@@ -230,6 +241,9 @@ const BookerDraftOrderPageSlice = createSlice({
       .addCase(addOrderParticipants.fulfilled, (state, { payload }) => {
         state.addOrderParticipantsInProgress = false;
         state.participantData = state.participantData.concat(payload.newUsers);
+        state.removedParticipantData = state.removedParticipantData.filter(
+          (p) => !payload.newUsers.map((u) => u.id.uuid).includes(p.id.uuid),
+        );
       })
       .addCase(addOrderParticipants.rejected, (state) => {
         state.addOrderParticipantsInProgress = false;
@@ -240,6 +254,9 @@ const BookerDraftOrderPageSlice = createSlice({
       })
       .addCase(deleteOrderParticipants.fulfilled, (state, { payload }) => {
         state.participantData = payload;
+        state.removedParticipantData = state.removedParticipantData.filter(
+          (p) => !payload.includes(p),
+        );
       })
       .addCase(deleteOrderParticipants.rejected, (state) => {
         return state;

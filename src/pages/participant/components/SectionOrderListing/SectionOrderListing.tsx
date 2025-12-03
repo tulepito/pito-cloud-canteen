@@ -131,29 +131,67 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
       }: { foodList: any[]; restaurant: any; memberOrder: any } = plan[item];
       const { foodId: hasDishInCart } = cartList?.[item as any] || {};
       const planDate = DateTime.fromMillis(Number(item)).toJSDate();
-      const itemLabel = (
-        <div className={classNames(css.tabTitle, {})}>
-          <div>
-            {intl.formatMessage({
-              id: `Calendar.week.dayHeader.${planDate.getDay()}`,
-            })}
-            , {planDate.getDate()}/{planDate.getMonth() + 1}
+      const weekdayLabel = intl.formatMessage({
+        id: `Calendar.week.dayHeader.${planDate.getDay()}`,
+      });
+      const dateNumber = planDate.getDate();
+      const monthNumber = planDate.getMonth() + 1;
+
+      const itemLabel = ({ isActive }: { isActive?: boolean }) => {
+        if (isMobileLayout) {
+          return (
+            <div
+              className={classNames(css.tabTitle, css.tabTitleMobile, {
+                [css.tabTitleMobileActive]: isActive,
+              })}>
+              <div className={css.tabDateWrapper}>
+                <span
+                  className={classNames(css.tabDate, {
+                    [css.tabDateActive]: isActive,
+                  })}>
+                  {dateNumber}
+                </span>
+                <span className={css.tabMonth}>/{monthNumber}</span>
+              </div>
+              <div className={css.tabWeekday}>{weekdayLabel}</div>
+              {hasDishInCart &&
+                (hasDishInCart === 'notJoined' ? (
+                  <Tooltip tooltipContent={'meow'}>
+                    <IconBanned className={css.tabTitleIcon} />
+                  </Tooltip>
+                ) : (
+                  <Tooltip tooltipContent={'meow'}>
+                    <IconCheckmarkTabTitle className={css.tabTitleIcon} />
+                  </Tooltip>
+                ))}
+              {isLast && (
+                <div className="absolute right-0 w-[40px] mr-[-40px]"></div>
+              )}
+            </div>
+          );
+        }
+
+        return (
+          <div className={classNames(css.tabTitle, {})}>
+            <div>
+              {weekdayLabel}, {dateNumber}/{monthNumber}
+            </div>
+            {hasDishInCart &&
+              (hasDishInCart === 'notJoined' ? (
+                <Tooltip tooltipContent={'meow'}>
+                  <IconBanned className={css.tabTitleIcon} />
+                </Tooltip>
+              ) : (
+                <Tooltip tooltipContent={'meow'}>
+                  <IconCheckmarkTabTitle className={css.tabTitleIcon} />
+                </Tooltip>
+              ))}
+            {isLast && (
+              <div className="absolute right-0 w-[40px] mr-[-40px]"></div>
+            )}
           </div>
-          {hasDishInCart &&
-            (hasDishInCart === 'notJoined' ? (
-              <Tooltip tooltipContent={'meow'}>
-                <IconBanned className={css.tabTitleIcon} />
-              </Tooltip>
-            ) : (
-              <Tooltip tooltipContent={'meow'}>
-                <IconCheckmarkTabTitle className={css.tabTitleIcon} />
-              </Tooltip>
-            ))}
-          {isLast && (
-            <div className="absolute right-0 w-[40px] mr-[-40px]"></div>
-          )}
-        </div>
-      );
+        );
+      };
 
       const selectDisabled =
         isOrderDeadlineOver ||
@@ -209,14 +247,20 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
           middleLabel
           navigationStartClassName={css.leftNavigation}
           navigationEndClassName={css.rightNavigation}
+          tabItemClassName={isMobileLayout ? css.timeTabItem : undefined}
+          tabActiveItemClassName={
+            isMobileLayout ? css.timeTabItemActive : undefined
+          }
           actionsComponent={
-            <TabActions
-              orderId={order?.id?.uuid}
-              orderDay={orderDay}
-              planId={`${planId}`}
-              isOrderDeadlineOver={isOrderDeadlineOver}
-              onAddedToCart={onAddedToCart}
-            />
+            !isMobileLayout && (
+              <TabActions
+                orderId={order?.id?.uuid}
+                orderDay={orderDay}
+                planId={`${planId}`}
+                isOrderDeadlineOver={isOrderDeadlineOver}
+                onAddedToCart={onAddedToCart}
+              />
+            )
           }
           enableTabScroll
         />
