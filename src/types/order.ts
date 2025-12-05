@@ -45,6 +45,8 @@ export type TUpdateParticipantOrderBody = {
   memberOrders?: TMemberOrders; // for auto pick food
 };
 
+export type TFirebaseMemberOrder = TUpdateParticipantOrderBody;
+
 export type TFood = {
   foodName: string;
   foodPrice: number;

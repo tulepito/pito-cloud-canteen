@@ -83,7 +83,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             totalPages: response.data.meta?.totalPages || 0,
           };
 
-          return new SuccessResponse(reviewsWithReplies, {
+          return new SuccessResponse({
+            data: reviewsWithReplies,
             message: 'Get reviews successfully',
             pagination,
           }).send(res);

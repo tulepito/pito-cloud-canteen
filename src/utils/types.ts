@@ -762,3 +762,5 @@ export type TFBNotification = {
   endDate: number;
   id: string;
 };
+
+export type TOrderMemberProcessStatus = 'pending' | 'completed' | 'failed';

@@ -1,0 +1,160 @@
+const { initializeApp } = require('firebase/app');
+const {
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  getCountFromServer,
+  getDoc,
+  getDocs,
+  getFirestore,
+  limit,
+  orderBy,
+  query,
+  startAfter,
+  updateDoc,
+  where,
+} = require('firebase/firestore');
+const pick = require('lodash/pick');
+const config = require('../../utils/config');
+
+const firebaseApp = initializeApp(config.firebase.config);
+const firestore = getFirestore(firebaseApp);
+
+const getCollectionData = async (collectionName) => {
+  const ref = collection(firestore, collectionName);
+  const snapshot = await (await getDocs(ref)).docs;
+  const list = [];
+  snapshot.forEach((_doc) => {
+    list.push({ ..._doc.data(), id: _doc.id });
+  });
+
+  return list;
+};
+
+const queryCollectionData = async ({
+  collectionName,
+  queryParams,
+  limitRecords = 20,
+  lastRecord,
+}) => {
+  const ref = collection(firestore, collectionName);
+  let q;
+
+  const queryFuncs = Object.keys(queryParams).map((key) =>
+    where(key, queryParams[key].operator, queryParams[key].value),
+  );
+  if (!lastRecord) {
+    q = query(
+      ref,
+      ...queryFuncs,
+      orderBy('createdAt', 'desc'),
+      limit(limitRecords),
+    );
+  } else {
+    const lastCreatedAt = new Date(lastRecord * 1000);
+    // next page
+    q = query(
+      ref,
+      ...queryFuncs,
+      orderBy('createdAt', 'desc'),
+      startAfter(lastCreatedAt),
+      limit(limitRecords),
+    );
+  }
+
+  const snapshot = await (await getDocs(q)).docs;
+
+  const list = [];
+  snapshot.forEach((_doc) => {
+    list.push({ ..._doc.data(), id: _doc.id });
+  });
+
+  return list;
+};
+
+const addCollectionDoc = async (data, collectionName) => {
+  const ref = collection(firestore, collectionName);
+
+  const addedDoc = await addDoc(ref, data);
+
+  return addedDoc.id;
+};
+
+const queryAllCollectionData = async ({
+  collectionName,
+  queryParams = {},
+  order = null, // { field: 'createdAt', direction: 'asc' }
+  neededDataAttributes,
+}) => {
+  const hasNeeded = neededDataAttributes?.length > 0;
+  const ref = collection(firestore, collectionName);
+
+  let q = query(ref);
+
+  if (queryParams) {
+    Object.keys(queryParams).forEach((field) => {
+      const { operator, value } = queryParams[field];
+      q = query(q, where(field, operator, value));
+    });
+  }
+
+  if (order) {
+    q = query(q, orderBy(order.field, order.direction));
+  }
+
+  const snapshot = await getDocs(q);
+
+  return snapshot.docs.map((_doc) => ({
+    ...(hasNeeded ? pick(_doc.data(), neededDataAttributes) : _doc.data()),
+    id: _doc.id,
+  }));
+};
+
+const getDocumentById = async (documentId, collectionName) => {
+  const docRef = doc(firestore, collectionName, documentId);
+  const docSnap = await getDoc(docRef);
+  if (docSnap.exists()) {
+    return { ...docSnap.data(), id: docSnap.id };
+  }
+
+  return null;
+};
+
+const getCollectionCount = async ({ collectionName, queryParams }) => {
+  const ref = collection(firestore, collectionName);
+  const queryFuncs = Object.keys(queryParams).map((key) =>
+    where(key, queryParams[key].operator, queryParams[key].value),
+  );
+  const q = query(ref, ...queryFuncs, orderBy('createdAt', 'desc'));
+  const count = await getCountFromServer(q);
+
+  return count.data().count;
+};
+
+const updateCollectionDoc = async (
+  documentId,
+  data,
+  path,
+  pathSegments = [],
+) => {
+  const docRef = doc(firestore, path, ...pathSegments, documentId);
+
+  await updateDoc(docRef, data);
+};
+
+const deleteDocument = async (documentId, path, pathSegments = []) => {
+  await deleteDoc(doc(firestore, path, ...pathSegments, documentId));
+};
+
+module.exports = {
+  firebaseApp,
+  deleteDocument,
+  getCollectionCount,
+  addCollectionDoc,
+  getCollectionData,
+  getDocumentById,
+  queryCollectionData,
+  queryAllCollectionData,
+  updateCollectionDoc,
+};

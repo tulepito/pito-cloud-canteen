@@ -1,5 +1,6 @@
 import type { VoucherInfo } from '@pages/api/participants/events/voucher/receive.api';
 import type { POSTParticipantRating } from '@pages/api/participants/ratings/index.api';
+import type { TUpdateParticipantOrderBody } from '@src/types/order';
 import type { ApiResponse } from '@src/utils/response';
 
 import { getApi, postApi, putApi } from './configs';
@@ -40,4 +41,19 @@ export const getEmailsApi = (options: { signal?: AbortSignal }) =>
     '/participants/events/voucher/get-emails',
     {},
     { signal: options.signal },
+  );
+
+/**
+ * Place order for participant
+ * @param orderId - order id
+ * @param body - body
+ * @returns { orderMemberDocumentId: string } - document id
+ */
+export const placeOrderApi = (
+  orderId: string,
+  body: TUpdateParticipantOrderBody,
+) =>
+  postApi<ApiResponse<{ orderMemberDocumentId: string }>>(
+    `/participants/orders/${orderId}/place-order`,
+    body,
   );

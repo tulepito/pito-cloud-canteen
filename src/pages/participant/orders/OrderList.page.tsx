@@ -105,6 +105,7 @@ const OrderListPage = () => {
     getStartOfMonth(getStartDayOfWeek(selectedDayOfMonth)),
   );
   const isFirstTimeReachMinOrMaxMonthControl = useBoolean(true);
+  const hasFetchedOrders = useRef(false);
 
   const subOrderDetailModalControl = useBoolean();
   const { isMobileLayout } = useViewport();
@@ -392,8 +393,9 @@ const OrderListPage = () => {
         const nextDayOfMonth = getNextMonth(selectedDayOfMonth!);
         setSelectedDayOfMonth(nextDayOfMonth);
 
-        if (nextDayOfMonth.getMonth() > maxSelectedMonth.getMonth()) {
+        if (nextDayOfMonth.getTime() > maxSelectedMonth.getTime()) {
           setMaxSelectedMonth(getEndOfMonth(nextDayOfMonth));
+          hasFetchedOrders.current = false;
           isFirstTimeReachMinOrMaxMonthControl.setTrue();
 
           return;
@@ -414,7 +416,7 @@ const OrderListPage = () => {
         ) {
           setMinSelectedMonth(getStartOfMonth(startDayOfWeek));
           setMaxSelectedMonth(getEndOfMonth(endDayOfWeek));
-
+          hasFetchedOrders.current = false;
           isFirstTimeReachMinOrMaxMonthControl.setTrue();
 
           return;
@@ -424,8 +426,9 @@ const OrderListPage = () => {
       const prevMonth = getPrevMonth(selectedDayOfMonth!);
       setSelectedDayOfMonth(prevMonth);
 
-      if (minSelectedMonth.getMonth() > prevMonth.getMonth()) {
+      if (prevMonth.getTime() < minSelectedMonth.getTime()) {
         setMinSelectedMonth(prevMonth);
+        hasFetchedOrders.current = false;
         isFirstTimeReachMinOrMaxMonthControl.setTrue();
 
         return;
@@ -446,7 +449,7 @@ const OrderListPage = () => {
       ) {
         setMinSelectedMonth(getStartOfMonth(startDayOfWeek));
         setMaxSelectedMonth(getEndOfMonth(endDayOfWeek));
-
+        hasFetchedOrders.current = false;
         isFirstTimeReachMinOrMaxMonthControl.setTrue();
 
         return;
@@ -507,13 +510,6 @@ const OrderListPage = () => {
   }, [selectedEvent]);
 
   const [isReadyLatestOrders, setReadyLatestOrders] = useState(false);
-  const hasFetchedOrders = useRef(false);
-  const prevDeps = useRef([
-    currentUserId,
-    minSelectedMonth,
-    maxSelectedMonth,
-    isFirstTimeReachMinOrMaxMonthControl.value,
-  ]);
 
   useEffect(() => {
     (async () => {
@@ -538,25 +534,6 @@ const OrderListPage = () => {
         }
       }
     })();
-
-    return () => {
-      if (
-        JSON.stringify([
-          currentUserId,
-          minSelectedMonth,
-          maxSelectedMonth,
-          isFirstTimeReachMinOrMaxMonthControl.value,
-        ]) !== JSON.stringify(prevDeps.current)
-      ) {
-        hasFetchedOrders.current = false;
-      }
-      prevDeps.current = [
-        currentUserId,
-        minSelectedMonth,
-        maxSelectedMonth,
-        isFirstTimeReachMinOrMaxMonthControl.value,
-      ];
-    };
   }, [
     currentUserId,
     minSelectedMonth,
@@ -581,12 +558,16 @@ const OrderListPage = () => {
         const monthInQuery = DateTime.fromMillis(+timestamp).toJSDate();
         setSelectedDayOfMonth(monthInQuery);
 
-        if (monthInQuery.getMonth() > maxSelectedMonth.getMonth()) {
+        if (monthInQuery.getTime() > maxSelectedMonth.getTime()) {
           setMaxSelectedMonth(getEndOfMonth(monthInQuery));
+          hasFetchedOrders.current = false;
+          isFirstTimeReachMinOrMaxMonthControl.setTrue();
         }
 
-        if (minSelectedMonth.getMonth() > monthInQuery.getMonth()) {
+        if (monthInQuery.getTime() < minSelectedMonth.getTime()) {
           setMinSelectedMonth(getStartOfMonth(monthInQuery));
+          hasFetchedOrders.current = false;
+          isFirstTimeReachMinOrMaxMonthControl.setTrue();
         }
       }
     }
