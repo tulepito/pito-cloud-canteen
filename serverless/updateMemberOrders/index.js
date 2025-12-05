@@ -35,7 +35,7 @@ exports.handler = async () => {
         direction: 'asc', // get all order members with ascending createdAt
       },
     });
-    console.log('orderMembers', orderMembers);
+    console.log('pendingOrderMembers', orderMembers);
     // group order members by planId
     const groupOrders = orderMembers.reduce((acc, orderMember) => {
       acc[orderMember.planId] = {
@@ -45,6 +45,7 @@ exports.handler = async () => {
 
       return acc;
     }, {});
+    console.log('Update member orders started');
     const updateOrderDetails = await Promise.allSettled(
       // restructute memberOrders to plan listing order detail
       Object.entries(groupOrders).map(async ([planId, memberOrders]) => {
@@ -52,9 +53,25 @@ exports.handler = async () => {
           id: planId,
         });
         const [planListing] = denormalisedResponseEntities(planListingResponse);
+        if (!planListing) {
+          console.error(
+            'Update member orders failed',
+            'Plan listing not found',
+          );
+
+          return;
+        }
         const { orderDetail, orderId } = Listing(planListing).getMetadata();
         if (!orderId) {
           console.error('Update member orders failed', 'Order ID is required');
+
+          return;
+        }
+        if (!orderDetail || typeof orderDetail !== 'object') {
+          console.error(
+            'Update member orders failed',
+            'Order detail is required',
+          );
 
           return;
         }
@@ -63,6 +80,14 @@ exports.handler = async () => {
         });
         const [orderListing] =
           denormalisedResponseEntities(orderListingResponse);
+        if (!orderListing) {
+          console.error(
+            'Update member orders failed',
+            'Order listing not found',
+          );
+
+          return;
+        }
 
         const { orderState } = Listing(orderListing).getMetadata();
         // if order state is not in progress or picking, cancel all pending member orders
@@ -102,6 +127,9 @@ exports.handler = async () => {
               ...Object.values(memberOrders).reduce(
                 (newMemberOrders, memberOrder) => {
                   const memberOrderData = memberOrder[orderDay];
+                  if (!memberOrderData || typeof memberOrderData !== 'object') {
+                    return newMemberOrders;
+                  }
                   const participantId = Object.keys(memberOrderData);
                   const memberMeal = Object.values(memberOrderData)[0];
                   newMemberOrders[participantId] = memberMeal;
@@ -121,7 +149,8 @@ exports.handler = async () => {
           metadata: { orderDetail: newOrderDetail },
         });
         const orderMemberRecordsInPlan = orderMembers.filter(
-          (orderMember) => orderMember.planId === planId,
+          (orderMember) =>
+            orderMember.planId === planId && orderMember.orderId === orderId,
         );
         // update order member status to completed
         await Promise.allSettled(
