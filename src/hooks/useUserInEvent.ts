@@ -23,7 +23,9 @@ export const useUserInEvent = () => {
         zone: 'Asia/Ho_Chi_Minh',
       });
       const eventStartDate = eventDate.startOf('day');
-      const eventEndDate = eventDate.endOf('month');
+      const eventEndDate = DateTime.fromISO('2025-12-31', {
+        zone: 'Asia/Ho_Chi_Minh',
+      }).endOf('day');
 
       if (now < eventStartDate || now > eventEndDate) {
         setIsUserInEvent(false);
