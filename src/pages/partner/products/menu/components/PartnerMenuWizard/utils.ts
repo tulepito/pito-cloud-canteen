@@ -1,4 +1,5 @@
 import { IntegrationMenuListing } from '@src/utils/data';
+import { getDateStartOfDate } from '@utils/dates';
 import { EMenuMealType, EMenuType } from '@utils/enums';
 import type { TIntegrationListing, TObject } from '@utils/types';
 
@@ -54,10 +55,10 @@ export const toTimestamp = (
   fallback?: number,
 ): number => {
   if (value instanceof Date) {
-    return value.getTime();
+    return getDateStartOfDate(value).getTime();
   }
   if (typeof value === 'number') {
-    return value;
+    return getDateStartOfDate(new Date(value)).getTime();
   }
 
   return fallback ?? Date.now();
