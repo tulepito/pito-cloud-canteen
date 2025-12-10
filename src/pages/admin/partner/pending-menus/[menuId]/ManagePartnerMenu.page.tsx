@@ -9,7 +9,7 @@ import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { adminRoutes } from '@src/paths';
-import { EMenuStatus } from '@src/utils/enums';
+import { EListingStates } from '@src/utils/enums';
 
 import MenuApprovalDetail from '../components/MenuApprovalDetail/MenuApprovalDetail';
 import RejectMenuModal from '../components/RejectMenuModal/RejectMenuModal';
@@ -67,7 +67,7 @@ const ManagePartnerMenuPage = () => {
         ManagePartnersMenusThunks.approveMenu({ menuId: menuId as string }),
       ).unwrap();
 
-      if (result.status === EMenuStatus.approved) {
+      if (result.status === EListingStates.published) {
         toast.success('Menu đã được duyệt thành công');
         router.push(adminRoutes.ManagePartnersMenus.path);
       }
@@ -96,7 +96,7 @@ const ManagePartnerMenuPage = () => {
         }),
       ).unwrap();
 
-      if (result.status === EMenuStatus.rejected) {
+      if (result.status === EListingStates.rejected) {
         toast.success('Menu đã được từ chối thành công');
         setIsRejectModalOpen(false);
         router.push(adminRoutes.ManagePartnersMenus.path);

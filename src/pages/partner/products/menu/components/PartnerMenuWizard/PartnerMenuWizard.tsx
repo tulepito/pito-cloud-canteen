@@ -25,7 +25,7 @@ import {
 } from '@pages/admin/partner/[restaurantId]/settings/menu/components/EditPartnerMenuWizard/utils';
 import { partnerPaths } from '@src/paths';
 import { CurrentUser, IntegrationMenuListing } from '@src/utils/data';
-import { EListingStates, EMenuStatus } from '@utils/enums';
+import { EListingStates } from '@utils/enums';
 import type { TCompany, TIntegrationListing, TListing } from '@utils/types';
 
 import {
@@ -219,10 +219,10 @@ const PartnerMenuWizard = () => {
   } = useAppSelector((state) => state.PartnerManageMenus);
 
   const currentMenu = menu as TIntegrationListing | null;
-  const menuStatus = currentMenu
-    ? IntegrationMenuListing(currentMenu).getMetadata()?.menuStatus
+  const listingState = currentMenu
+    ? IntegrationMenuListing(currentMenu).getMetadata()?.listingState
     : undefined;
-  const isReadOnly = menuStatus === EMenuStatus.approved;
+  const isReadOnly = listingState === EListingStates.published;
 
   const tabLink = (tabName: string) => {
     return {

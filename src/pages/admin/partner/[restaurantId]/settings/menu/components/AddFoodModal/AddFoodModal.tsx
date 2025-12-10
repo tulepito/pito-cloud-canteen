@@ -128,7 +128,6 @@ const AddFoodModal: React.FC<TAddFoodModal> = (props) => {
     currentDate,
     isReadOnly,
   } = props;
-  if (isReadOnly) return null;
   const dispatch = useAppDispatch();
   const [page, setPage] = useState<number>(1);
   const [keywords, setKeywords] = useState<string>('');
@@ -281,6 +280,8 @@ const AddFoodModal: React.FC<TAddFoodModal> = (props) => {
     values.rowCheckbox || [],
     menuPickedFoods,
   );
+
+  if (isReadOnly) return null;
 
   return (
     <Modal

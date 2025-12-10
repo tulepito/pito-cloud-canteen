@@ -26,6 +26,7 @@ export enum EListingMenuStates {
 }
 
 export enum EListingStates {
+  rejected = 'rejected',
   draft = 'draft',
   pendingApproval = 'pendingApproval',
   published = 'published',
@@ -530,10 +531,4 @@ export enum ETimePeriodOption {
 export enum EAppLocale {
   VI = 'vi',
   EN = 'en',
-}
-
-export enum EMenuStatus {
-  pending = 'pending',
-  approved = 'approved',
-  rejected = 'rejected',
 }

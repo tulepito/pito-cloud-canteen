@@ -20,7 +20,6 @@ import type {
   EListingStates,
   EManageCompanyOrdersTab,
   EMenuMealType,
-  EMenuStatus,
   EMenuType,
   ENotificationPopupType,
   EOrderDraftStates,
@@ -757,7 +756,7 @@ export type TFBNotification = {
 export type TMenuFood = TMenuFoodItem;
 
 export type TMenuStateHistory = {
-  state: EMenuStatus;
+  state: EListingStates;
   reason: string;
   updatedAt: number;
 };

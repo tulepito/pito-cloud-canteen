@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { useField, useForm } from 'react-final-form-hooks';
 import classNames from 'classnames';
 import { DateTime } from 'luxon';
@@ -19,7 +18,7 @@ import useBoolean from '@hooks/useBoolean';
 import { partnerPaths } from '@src/paths';
 import { Listing } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
-import { EListingStates, EMenuStatus } from '@src/utils/enums';
+import { EListingStates } from '@src/utils/enums';
 import type { TListing, TMenuStateHistory, TObject } from '@src/utils/types';
 
 import { PartnerManageMenusThunks } from '../PartnerManageMenus.slice';
@@ -58,7 +57,7 @@ const MenuCard: React.FC<TMenuCardProps> = ({
   const menuId = menuGetter.getId();
   const { title: menuName } = menuGetter.getAttributes();
   const { startDate, endDate } = menuGetter.getPublicData();
-  const { listingState, menuStatus } = menuGetter.getMetadata();
+  const { listingState } = menuGetter.getMetadata();
 
   const isDraftMenu = listingState === EListingStates.draft;
 
@@ -85,29 +84,8 @@ const MenuCard: React.FC<TMenuCardProps> = ({
 
   const menuStateHistory = menuGetter.getMetadata().menuStateHistory;
   const rejectedReason = menuStateHistory?.findLast(
-    (item: TMenuStateHistory) => item.state === EMenuStatus.rejected,
+    (item: TMenuStateHistory) => item.state === EListingStates.rejected,
   )?.rejectedReason;
-
-  useEffect(() => {
-    if (typeof isActiveValue === 'boolean') {
-      const newListingState = isActiveValue
-        ? EListingStates.published
-        : EListingStates.closed;
-
-      if (
-        newListingState !== listingState &&
-        listingState !== EListingStates.draft
-      ) {
-        dispatch(
-          PartnerManageMenusThunks.toggleMenuActiveStatus({
-            id: menuId,
-            newListingState,
-          }),
-        );
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isActiveValue, listingState]);
 
   const handleMenuCardClick = (event: any) => {
     event.stopPropagation();
@@ -149,7 +127,7 @@ const MenuCard: React.FC<TMenuCardProps> = ({
       <div className={css.titleContainer} onClick={handleMenuCardClick}>
         <div className={css.titleWrapper}>
           <div className={css.menuName}>{menuName}</div>
-          {menuStatus === EMenuStatus.pending && (
+          {listingState === EListingStates.pendingApproval && (
             <div className={css.statusBadge}>
               <Badge
                 type={EBadgeType.warning}
@@ -158,7 +136,7 @@ const MenuCard: React.FC<TMenuCardProps> = ({
               />
             </div>
           )}
-          {menuStatus === EMenuStatus.rejected && (
+          {listingState === EListingStates.rejected && (
             <div className={css.statusBadge}>
               <Badge
                 type={EBadgeType.danger}
@@ -186,7 +164,7 @@ const MenuCard: React.FC<TMenuCardProps> = ({
         </RenderWhen>
       </div>
       <div className={css.actionContainer}>
-        {menuStatus === EMenuStatus.rejected && rejectedReason && (
+        {listingState === EListingStates.rejected && rejectedReason && (
           <div className={css.reasonWrapper}>
             <span
               className={classNames(css.reasonText, 'self-start text-black')}>
@@ -207,7 +185,11 @@ const MenuCard: React.FC<TMenuCardProps> = ({
             onClick={handleEditMenuClick}
             className={css.iconContainer}
             aria-disabled={isAnyMenuActionsInProgress}>
-            {menuStatus === EMenuStatus.approved ? <IconEye /> : <IconEdit />}
+            {listingState === EListingStates.published ? (
+              <IconEye />
+            ) : (
+              <IconEdit />
+            )}
           </div>
           <div
             className={css.iconContainer}

@@ -14,7 +14,7 @@ import adminChecker from '@services/permissionChecker/admin';
 import { Listing } from '@src/utils/data';
 import { buildFullNameFromProfile } from '@src/utils/emailTemplate/participantOrderPicking';
 import {
-  EMenuStatus,
+  EListingStates,
   ENativeNotificationType,
   ENotificationType,
 } from '@src/utils/enums';
@@ -29,7 +29,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         const sdk = getIntegrationSdk();
         const menuResponse = await sdk.listings.show({
           id: menuId as string,
-          meta_menuStatus: EMenuStatus.pending,
+          meta_listingState: EListingStates.pendingApproval,
           include: ['author'],
         });
         const [menu] = denormalisedResponseEntities(menuResponse);
@@ -55,7 +55,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       try {
         const { menuId } = req.query;
         const { menuStatus, rejectedReason } = req.body as {
-          menuStatus: EMenuStatus;
+          menuStatus: EListingStates;
           rejectedReason?: string;
         };
         const sdk = getIntegrationSdk();
@@ -79,12 +79,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           {
             id: menuId as string,
             metadata: {
-              menuStatus,
+              listingState: menuStatus,
               menuStateHistory: [
                 ...menuStateHistory,
                 {
                   state: menuStatus,
-                  ...(menuStatus === EMenuStatus.rejected && {
+                  ...(menuStatus === EListingStates.rejected && {
                     rejectedReason,
                   }),
                   updatedAt,
@@ -96,7 +96,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         );
         const partnerEmail = partner?.attributes?.email;
 
-        if (menuStatus === EMenuStatus.approved) {
+        if (menuStatus === EListingStates.published) {
           await Promise.allSettled(
             [
               partnerEmail
@@ -134,7 +134,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             ].filter(Boolean) as Promise<any>[],
           );
         }
-        if (menuStatus === EMenuStatus.rejected) {
+        if (menuStatus === EListingStates.rejected) {
           await Promise.allSettled(
             [
               partnerEmail

@@ -103,9 +103,9 @@ const FieldCheckbox: React.FC<TFieldCheckboxProps> = (props) => {
 
   const successColorVariantMaybe = useSuccessColor
     ? {
-      checkedClassName: css.checkedSuccess,
-      boxClassName: css.boxSuccess,
-    }
+        checkedClassName: css.checkedSuccess,
+        boxClassName: css.boxSuccess,
+      }
     : {};
 
   return (

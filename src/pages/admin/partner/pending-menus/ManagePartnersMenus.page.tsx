@@ -12,7 +12,7 @@ import { TableForm } from '@components/Table/Table';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import type { MenuListing } from '@src/types';
 import { formatTimestamp } from '@utils/dates';
-import { EMenuMealType, EMenuStatus, EMenuType } from '@utils/enums';
+import { EListingStates, EMenuMealType, EMenuType } from '@utils/enums';
 
 import { ManagePartnersMenusThunks } from './ManagePartnersMenus.slice';
 
@@ -104,21 +104,22 @@ const TABLE_COLUMNS: TColumn[] = [
     render: (data: any) => {
       const statusConfig: Record<string, { label: string; type: EBadgeType }> =
         {
-          [EMenuStatus.pending]: {
+          [EListingStates.pendingApproval]: {
             label: 'Chờ duyệt',
             type: EBadgeType.warning,
           },
-          [EMenuStatus.approved]: {
+          [EListingStates.published]: {
             label: 'Đã duyệt',
             type: EBadgeType.success,
           },
-          [EMenuStatus.rejected]: {
+          [EListingStates.rejected]: {
             label: 'Không duyệt',
             type: EBadgeType.danger,
           },
         };
       const config =
-        statusConfig[data?.status] || statusConfig[EMenuStatus.pending];
+        statusConfig[data?.status] ||
+        statusConfig[EListingStates.pendingApproval];
 
       return <Badge label={config.label} type={config.type} hasDotIcon />;
     },
@@ -153,7 +154,7 @@ const parseMenusToTableData = (
     const mealType = publicData?.mealType || '';
     const startDate = publicData?.startDate;
     const endDate = publicData?.endDate;
-    const status = metadata?.menuStatus || '';
+    const status = metadata?.listingState || '';
 
     return {
       key: menuId,

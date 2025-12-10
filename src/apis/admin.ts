@@ -2,7 +2,7 @@ import type { AdminViewerRatingData } from '@pages/admin/company/components/Admi
 import type { GETCompanyRaitingsQuery } from '@pages/api/admin/company/[companyId]/ratings/index.api';
 import type { POSTChangeMenuEndDateInBulkBody } from '@pages/api/admin/listings/menus/change-end-date-in-bulk.api';
 import type { MenuListing, TQueryParams } from '@src/types';
-import { EMenuStatus } from '@src/utils/enums';
+import { EListingStates } from '@src/utils/enums';
 import type { ApiResponse } from '@src/utils/response';
 import type { TObject } from '@src/utils/types';
 
@@ -177,10 +177,10 @@ export const getPartnerPendingMenuDetailApi = (menuId: string) =>
  * @returns Response with menu ID
  */
 export const approvePartnerMenuApi = (menuId: string) =>
-  putApi<ApiResponse<{ id: string; status: EMenuStatus }>>(
+  putApi<ApiResponse<{ id: string; status: EListingStates }>>(
     `/admin/pending-menus/${menuId}`,
     {
-      menuStatus: EMenuStatus.approved,
+      menuStatus: EListingStates.published,
     },
   );
 
@@ -191,10 +191,10 @@ export const approvePartnerMenuApi = (menuId: string) =>
  * @returns Response with menu ID
  */
 export const rejectPartnerMenuApi = (menuId: string, rejectedReason: string) =>
-  putApi<ApiResponse<{ id: string; status: EMenuStatus }>>(
+  putApi<ApiResponse<{ id: string; status: EListingStates }>>(
     `/admin/pending-menus/${menuId}`,
     {
-      menuStatus: EMenuStatus.rejected,
+      menuStatus: EListingStates.rejected,
       rejectedReason,
     },
   );

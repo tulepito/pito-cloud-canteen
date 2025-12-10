@@ -7,7 +7,7 @@ import { getIntegrationSdk } from '@services/integrationSdk';
 import adminChecker from '@services/permissionChecker/admin';
 import type { MenuListing, UserListing } from '@src/types';
 import { buildFullNameFromProfile } from '@src/utils/emailTemplate/participantOrderPicking';
-import { EListingStates, EListingType, EMenuStatus } from '@src/utils/enums';
+import { EListingStates, EListingType } from '@src/utils/enums';
 import {
   FailedResponse,
   HttpStatus,
@@ -30,8 +30,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         const menusResponse = await sdk.listings.query({
           meta_listingType: EListingType.menu,
           meta_isDeleted: false,
-          meta_menuStatus: EMenuStatus.pending,
-          meta_listingState: EListingStates.published,
+          meta_listingState: EListingStates.pendingApproval,
           page,
           perPage,
           include: ['author'],

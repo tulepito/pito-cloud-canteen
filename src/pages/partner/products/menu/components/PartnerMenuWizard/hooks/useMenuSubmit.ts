@@ -12,7 +12,7 @@ import {
 } from '@pages/admin/partner/[restaurantId]/settings/menu/components/EditPartnerMenuWizard/utils';
 import { partnerPaths } from '@src/paths';
 import { IntegrationMenuListing, Listing } from '@src/utils/data';
-import { EListingStates, EMenuStatus } from '@utils/enums';
+import { EListingStates } from '@utils/enums';
 import type { TIntegrationListing } from '@utils/types';
 
 import {
@@ -66,8 +66,8 @@ export const useMenuSubmit = ({
     values: TEditMenuFormValues,
     setSubmittedValues: (values: TEditMenuFormValues | null) => void,
   ): Promise<void> => {
-    const menuStatus = menuListing.getMetadata()?.menuStatus;
-    if (menuStatus === EMenuStatus.approved) {
+    const listingState = menuListing.getMetadata()?.listingState;
+    if (listingState === EListingStates.published) {
       if (activeTab === MENU_COMPLETE_TAB) {
         router.push(partnerPaths.ManageMenus);
 
@@ -137,9 +137,9 @@ export const useMenuSubmit = ({
 
     // Handle post-submit actions
     if (listing) {
-      const listingState =
+      const menuState =
         IntegrationMenuListing(listing).getMetadata().listingState;
-      const isDraft = listingState === EListingStates.draft;
+      const isDraft = menuState === EListingStates.draft;
 
       if (!isDraft && !error) {
         setSubmittedValues(values);

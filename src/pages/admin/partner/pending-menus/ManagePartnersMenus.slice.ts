@@ -8,7 +8,7 @@ import {
 } from '@apis/admin';
 import { createAsyncThunk } from '@redux/redux.helper';
 import type { MenuListing, TQueryParams } from '@src/types';
-import type { EMenuStatus } from '@src/utils/enums';
+import type { EListingStates } from '@src/utils/enums';
 import { storableError } from '@src/utils/errors';
 import type { TError, TPagination } from '@src/utils/types';
 
@@ -122,7 +122,7 @@ const fetchMenuDetail = createAsyncThunk<
  * @returns Response with menu ID
  */
 const approveMenu = createAsyncThunk<
-  { id: string; status: EMenuStatus },
+  { id: string; status: EListingStates },
   { menuId: string }
 >(
   'admin/ManagePartnersMenus/APPROVE_MENU',
@@ -148,7 +148,7 @@ const approveMenu = createAsyncThunk<
  * @returns Response with menu
  */
 const rejectMenu = createAsyncThunk<
-  { id: string; status: EMenuStatus },
+  { id: string; status: EListingStates },
   { menuId: string; reason: string }
 >(
   'admin/ManagePartnersMenus/REJECT_MENU',

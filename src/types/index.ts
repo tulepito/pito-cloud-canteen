@@ -1,8 +1,8 @@
 import type {
   ECompanyPermission,
   EDayOfWeek,
+  EListingStates,
   EMenuMealType,
-  EMenuStatus,
   EMenuType,
   EUserRole,
 } from '@src/utils/enums';
@@ -468,9 +468,8 @@ export type TMenuPublicData = {
 export type TMenuMetadata = {
   authorId: string;
   restaurantId: string;
-  menuStatus: EMenuStatus;
+  listingState: EListingStates;
   menuType: EMenuType;
-  listingState: string;
   listingType: 'menu';
   geolocation: {
     lat: number;

@@ -13,7 +13,6 @@ import { buildFullNameFromProfile } from '@src/utils/emailTemplate/participantOr
 import {
   EListingMenuStates,
   EListingStates,
-  EMenuStatus,
   ERestaurantListingStatus,
   ESlackNotificationType,
 } from '@src/utils/enums';
@@ -41,7 +40,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         });
 
         const [menu] = denormalisedResponseEntities(menuResponse);
-        const { restaurantId, menuStatus: previousMenuStatus } =
+        const { restaurantId, listingState: previousListingState } =
           IntegrationListing(menu).getMetadata();
         const restaurantResponse = await integrationSdk.listings.show({
           id: restaurantId,
@@ -66,17 +65,17 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         await integrationSdk.listings.update({
           id: menuId,
           metadata: {
-            menuStatus: EMenuStatus.pending,
+            listingState: EListingStates.pendingApproval,
             menuStateHistory: [
               ...(Listing(menu).getMetadata()?.menuStateHistory || []),
               {
-                state: EMenuStatus.pending,
+                state: EListingStates.pendingApproval,
                 updatedAt: new Date().getTime(),
               },
             ],
           },
         });
-        if (previousMenuStatus !== EMenuStatus.pending) {
+        if (previousListingState !== EListingStates.pendingApproval) {
           await createSlackNotification(
             ESlackNotificationType.PARTNER_MENU_PUBLISHED_DRAFT_TO_PENDING,
             {
@@ -99,12 +98,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
                 mealTypes: undefined,
               },
               metadata: {
-                menuStatus: EMenuStatus.pending,
-                listingState: EListingStates.published,
+                listingState: EListingStates.pendingApproval,
                 menuStateHistory: [
                   ...(Listing(menu).getMetadata()?.menuStateHistory || []),
                   {
-                    state: EMenuStatus.pending,
+                    state: EListingStates.pendingApproval,
                     updatedAt: new Date().getTime(),
                   },
                 ],
