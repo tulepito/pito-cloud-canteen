@@ -25,7 +25,7 @@ import {
 } from '@pages/admin/partner/[restaurantId]/settings/menu/components/EditPartnerMenuWizard/utils';
 import { partnerPaths } from '@src/paths';
 import { CurrentUser, IntegrationMenuListing } from '@src/utils/data';
-import { EListingStates } from '@utils/enums';
+import { EListingStates, EMenuStatus } from '@utils/enums';
 import type { TCompany, TIntegrationListing, TListing } from '@utils/types';
 
 import {
@@ -51,6 +51,7 @@ type TPartnerMenuTabProps = {
   restaurantId: string;
   currentMenu?: TIntegrationListing | null;
   setSubmittedValues: TSetSubmittedValues;
+  isReadOnly: boolean;
 } & TFormTabChildrenProps;
 
 const PartnerMenuTab = (props: TPartnerMenuTabProps) => {
@@ -61,6 +62,7 @@ const PartnerMenuTab = (props: TPartnerMenuTabProps) => {
     currentMenu,
     menuId,
     setSubmittedValues,
+    isReadOnly,
   } = props;
 
   // Use custom hook to merge menu data
@@ -117,6 +119,7 @@ const PartnerMenuTab = (props: TPartnerMenuTabProps) => {
           initialValues={initialValues}
           formRef={formRef}
           onSubmit={onSubmit}
+          isReadOnly={isReadOnly}
         />
       );
     }
@@ -129,6 +132,7 @@ const PartnerMenuTab = (props: TPartnerMenuTabProps) => {
           onSubmit={onSubmit}
           currentMenu={syntheticMenu as TIntegrationListing}
           restaurantId={restaurantId}
+          isReadOnly={isReadOnly}
         />
       );
     }
@@ -142,6 +146,7 @@ const PartnerMenuTab = (props: TPartnerMenuTabProps) => {
           initialValues={initialValues}
           currentMenu={syntheticMenu}
           restaurantId={restaurantId}
+          isReadOnly={isReadOnly}
         />
       );
     }
@@ -214,6 +219,10 @@ const PartnerMenuWizard = () => {
   } = useAppSelector((state) => state.PartnerManageMenus);
 
   const currentMenu = menu as TIntegrationListing | null;
+  const menuStatus = currentMenu
+    ? IntegrationMenuListing(currentMenu).getMetadata()?.menuStatus
+    : undefined;
+  const isReadOnly = menuStatus === EMenuStatus.approved;
 
   const tabLink = (tabName: string) => {
     return {
@@ -322,10 +331,9 @@ const PartnerMenuWizard = () => {
     return null;
   }
 
-  const submitReady = isEqual(
-    submittedValues,
-    formRef.current?.getState().values,
-  );
+  const submitReady = !isReadOnly
+    ? isEqual(submittedValues, formRef.current?.getState().values)
+    : false;
 
   const handleGoBack = () => {
     const tabIndex = EDIT_PARTNER_MENU_TABS.findIndex((cur) => cur === tab);
@@ -359,10 +367,12 @@ const PartnerMenuWizard = () => {
       </h2>
       <FormWizard formTabNavClassName={css.formTabNav}>
         {EDIT_PARTNER_MENU_TABS.map((menuTab: string, index: number) => {
-          const disabled = !tabCompleted(
-            EDIT_PARTNER_MENU_TABS[index - 1],
-            currentMenu as TIntegrationListing,
-          );
+          const disabled = !isReadOnly
+            ? !tabCompleted(
+                EDIT_PARTNER_MENU_TABS[index - 1],
+                currentMenu as TIntegrationListing,
+              )
+            : false;
 
           return (
             <PartnerMenuTab
@@ -380,6 +390,7 @@ const PartnerMenuWizard = () => {
               restaurantId={restaurantId}
               currentMenu={currentMenu}
               setSubmittedValues={setSubmittedValues}
+              isReadOnly={isReadOnly}
             />
           );
         })}

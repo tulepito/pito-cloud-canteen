@@ -40,6 +40,12 @@ import participantReviewReply, {
 import participantSubOrderIsCanceled, {
   participantSubOrderIsCanceledSubject,
 } from '@src/utils/emailTemplate/participantSubOrderIsCanceled';
+import {
+  partnerMenuApprovedSubject,
+  partnerMenuApprovedTemplate,
+  partnerMenuRejectedSubject,
+  partnerMenuRejectedTemplate,
+} from '@src/utils/emailTemplate/partnerMenuStatus';
 import partnerNewOrderAppear, {
   partnerNewOrderAppearSubject,
 } from '@src/utils/emailTemplate/partnerNewOrderAppear';
@@ -81,6 +87,8 @@ export enum EmailTemplateForPartnerTypes {
   PARTNER_NEW_ORDER_APPEAR = 'PARTNER_NEW_ORDER_APPEAR',
   PARTNER_SUB_ORDER_CANCELED = 'PARTNER_SUB_ORDER_CANCELED',
   PARTNER_ORDER_DETAILS_UPDATED = 'PARTNER_ORDER_DETAILS_UPDATED',
+  PARTNER_MENU_APPROVED = 'PARTNER_MENU_APPROVED',
+  PARTNER_MENU_REJECTED = 'PARTNER_MENU_REJECTED',
 }
 
 export const EmailTemplateTypes = {
@@ -622,6 +630,49 @@ export const emailSendingFactory = async (
         const emailDataParams = {
           receiver: [partnerEmail],
           subject: partnerOrderDetailsUpdatedSubject(formattedSubOrderDate),
+          content: emailTemplate as string,
+          sender: systemSenderEmail as string,
+        };
+        sendIndividualEmail(emailDataParams);
+        break;
+      }
+      case EmailTemplateTypes.PARTNER.PARTNER_MENU_APPROVED: {
+        const { partnerEmail, partnerName, menuName, menuLink } = emailParams;
+        if (!partnerEmail || !menuName || !menuLink) break;
+
+        const emailTemplate = partnerMenuApprovedTemplate({
+          partnerName,
+          menuName,
+          menuLink,
+        });
+        const emailDataParams = {
+          receiver: [partnerEmail],
+          subject: partnerMenuApprovedSubject(menuName),
+          content: emailTemplate as string,
+          sender: systemSenderEmail as string,
+        };
+        sendIndividualEmail(emailDataParams);
+        break;
+      }
+      case EmailTemplateTypes.PARTNER.PARTNER_MENU_REJECTED: {
+        const {
+          partnerEmail,
+          partnerName,
+          menuName,
+          menuLink,
+          rejectedReason,
+        } = emailParams;
+        if (!partnerEmail || !menuName || !menuLink) break;
+
+        const emailTemplate = partnerMenuRejectedTemplate({
+          partnerName,
+          menuName,
+          menuLink,
+          rejectedReason,
+        });
+        const emailDataParams = {
+          receiver: [partnerEmail],
+          subject: partnerMenuRejectedSubject(menuName),
           content: emailTemplate as string,
           sender: systemSenderEmail as string,
         };

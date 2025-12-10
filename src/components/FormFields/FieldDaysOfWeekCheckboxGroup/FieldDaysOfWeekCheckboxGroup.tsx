@@ -61,6 +61,7 @@ const FieldDaysOfWeekCheckboxGroupComponent: React.FC<
                 id={`${name}.${day}`}
                 name={name}
                 value={day as string}
+                disabled={disabled}
               />
               <label htmlFor={`${name}.${day}`} key={day as string}>
                 {intl.formatMessage({

@@ -26,11 +26,18 @@ type TFieldMenuApplyTimeGroup = {
   dateInputClassName?: string;
   className?: string;
   inputFieldsClassName?: string;
+  isReadOnly?: boolean;
 };
 
 const FieldMenuApplyTimeGroup: React.FC<TFieldMenuApplyTimeGroup> = (props) => {
-  const { values, form, dateInputClassName, className, inputFieldsClassName } =
-    props;
+  const {
+    values,
+    form,
+    dateInputClassName,
+    className,
+    inputFieldsClassName,
+    isReadOnly,
+  } = props;
   const intl = useIntl();
   const { startDate: startDateInitialValue, endDate: endDateInitialValue } =
     values;
@@ -88,6 +95,8 @@ const FieldMenuApplyTimeGroup: React.FC<TFieldMenuApplyTimeGroup> = (props) => {
           name="startDate"
           selected={startDate}
           onChange={(date: Date) => setStartDate(date)}
+          disabled={isReadOnly}
+          readOnly={isReadOnly}
           minDate={today}
           className={startDateClasses}
           dateFormat={'EEE, dd MMMM, yyyy'}
@@ -112,7 +121,8 @@ const FieldMenuApplyTimeGroup: React.FC<TFieldMenuApplyTimeGroup> = (props) => {
             name="endDate"
             selected={values.endDate}
             onChange={(date: Date) => setEndDate(date)}
-            disabled={!values.startDate}
+            disabled={isReadOnly || !values.startDate}
+            readOnly={isReadOnly}
             minDate={minEndDate || today}
             className={endDateClasses}
             dateFormat={'dd MMMM, yyyy'}
@@ -135,6 +145,7 @@ const FieldMenuApplyTimeGroup: React.FC<TFieldMenuApplyTimeGroup> = (props) => {
             id="numberOfCycles"
             name="numberOfCycles"
             className={css.numberOfCyclesInput}
+            disabled={isReadOnly}
             placeholder={intl.formatMessage({
               id: 'EditMenuInformationForm.numberOfCyclesPlaceholder',
             })}
@@ -166,7 +177,7 @@ const FieldMenuApplyTimeGroup: React.FC<TFieldMenuApplyTimeGroup> = (props) => {
         )}
       </div>
       <FieldDaysOfWeekCheckboxGroup
-        disabled={disabledDaysOfWeek}
+        disabled={isReadOnly || disabledDaysOfWeek}
         daysOfWeek={daysOfWeek}
         label={intl.formatMessage({
           id: 'EditMenuInformationForm.daysOfWeekLabel',

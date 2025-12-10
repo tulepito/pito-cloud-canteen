@@ -103,9 +103,9 @@ const FieldCheckbox: React.FC<TFieldCheckboxProps> = (props) => {
 
   const successColorVariantMaybe = useSuccessColor
     ? {
-        checkedClassName: css.checkedSuccess,
-        boxClassName: css.boxSuccess,
-      }
+      checkedClassName: css.checkedSuccess,
+      boxClassName: css.boxSuccess,
+    }
     : {};
 
   return (
@@ -121,6 +121,7 @@ const FieldCheckbox: React.FC<TFieldCheckboxProps> = (props) => {
                   id={id}
                   className={css.input}
                   {...input}
+                  disabled={disabled}
                   onChange={(event: TFormEvent) => handleOnChange(input, event)}
                 />
                 {label && (

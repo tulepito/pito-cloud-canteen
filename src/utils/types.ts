@@ -5,6 +5,8 @@ import type { NextPage } from 'next';
 import { types as sdkLoader } from '@sharetribe/sdk';
 import type { adminRoutes, partnerRoutes } from '@src/paths';
 
+import type { TMenuFoodItem } from '../types/index';
+
 import type {
   EAvailabilityPlans,
   EBookerOrderDraftStates,
@@ -18,6 +20,7 @@ import type {
   EListingStates,
   EManageCompanyOrdersTab,
   EMenuMealType,
+  EMenuStatus,
   EMenuType,
   ENotificationPopupType,
   EOrderDraftStates,
@@ -749,4 +752,12 @@ export type TFBNotification = {
   startDate: number;
   endDate: number;
   id: string;
+};
+
+export type TMenuFood = TMenuFoodItem;
+
+export type TMenuStateHistory = {
+  state: EMenuStatus;
+  reason: string;
+  updatedAt: number;
 };

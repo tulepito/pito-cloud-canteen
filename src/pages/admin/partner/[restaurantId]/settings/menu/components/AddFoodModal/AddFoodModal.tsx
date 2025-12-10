@@ -36,6 +36,7 @@ type TAddFoodModal = {
   values: any;
   form: FormApi;
   currentDate?: number | null;
+  isReadOnly?: boolean;
 };
 
 const FOOD_TABLE_COLUMNS: TColumn[] = [
@@ -118,7 +119,16 @@ const sortFoods = ({ columnName, type }: TTableSortValue, data: any) => {
 };
 
 const AddFoodModal: React.FC<TAddFoodModal> = (props) => {
-  const { isOpen, handleClose, currentMenu, values, form, currentDate } = props;
+  const {
+    isOpen,
+    handleClose,
+    currentMenu,
+    values,
+    form,
+    currentDate,
+    isReadOnly,
+  } = props;
+  if (isReadOnly) return null;
   const dispatch = useAppDispatch();
   const [page, setPage] = useState<number>(1);
   const [keywords, setKeywords] = useState<string>('');

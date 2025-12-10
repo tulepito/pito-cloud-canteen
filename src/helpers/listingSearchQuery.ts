@@ -12,6 +12,7 @@ import {
   EImageVariants,
   EListingStates,
   EListingType,
+  EMenuStatus,
   EOrderStates,
   ERestaurantListingStatus,
 } from '@utils/enums';
@@ -74,6 +75,7 @@ export const getMenuQuery = ({
     pub_daysOfWeek: `has_any:${dayOfWeek}`,
     pub_mealType: mealType,
     meta_isDeleted: false,
+    meta_menuStatus: EMenuStatus.approved,
     ...(menuTypes.length > 0 ? { meta_menuType: menuTypes.join(',') } : {}),
     ...(nutritions.length > 0
       ? {

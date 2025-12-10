@@ -243,7 +243,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             }
           }
 
-          return new SuccessResponse(updatedReview, {
+          return new SuccessResponse({
+            data: updatedReview,
             message: 'Reply created successfully',
           }).send(res);
         } catch (error) {

@@ -1,4 +1,11 @@
-import type { ECompanyPermission, EUserRole } from '@src/utils/enums';
+import type {
+  ECompanyPermission,
+  EDayOfWeek,
+  EMenuMealType,
+  EMenuStatus,
+  EMenuType,
+  EUserRole,
+} from '@src/utils/enums';
 
 import type { Assert, DeepPartial, Image, ListingBuilder } from './utils';
 
@@ -429,4 +436,78 @@ export type TReviewReply = {
   status?: TReviewStatus;
   approvedAt?: number;
   approvedBy?: string;
+};
+
+// Menu Listing Types
+export type TMenuFoodItem = {
+  id: string;
+  title: string;
+  price: number;
+  foodNote: string;
+  sideDishes: string[];
+  nutritionsList: string[];
+};
+
+export type TMenuPublicData = {
+  daysOfWeek: EDayOfWeek[];
+  endDate: number;
+  foodsByDate: Record<EDayOfWeek, Record<string, TMenuFoodItem>>;
+  mealType: EMenuMealType;
+  menuType: EMenuType;
+  numberOfCycles: number;
+  startDate: number;
+  monMinFoodPrice?: number;
+  tueMinFoodPrice?: number;
+  wedMinFoodPrice?: number;
+  thuMinFoodPrice?: number;
+  friMinFoodPrice?: number;
+  satMinFoodPrice?: number;
+  sunMinFoodPrice?: number;
+};
+
+export type TMenuMetadata = {
+  authorId: string;
+  restaurantId: string;
+  menuStatus: EMenuStatus;
+  menuType: EMenuType;
+  listingState: string;
+  listingType: 'menu';
+  geolocation: {
+    lat: number;
+    lng: number;
+  };
+  monFoodIdList?: string[];
+  tueFoodIdList?: string[];
+  wedFoodIdList?: string[];
+  thuFoodIdList?: string[];
+  friFoodIdList?: string[];
+  satFoodIdList?: string[];
+  sunFoodIdList?: string[];
+  monFoodType?: string[];
+  tueFoodType?: string[];
+  wedFoodType?: string[];
+  thuFoodType?: string[];
+  friFoodType?: string[];
+  satFoodType?: string[];
+  sunFoodType?: string[];
+  monNutritions?: string[];
+  tueNutritions?: string[];
+  wedNutritions?: string[];
+  thuNutritions?: string[];
+  friNutritions?: string[];
+  satNutritions?: string[];
+  sunNutritions?: string[];
+};
+
+export type MenuListing = ListingBuilder<
+  {},
+  TMenuPublicData,
+  TMenuMetadata,
+  {},
+  {}
+>;
+
+export type TQueryParams = {
+  page: number;
+  perPage: number;
 };

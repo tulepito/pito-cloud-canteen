@@ -8,6 +8,7 @@ import { IntegrationListing } from '@src/utils/data';
 import {
   EListingMenuStates,
   EListingStates,
+  EMenuStatus,
   ERestaurantListingStatus,
 } from '@src/utils/enums';
 
@@ -52,6 +53,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           {
             id: menuId,
             metadata: {
+              menuStatus: EMenuStatus.approved,
               listingState: EListingStates.published,
             },
           },

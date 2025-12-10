@@ -32,6 +32,7 @@ type TExtraProps = {
   formRef: any;
   restaurantId: string;
   anchorDate: Date;
+  isReadOnly?: boolean;
 };
 type TEditMenuPricingFormComponentProps =
   FormRenderProps<TEditMenuPricingFormValues> & Partial<TExtraProps>;
@@ -61,12 +62,20 @@ const EditMenuPricingFormComponent: React.FC<
   TEditMenuPricingFormComponentProps
 > = (props) => {
   const [currentDate, setCurrentDate] = useState<number | null>();
-  const { handleSubmit, currentMenu, values, form, formRef, anchorDate } =
-    props;
+  const {
+    handleSubmit,
+    currentMenu,
+    values,
+    form,
+    formRef,
+    anchorDate,
+    isReadOnly,
+  } = props;
 
   useImperativeHandle(formRef, () => form);
 
   const onRemovePickedFood = (removeId: string, date: Date) => {
+    if (isReadOnly) return;
     const currentDateAsTimestamp = date.getTime();
     const pickedFoodsOnDate = { ...values.foodsByDate[currentDateAsTimestamp] };
     Object.keys(pickedFoodsOnDate).forEach((keyId: string) => {
@@ -89,10 +98,12 @@ const EditMenuPricingFormComponent: React.FC<
   const resourcesForCalendar = renderResourcesForCalendar(values.foodsByDate, {
     onRemovePickedFood,
     daysOfWeek,
+    hideRemoveButton: isReadOnly,
   });
 
   const onSetCurrentDate = (params: any) => () => {
     const { date, events } = params;
+    if (isReadOnly) return;
     const dateAsTimeStaimp = new Date(date).getTime();
     setCurrentDate(dateAsTimeStaimp);
     const currentDayEvents = events.filter(
@@ -132,6 +143,7 @@ const EditMenuPricingFormComponent: React.FC<
                   {...contentProps}
                   currentMenu={currentMenu}
                   onSetCurrentDate={onSetCurrentDate}
+                  isReadOnly={isReadOnly}
                 />
               ),
               contentEnd: (contentProps: any) => (
@@ -160,6 +172,7 @@ const EditMenuPricingFormComponent: React.FC<
         values={values}
         form={form as unknown as FormApi}
         currentDate={currentDate}
+        isReadOnly={isReadOnly}
       />
     </>
   );

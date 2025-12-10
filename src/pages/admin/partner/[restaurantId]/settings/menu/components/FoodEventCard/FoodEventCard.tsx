@@ -14,7 +14,12 @@ const FoodEventCard = ({
   event: { resource: TEditMenuPricingCalendarResources; start: Date };
 }) => {
   const { resource, start } = event;
-  const { title, onRemovePickedFood, sideDishes = [] } = resource;
+  const {
+    title,
+    onRemovePickedFood,
+    sideDishes = [],
+    hideRemoveButton,
+  } = resource;
 
   return (
     <div className={css.root}>
@@ -35,14 +40,16 @@ const FoodEventCard = ({
           </div>
         )}
       </div>
-      <InlineTextButton
-        type="button"
-        onClick={() =>
-          onRemovePickedFood && onRemovePickedFood(resource.id, start)
-        }
-        className={css.buttonClose}>
-        <IconClose rootClassName={css.iconClose} />
-      </InlineTextButton>
+      {!hideRemoveButton && (
+        <InlineTextButton
+          type="button"
+          onClick={() =>
+            onRemovePickedFood && onRemovePickedFood(resource.id, start)
+          }
+          className={css.buttonClose}>
+          <IconClose rootClassName={css.iconClose} />
+        </InlineTextButton>
+      )}
     </div>
   );
 };
