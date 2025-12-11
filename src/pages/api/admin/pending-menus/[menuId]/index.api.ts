@@ -65,6 +65,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         });
         const [menu] = denormalisedResponseEntities(menuResponse);
         const menuMeta = Listing(menu).getMetadata();
+        if (menuMeta?.listingState !== EListingStates.pendingApproval) {
+          return new FailedResponse({
+            message: 'Menu is not in pending approval state',
+          }).send(res);
+        }
         const menuStateHistory = menuMeta?.menuStateHistory || [];
         const menuName =
           menu?.attributes?.title || menu?.attributes?.name || 'Menu';
@@ -72,7 +77,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         const partnerName = buildFullNameFromProfile(
           partner?.attributes?.profile,
         );
-        console.log('partner Id', partner?.id?.uuid);
         const menuLink = `${process.env.NEXT_PUBLIC_CANONICAL_URL}/partner/products/menu/${menuId}`;
         const updatedAt = new Date().getTime();
         await sdk.listings.update(
