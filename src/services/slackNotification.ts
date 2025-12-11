@@ -1039,7 +1039,7 @@ export const createSlackNotification = async (
         const { menuName, restaurantName, menuLink } =
           notificationParams.menuPublishedDraftToPendingData;
         await axios.post(
-          process.env.SLACK_WEBHOOK_URL,
+          process.env.SLACK_PARTNER_WEBHOOK_URL,
           {
             blocks: [
               {
@@ -1074,7 +1074,7 @@ export const createSlackNotification = async (
           notificationParams.adminApprovePartnerMenuData;
 
         await axios.post(
-          process.env.SLACK_RATING_WEBHOOK_URL,
+          process.env.SLACK_PARTNER_WEBHOOK_URL,
           {
             blocks: [
               {
@@ -1110,7 +1110,7 @@ export const createSlackNotification = async (
           notificationParams.adminRejectPartnerMenuData;
 
         await axios.post(
-          process.env.SLACK_RATING_WEBHOOK_URL,
+          process.env.SLACK_PARTNER_WEBHOOK_URL,
           {
             blocks: [
               {
