@@ -1,6 +1,9 @@
 import type { AdminViewerRatingData } from '@pages/admin/company/components/AdminRatingSection/AdminRatingSection';
 import type { GETCompanyRaitingsQuery } from '@pages/api/admin/company/[companyId]/ratings/index.api';
 import type { POSTChangeMenuEndDateInBulkBody } from '@pages/api/admin/listings/menus/change-end-date-in-bulk.api';
+import type { MenuListing, TQueryParams } from '@src/types';
+import { EListingStates } from '@src/utils/enums';
+import type { ApiResponse } from '@src/utils/response';
 import type { TObject } from '@src/utils/types';
 
 import { deleteApi, getApi, getDedupApi, postApi, putApi } from './configs';
@@ -143,4 +146,55 @@ export const getAdminCompanyRatingsApi = (
   getDedupApi<AdminViewerRatingData>(
     `/admin/company/${companyId}/ratings/`,
     payload,
+  );
+
+/**
+ * Get partner pending menus
+ * @param params - Query parameters
+ * @returns Response with paginated menus data with restaurant name
+ */
+export const getPartnerPendingMenuApi = (params: TQueryParams) =>
+  getApi<ApiResponse<(MenuListing & { restaurantName: string })[]>>(
+    '/admin/pending-menus',
+    params,
+  );
+
+/**
+ * Get partner menu detail
+ * @param menuId - Menu ID
+ * @returns Response with menu detail
+ */
+export const getPartnerPendingMenuDetailApi = (menuId: string) =>
+  getApi<ApiResponse<MenuListing & { restaurantName: string }>>(
+    `/admin/pending-menus/${menuId}`,
+  );
+
+/**
+ * Update partner menu status
+ * @param menuId - Menu ID
+ * @param menuStatus - Menu status
+ * @param rejectedReason - Rejected reason
+ * @returns Response with menu ID
+ */
+export const approvePartnerMenuApi = (menuId: string) =>
+  putApi<ApiResponse<{ id: string; status: EListingStates }>>(
+    `/admin/pending-menus/${menuId}`,
+    {
+      menuStatus: EListingStates.published,
+    },
+  );
+
+/**
+ * Reject partner menu
+ * @param menuId - Menu ID
+ * @param rejectedReason - Rejected reason
+ * @returns Response with menu ID
+ */
+export const rejectPartnerMenuApi = (menuId: string, rejectedReason: string) =>
+  putApi<ApiResponse<{ id: string; status: EListingStates }>>(
+    `/admin/pending-menus/${menuId}`,
+    {
+      menuStatus: EListingStates.rejected,
+      rejectedReason,
+    },
   );

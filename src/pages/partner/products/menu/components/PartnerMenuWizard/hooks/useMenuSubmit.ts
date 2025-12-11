@@ -1,3 +1,4 @@
+import { toast } from 'react-toastify';
 import type { NextRouter } from 'next/router';
 import { useRouter } from 'next/router';
 
@@ -10,7 +11,7 @@ import {
   MENU_PRICING_TAB,
 } from '@pages/admin/partner/[restaurantId]/settings/menu/components/EditPartnerMenuWizard/utils';
 import { partnerPaths } from '@src/paths';
-import { IntegrationMenuListing } from '@src/utils/data';
+import { IntegrationMenuListing, Listing } from '@src/utils/data';
 import { EListingStates } from '@utils/enums';
 import type { TIntegrationListing } from '@utils/types';
 
@@ -58,11 +59,29 @@ export const useMenuSubmit = ({
   const draftMenu = useAppSelector(
     (state) => state.PartnerManageMenus.draftMenu,
   );
+  const menu = useAppSelector((state) => state.PartnerManageMenus.menu);
+  const menuListing = Listing(menu);
 
   const handleSubmit = async (
     values: TEditMenuFormValues,
     setSubmittedValues: (values: TEditMenuFormValues | null) => void,
   ): Promise<void> => {
+    const listingState = menuListing.getMetadata()?.listingState;
+    if (listingState === EListingStates.published) {
+      if (activeTab === MENU_COMPLETE_TAB) {
+        router.push(partnerPaths.ManageMenus);
+
+        return;
+      }
+      await redirectAfterDraftUpdate(
+        menuId!,
+        activeTab,
+        EDIT_PARTNER_MENU_TABS,
+        router,
+      );
+
+      return;
+    }
     // Prepare submit values based on tab and mode
     const submitValues = createSubmitMenuValues(
       { ...values, restaurantId },
@@ -118,9 +137,9 @@ export const useMenuSubmit = ({
 
     // Handle post-submit actions
     if (listing) {
-      const listingState =
+      const menuState =
         IntegrationMenuListing(listing).getMetadata().listingState;
-      const isDraft = listingState === EListingStates.draft;
+      const isDraft = menuState === EListingStates.draft;
 
       if (!isDraft && !error) {
         setSubmittedValues(values);
@@ -132,10 +151,16 @@ export const useMenuSubmit = ({
           PartnerManageMenusThunks.publishDraftMenu(),
         );
         if (publishMeta.requestStatus === 'fulfilled') {
-          router.push(partnerPaths.ManageMenus);
+          toast.success(
+            'Menu đã được tạo thành công. Đối tác vui lòng chờ duyệt',
+          );
+          setTimeout(() => {
+            router.push(partnerPaths.ManageMenus);
+          }, 3000);
 
           return;
         }
+        error = publishMeta;
       }
 
       // Redirect to next tab for draft

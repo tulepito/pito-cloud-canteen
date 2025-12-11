@@ -18,6 +18,7 @@ import css from './EditMenuInformationForm.module.scss';
 
 type TExtraProps = {
   formRef: any;
+  isReadOnly?: boolean;
 };
 type TEditMenuInformationFormComponentProps =
   FormRenderProps<TEditMenuInformationFormValues> & Partial<TExtraProps>;
@@ -27,7 +28,7 @@ type TEditMenuInformationFormProps = FormProps<TEditMenuInformationFormValues> &
 const EditMenuInformationFormComponent: React.FC<
   TEditMenuInformationFormComponentProps
 > = (props) => {
-  const { handleSubmit, form, values, formRef } = props;
+  const { handleSubmit, form, values, formRef, isReadOnly } = props;
   const intl = useIntl();
 
   useImperativeHandle(formRef, () => form);
@@ -43,6 +44,7 @@ const EditMenuInformationFormComponent: React.FC<
             className={css.field}
             id="title"
             name="title"
+            disabled={isReadOnly}
             label={intl.formatMessage({
               id: 'EditMenuInformationForm.titleLabel',
             })}
@@ -65,6 +67,7 @@ const EditMenuInformationFormComponent: React.FC<
                   name="menuType"
                   id={opt.key}
                   key={opt.key}
+                  disabled={isReadOnly}
                   value={opt.key}
                   label={opt.label}
                 />
@@ -80,6 +83,7 @@ const EditMenuInformationFormComponent: React.FC<
                 name="mealType"
                 id={meal.key}
                 key={meal.key}
+                disabled={isReadOnly}
                 value={meal.key}
                 label={meal.label}
               />
@@ -94,6 +98,7 @@ const EditMenuInformationFormComponent: React.FC<
         <FieldMenuApplyTimeGroup
           values={values}
           form={form as unknown as FormApi}
+          isReadOnly={isReadOnly}
         />
       </div>
     </Form>

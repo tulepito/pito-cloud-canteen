@@ -37,12 +37,6 @@ export enum HttpStatus {
   INTERNAL_SERVER_ERROR = 500,
 }
 
-type BaseOptions = {
-  message?: string;
-  msgcode?: string;
-  pagination?: TPagination;
-};
-
 const defaultMsgcode = (status: number): string => {
   if (status >= 200 && status < 300) return MessageCode.OK;
   if (status === 400) return MessageCode.BAD_REQUEST;
@@ -64,56 +58,70 @@ export class ResponseFactory<T = any> {
 
   public message?: string;
 
-  public data?: T | null;
-
-  public pagination?: TPagination;
-
-  constructor(
-    status: number,
-    { message, msgcode, pagination }: BaseOptions = {},
-    data?: T | null,
-  ) {
+  constructor({
+    status,
+    message,
+    msgcode,
+  }: {
+    status: number;
+    message?: string;
+    msgcode?: string;
+  }) {
     this.status = status;
     this.statusCode = status;
     this.msgcode = msgcode ?? defaultMsgcode(status);
-    this.message = message;
-    this.data = data ?? null;
-    this.pagination = pagination;
+    this.message = message ?? '';
   }
 
   public send(res: NextApiResponse) {
     const body: ApiResponse<T> = {
-      status: this.status,
-      statusCode: this.statusCode,
-      msgcode: this.msgcode,
-      message: this.message,
-      data: this.data ?? null,
-      pagination: this.pagination,
+      ...this,
     };
 
     return res.status(this.statusCode).json(body);
   }
 }
 
-export class SuccessResponse<T = any> extends ResponseFactory<T> {
-  constructor(
-    data?: T | null,
-    options: BaseOptions = {},
+export class SuccessResponse<T = any> extends ResponseFactory {
+  public data?: T | null;
+
+  public pagination?: TPagination;
+
+  constructor({
+    data,
+    pagination,
     status = HttpStatus.OK,
-  ) {
-    super(status, options, data ?? null);
+    message,
+    msgcode,
+  }: {
+    data?: T | null;
+    pagination?: TPagination;
+    status?: number;
+    message?: string;
+    msgcode?: string;
+  }) {
+    super({ status, message, msgcode });
+    this.data = data ?? null;
+    this.pagination = pagination;
   }
 }
 
-export class FailedResponse extends ResponseFactory<null> {
-  public errors?: Record<string, any>;
+export class FailedResponse extends ResponseFactory {
+  public error?: string;
 
-  constructor(
-    status: number,
-    options: BaseOptions & { errors?: Record<string, any> } = {},
-  ) {
-    super(status, options, null);
-    this.errors = options.errors;
+  constructor({
+    error,
+    message,
+    msgcode,
+    status = HttpStatus.INTERNAL_SERVER_ERROR,
+  }: {
+    error?: string;
+    msgcode?: string;
+    status?: number;
+    message?: string;
+  }) {
+    super({ status, message, msgcode });
+    this.error = error;
   }
 }
 

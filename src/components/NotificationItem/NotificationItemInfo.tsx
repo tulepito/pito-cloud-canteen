@@ -27,6 +27,7 @@ const NotificationItemInfo: React.FC<NotificationItemInfoProps> = (props) => {
     startDate,
     endDate,
     partnerName,
+    menuName,
   } = notificationItem;
   const { seconds } = createdAt;
   const formattedDate = formatTimestamp(date || subOrderDate);
@@ -396,6 +397,42 @@ const NotificationItemInfo: React.FC<NotificationItemInfoProps> = (props) => {
               {
                 span: (msg: any) => <span className={css.boldText}>{msg}</span>,
                 foodName,
+              },
+            )}
+          </div>
+          <div className={css.pastTime}>{pastTime}</div>
+        </div>
+      );
+
+    case ENotificationType.PARTNER_MENU_APPROVED_BY_ADMIN:
+      return (
+        <div className={css.contentWrapper}>
+          <div className={css.content}>
+            {intl.formatMessage(
+              {
+                id: 'NotificationItemInfo.title.partnerMenuApprovedByAdmin',
+              },
+              {
+                span: (msg: any) => <span className={css.boldText}>{msg}</span>,
+                menuName,
+              },
+            )}
+          </div>
+          <div className={css.pastTime}>{pastTime}</div>
+        </div>
+      );
+
+    case ENotificationType.PARTNER_MENU_REJECTED_BY_ADMIN:
+      return (
+        <div className={css.contentWrapper}>
+          <div className={css.content}>
+            {intl.formatMessage(
+              {
+                id: 'NotificationItemInfo.title.partnerMenuRejectedByAdmin',
+              },
+              {
+                span: (msg: any) => <span className={css.boldText}>{msg}</span>,
+                menuName,
               },
             )}
           </div>

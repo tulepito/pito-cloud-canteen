@@ -202,7 +202,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           );
           updatedReview.attributes!.metadata!.replies = validReplies;
 
-          return new SuccessResponse(updatedReview, {
+          return new SuccessResponse({
+            data: updatedReview,
             message: 'Reply processed successfully',
           }).send(res);
         } catch (error) {

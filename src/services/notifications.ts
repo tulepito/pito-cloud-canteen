@@ -30,6 +30,8 @@ type NotificationParams = {
   seen: boolean;
   startDate: number;
   endDate: number;
+  menuId: string;
+  menuName: string;
 };
 
 export type NotificationInvitationParams = TObject &
@@ -332,6 +334,30 @@ export const createFirebaseDocNotification = async (
           foodName,
           foodId,
           relatedLink: partnerPaths.ManageFood,
+        };
+
+        break;
+      }
+
+      case ENotificationType.PARTNER_MENU_APPROVED_BY_ADMIN: {
+        const { menuName, menuId } = notificationParams;
+        data = {
+          ...data,
+          menuName,
+          menuId,
+          relatedLink: partnerPaths.EditMenu.replace('[menuId]', menuId!),
+        };
+
+        break;
+      }
+
+      case ENotificationType.PARTNER_MENU_REJECTED_BY_ADMIN: {
+        const { menuName, menuId } = notificationParams;
+        data = {
+          ...data,
+          menuName,
+          menuId,
+          relatedLink: partnerPaths.EditMenu.replace('[menuId]', menuId!),
         };
 
         break;

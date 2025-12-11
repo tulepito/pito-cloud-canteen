@@ -26,6 +26,7 @@ export enum EListingMenuStates {
 }
 
 export enum EListingStates {
+  rejected = 'rejected',
   draft = 'draft',
   pendingApproval = 'pendingApproval',
   published = 'published',
@@ -232,11 +233,6 @@ export enum EOrderDetailsStatus {
   pending = 'pending',
 }
 
-export enum EMenuStatus {
-  active = 'active',
-  inactive = 'inactive',
-}
-
 export enum EMenuMealType {
   breakfast = 'breakfast',
   lunch = 'lunch',
@@ -367,6 +363,8 @@ export enum ENotificationType {
   PARTNER_PROFILE_UPDATED_BY_ADMIN = 'PARTNER_PROFILE_UPDATED_BY_ADMIN',
   PARTNER_FOOD_ACCEPTED_BY_ADMIN = 'PARTNER_FOOD_ACCEPTED_BY_ADMIN',
   PARTNER_FOOD_REJECTED_BY_ADMIN = 'PARTNER_FOOD_REJECTED_BY_ADMIN',
+  PARTNER_MENU_APPROVED_BY_ADMIN = 'PARTNER_MENU_APPROVED_BY_ADMIN',
+  PARTNER_MENU_REJECTED_BY_ADMIN = 'PARTNER_MENU_REJECTED_BY_ADMIN',
   PARTNER_SUB_ORDER_CHANGED = 'PARTNER_SUB_ORDER_CHANGED',
 
   BOOKER_NEW_ORDER_CREATED = 'BOOKER_NEW_ORDER_CREATED',
@@ -432,6 +430,8 @@ export enum ENativeNotificationType {
   PartnerSubOrderNegativeRating = 'PartnerSubOrderNegativeRating',
   AdminReplyReview = 'AdminReplyReview',
   AdminApprovePartnerReplyReview = 'AdminApprovePartnerReplyReview',
+  AdminApprovePartnerMenu = 'AdminApprovePartnerMenu',
+  AdminRejectPartnerMenu = 'AdminRejectPartnerMenu',
   Events = 'Events',
 }
 
@@ -482,6 +482,9 @@ export enum ESlackNotificationType {
   PARTNER_REPLY_REVIEW = 'partnerReplyReview',
   ADMIN_REPLY_REVIEW = 'adminReplyReview',
   ADMIN_APPROVE_PARTNER_REPLY_REVIEW = 'adminApprovePartnerReplyReview',
+  PARTNER_MENU_PUBLISHED_DRAFT_TO_PENDING = 'partnerMenuPublishedDraftToPending',
+  ADMIN_APPROVE_PARTNER_MENU = 'adminApprovePartnerMenu',
+  ADMIN_REJECT_PARTNER_MENU = 'adminRejectPartnerMenu',
 }
 
 export enum QuizStep {

@@ -306,6 +306,7 @@ export const renderResourcesForCalendar = (
   extraData: {
     onRemovePickedFood: (id: string, date: Date) => void;
     daysOfWeek: string[];
+    hideRemoveButton?: boolean;
   },
 ) => {
   const resourses: {

@@ -55,7 +55,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           const userVoucher = vouchers?.[userId];
 
           if (userVoucher?.status !== 'pending') {
-            return new SuccessResponse(userVoucher, {
+            return new SuccessResponse({
+              data: userVoucher,
               message: 'Voucher đã được nhận',
             }).send(res);
           }
@@ -69,7 +70,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             NEXT_PUBLIC_FIREBASE_EVENT_COLLECTION_NAME!,
           );
 
-          return new SuccessResponse(userVoucher, {
+          return new SuccessResponse({
+            data: userVoucher,
             message: 'Lấy voucher thành công',
           }).send(res);
         } catch (error) {

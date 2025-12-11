@@ -50,6 +50,7 @@ type TExtraProps = {
   formRef: any;
   restaurantId: string;
   anchorDate: Date;
+  isReadOnly?: boolean;
 };
 type TEditMenuCompleteFormComponentProps =
   FormRenderProps<TEditMenuCompleteFormValues> & Partial<TExtraProps>;
@@ -59,8 +60,15 @@ type TEditMenuCompleteFormProps = FormProps<TEditMenuCompleteFormValues> &
 const EditMenuCompleteFormComponent: React.FC<
   TEditMenuCompleteFormComponentProps
 > = (props) => {
-  const { handleSubmit, currentMenu, formRef, form, values, anchorDate } =
-    props;
+  const {
+    handleSubmit,
+    currentMenu,
+    formRef,
+    form,
+    values,
+    anchorDate,
+    isReadOnly,
+  } = props;
   formRef.current = form;
   const [currentDate, setCurrentDate] = useState<number | null>();
   const { title } = IntegrationListing(currentMenu).getAttributes();
@@ -71,6 +79,7 @@ const EditMenuCompleteFormComponent: React.FC<
   const { daysOfWeek = [] } = IntegrationListing(currentMenu).getPublicData();
   const { foodsByDate } = values;
   const onRemovePickedFood = (removeId: string, date: Date) => {
+    if (isReadOnly) return;
     const currentDateAsTimestamp = date.getTime();
     const pickedFoodsOnDate = { ...values.foodsByDate[currentDateAsTimestamp] };
     Object.keys(pickedFoodsOnDate).forEach((keyId: string) => {
@@ -91,10 +100,12 @@ const EditMenuCompleteFormComponent: React.FC<
   const resourcesForCalendar = renderResourcesForCalendar(foodsByDate, {
     onRemovePickedFood,
     daysOfWeek,
+    hideRemoveButton: isReadOnly,
   });
 
   const onSetCurrentDate = (params: any) => () => {
     const { date, events } = params;
+    if (isReadOnly) return;
     const dateAsTimeStaimp = new Date(date).getTime();
     setCurrentDate(dateAsTimeStaimp);
     const currentDayEvents = events.filter(
@@ -185,6 +196,7 @@ const EditMenuCompleteFormComponent: React.FC<
                       {...contentProps}
                       currentMenu={currentMenu}
                       onSetCurrentDate={onSetCurrentDate}
+                      isReadOnly={isReadOnly}
                     />
                   ),
                 }}
@@ -209,6 +221,7 @@ const EditMenuCompleteFormComponent: React.FC<
         values={values}
         form={form as unknown as FormApi}
         currentDate={currentDate}
+        isReadOnly={isReadOnly}
       />
     </>
   );

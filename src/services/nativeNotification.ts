@@ -359,6 +359,51 @@ export const createNativeNotificationToPartner = async (
       }
       break;
 
+    case ENativeNotificationType.AdminApprovePartnerMenu: {
+      const { menuId, menuName, partnerName } = notificationParams;
+      const url = `${BASE_URL}/partner/products/menu/${menuId}`;
+
+      const oneSignals: Promise<void>[] = [];
+      oneSignalUserIds.forEach((oneSignalUserId: string) => {
+        oneSignals.push(
+          sendNotification({
+            title: '😍 Menu đã được duyệt!',
+            content: `Menu ${menuName || ''} của ${
+              partnerName || 'bạn'
+            } đã được duyệt. Nhấn để xem chi tiết.`,
+            url,
+            oneSignalUserId,
+          }),
+        );
+      });
+      await Promise.allSettled(oneSignals);
+      break;
+    }
+
+    case ENativeNotificationType.AdminRejectPartnerMenu: {
+      const { menuId, menuName, partnerName, rejectedReason } =
+        notificationParams;
+      const url = `${BASE_URL}/partner/products/menu/${menuId}`;
+
+      const oneSignals: Promise<void>[] = [];
+      oneSignalUserIds.forEach((oneSignalUserId: string) => {
+        oneSignals.push(
+          sendNotification({
+            title: '😢 Menu chưa được duyệt',
+            content: `Menu ${menuName || ''} của ${
+              partnerName || 'bạn'
+            } bị từ chối${
+              rejectedReason ? `: ${rejectedReason}` : ''
+            }. Nhấn để xem chi tiết.`,
+            url,
+            oneSignalUserId,
+          }),
+        );
+      });
+      await Promise.allSettled(oneSignals);
+      break;
+    }
+
     case ENativeNotificationType.PartnerSubOrderNegativeRating:
       {
         const { subOrderDate } = notificationParams;

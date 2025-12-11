@@ -42,29 +42,23 @@ export const useMenuDataMerge = ({
     (state) => state.PartnerManageMenus.draftMenu,
   );
 
-  // Create synthetic menu for form rendering
   const syntheticMenu = useMemo(
     () => createSyntheticMenu(draftMenu, menuId, restaurantId, currentMenu),
     [draftMenu, menuId, restaurantId, currentMenu],
   );
 
-  // Get menu listing helper
   const currentMenuListing = useMemo(
     () => IntegrationMenuListing(syntheticMenu),
     [syntheticMenu],
   );
 
-  // Get food IDs to query
   const idsToQuery = currentMenuListing.getListFoodIds();
 
-  // Query picked foods
   const { menuPickedFoods } = useQueryMenuPickedFoods({
     restaurantId: restaurantId as string,
     ids: idsToQuery,
   });
 
-  // Calculate list of dates based on start/end date and days of week
-  // findClassDays returns timestamps (number[])
   const startDate = draftMenu?.startDate;
   const endDate = draftMenu?.endDate;
 
@@ -76,7 +70,6 @@ export const useMenuDataMerge = ({
       : [];
   }, [draftMenu?.daysOfWeek, startDate, endDate]);
 
-  // Find minimum date (listDates contains timestamps)
   const minDate = useMemo(
     () =>
       listDates.length > 0
@@ -87,10 +80,8 @@ export const useMenuDataMerge = ({
     [listDates],
   );
 
-  // Anchor date for calendar
   const anchorDate = useMemo(() => new Date(minDate), [minDate]);
 
-  // Render foods by date for form
   const foodByDateToRender = useMemo(() => {
     const foodsByDate = draftMenu?.foodsByDate || {};
 

@@ -140,7 +140,9 @@ export const recommendRestaurantForSpecificDay = async ({
   }
 
   if (restaurantsFiltered.length > 0) {
-    const randomNumber = Math.floor(Math.random() * restaurantsFiltered.length);
+    const randomNumber = Math.floor(
+      Math.random() * restaurantsFiltered.length - 1,
+    );
 
     const otherRandomNumber = Math.abs(
       randomNumber - restaurantsFiltered.length + 1,
