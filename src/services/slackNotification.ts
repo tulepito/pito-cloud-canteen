@@ -1039,7 +1039,7 @@ export const createSlackNotification = async (
         const { menuName, restaurantName, menuLink } =
           notificationParams.menuPublishedDraftToPendingData;
         await axios.post(
-          process.env.SLACK_RATING_WEBHOOK_URL,
+          process.env.SLACK_WEBHOOK_URL,
           {
             blocks: [
               {
