@@ -4,6 +4,7 @@ import { shallowEqual } from 'react-redux';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/router';
 
+import Badge, { EBadgeType } from '@components/Badge/Badge';
 import Button from '@components/Button/Button';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import LoadingContainer from '@components/LoadingContainer/LoadingContainer';
@@ -137,6 +138,25 @@ const ManagePartnerMenuPage = () => {
   }
 
   const menuTitle = currentMenu?.attributes?.title || '';
+  const status = currentMenu.attributes?.metadata?.listingState;
+  const statusMap: Record<string, { type: EBadgeType; label: string }> = {
+    [EListingStates.published]: {
+      type: EBadgeType.success,
+      label: 'Đã duyệt',
+    },
+    [EListingStates.pendingApproval]: {
+      type: EBadgeType.warning,
+      label: 'Chờ duyệt',
+    },
+    [EListingStates.rejected]: {
+      type: EBadgeType.danger,
+      label: 'Từ chối',
+    },
+  };
+  const badgeProps = statusMap[status ?? ''] ?? {
+    type: EBadgeType.warning,
+    label: status || '',
+  };
 
   return (
     <div>
@@ -152,12 +172,16 @@ const ManagePartnerMenuPage = () => {
             <FormattedMessage id="ManagePartnerMenuApproval.pageTitle" />
           </h1>
           <p className="text-sm text-gray-500 mt-0.5">{menuTitle}</p>
+          <Badge
+            type={badgeProps.type}
+            label={badgeProps.label}
+            className="mt-2"
+          />
         </div>
       </div>
 
       {/* Menu Detail Content */}
       <MenuApprovalDetail menu={currentMenu} anchorDate={anchorDate} />
-
       {/* Action Buttons - Sticky Footer */}
       <div className="sticky bottom-4 mt-6">
         <div className="flex justify-between gap-4 py-4 px-6 bg-white rounded-xl">
@@ -167,21 +191,24 @@ const ManagePartnerMenuPage = () => {
             disabled={approveMenuInProgress || rejectMenuInProgress}>
             <FormattedMessage id="ManagePartnerMenuApproval.cancel" />
           </Button>
-          <div className="flex gap-4">
-            <Button
-              variant="secondary"
-              className="!border-red-300 !text-red-600 hover:!bg-red-50"
-              onClick={handleOpenRejectModal}
-              disabled={approveMenuInProgress || rejectMenuInProgress}>
-              <FormattedMessage id="ManagePartnerMenuApproval.reject" />
-            </Button>
-            <Button
-              onClick={handleApprove}
-              inProgress={approveMenuInProgress}
-              disabled={rejectMenuInProgress}>
-              <FormattedMessage id="ManagePartnerMenuApproval.approve" />
-            </Button>
-          </div>
+          {currentMenu.attributes?.metadata?.listingState ===
+            EListingStates.pendingApproval && (
+            <div className="flex gap-4">
+              <Button
+                variant="secondary"
+                className="!border-red-300 !text-red-600 hover:!bg-red-50"
+                onClick={handleOpenRejectModal}
+                disabled={approveMenuInProgress || rejectMenuInProgress}>
+                <FormattedMessage id="ManagePartnerMenuApproval.reject" />
+              </Button>
+              <Button
+                onClick={handleApprove}
+                inProgress={approveMenuInProgress}
+                disabled={rejectMenuInProgress}>
+                <FormattedMessage id="ManagePartnerMenuApproval.approve" />
+              </Button>
+            </div>
+          )}
         </div>
       </div>
 
