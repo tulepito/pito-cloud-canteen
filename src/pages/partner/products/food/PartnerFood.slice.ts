@@ -10,6 +10,7 @@ import {
   createPartnerFoodApi,
   fetchFoodDeletableApi,
   fetchFoodEditableApi,
+  fetchFoodEditableBatchApi,
   fetchPartnerFoodApi,
   queryPartnerFoodsApi,
   reApprovalFoodApi,
@@ -209,6 +210,8 @@ const CREATE_FOOD_FROM_FILE = 'app/ManageFoodsPage/CREATE_FOOD_FROM_FILE';
 const QUERY_MENU_PICKED_FOODS = 'app/ManageFoodsPage/QUERY_MENU_PICKED_FOODS';
 const FETCH_APPROVAL_FOODS = 'app/ManageFoodsPage/FETCH_APPROVAL_FOODS';
 const FETCH_EDITABLE_FOOD = 'app/ManageFoodsPage/FETCH_EDITABLE_FOOD';
+const FETCH_EDITABLE_FOODS_BATCH =
+  'app/ManageFoodsPage/FETCH_EDITABLE_FOODS_BATCH';
 const FETCH_DELETABLE_FOOD = 'app/ManageFoodsPage/FETCH_DELETABLE_FOOD';
 const FETCH_DRAFT_FOODS = 'app/ManageFoodsPage/FETCH_DRAFT_FOODS';
 
@@ -598,6 +601,15 @@ const fetchEditableFood = createAsyncThunk(
   },
 );
 
+const fetchEditableFoodsBatch = createAsyncThunk(
+  FETCH_EDITABLE_FOODS_BATCH,
+  async (foodIds: string[]) => {
+    const { data } = await fetchFoodEditableBatchApi(foodIds);
+
+    return data.items as Array<{ foodId: string; isEditable: boolean }>;
+  },
+);
+
 const fetchDeletableFood = createAsyncThunk(
   FETCH_DELETABLE_FOOD,
   async (id: string) => {
@@ -716,6 +728,7 @@ export const partnerFoodSliceThunks = {
   requestUploadFoodImages,
   createPartnerFoodListing,
   updatePartnerFoodListing,
+  fetchEditableFoodsBatch,
   showPartnerFoodListing,
   removePartnerFood,
   showDuplicateFood,
@@ -763,6 +776,10 @@ const partnerFoodSlice = createSlice({
     },
     setInitialStates: () => ({
       ...initialState,
+    }),
+    setCreateCsvError: (state, { payload }) => ({
+      ...state,
+      createPartnerFoodFromCsvError: payload,
     }),
   },
   extraReducers: (builder) => {
@@ -963,6 +980,29 @@ const partnerFoodSlice = createSlice({
         },
       }))
       .addCase(fetchEditableFood.rejected, (state, { error }) => ({
+        ...state,
+        fetchEditableFoodInProgress: false,
+        fetchEditableFoodError: error.message,
+      }))
+
+      .addCase(fetchEditableFoodsBatch.pending, (state) => ({
+        ...state,
+        fetchEditableFoodInProgress: true,
+        fetchEditableFoodError: null,
+      }))
+      .addCase(fetchEditableFoodsBatch.fulfilled, (state, { payload }) => {
+        const newEditableMap = { ...state.editableFoodMap };
+        payload.forEach(({ foodId, isEditable }) => {
+          newEditableMap[foodId] = isEditable;
+        });
+
+        return {
+          ...state,
+          fetchEditableFoodInProgress: false,
+          editableFoodMap: newEditableMap,
+        };
+      })
+      .addCase(fetchEditableFoodsBatch.rejected, (state, { error }) => ({
         ...state,
         fetchEditableFoodInProgress: false,
         fetchEditableFoodError: error.message,

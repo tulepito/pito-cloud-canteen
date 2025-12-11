@@ -252,6 +252,10 @@ export const adminRoutes = {
     path: '/admin/partner/[restaurantId]/settings/menu',
     label: 'Thực đơn',
   },
+  ManagePartnersMenus: {
+    path: '/admin/partner/pending-menus',
+    label: 'Quản lý thực đơn đối tác',
+  },
   ManagePartnerFixedMenus: {
     path: '/admin/partner/[restaurantId]/settings/menu/fixed-menu',
     label: 'Thực đơn cố định',
@@ -478,6 +482,18 @@ export const partnerRoutes = {
   Reviews: {
     path: partnerPaths.ManageReviews,
     label: 'Đánh giá',
+  },
+  ManageMenus: {
+    path: partnerPaths.ManageMenus,
+    label: 'Thực đơn',
+  },
+  CreateMenu: {
+    path: partnerPaths.CreateMenu,
+    label: 'Tạo thực đơn',
+  },
+  EditMenu: {
+    path: partnerPaths.EditMenu,
+    label: 'Chỉnh sửa thực đơn',
   },
 };
 

@@ -5,9 +5,11 @@ import classNames from 'classnames';
 
 import Form from '@components/Form/Form';
 import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
+import { useAppDispatch } from '@hooks/reduxHooks';
 import type { EFoodApprovalState } from '@src/utils/enums';
 import type { TListing, TPagination } from '@src/utils/types';
 
+import { partnerFoodSliceThunks } from '../../PartnerFood.slice';
 import FoodRow from '../FoodRow/FoodRow';
 
 import css from './RowFoodListForm.module.scss';
@@ -21,6 +23,7 @@ type TExtraProps = {
   pagination: TPagination;
   foodApprovalActiveTab: EFoodApprovalState;
   editableFoodMap: Record<string, boolean>;
+  fetchEditableFoodInProgress: boolean;
   getGridFoodListFormValues: (values: string[]) => void;
   onPageChange: (page: number) => void;
   setFoodToRemove: (params: { id: string }) => void;
@@ -45,7 +48,9 @@ const RowFoodListFormComponent: React.FC<TRowFoodListFormComponentProps> = (
     form,
     foodApprovalActiveTab,
     editableFoodMap,
+    fetchEditableFoodInProgress,
   } = props;
+  const dispatch = useAppDispatch();
 
   const onCheckAllChange = (event: any) => {
     const { checked, value, name } = event.target;
@@ -66,6 +71,28 @@ const RowFoodListFormComponent: React.FC<TRowFoodListFormComponentProps> = (
     getGridFoodListFormValues?.(values.foodId || []);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(values)]);
+
+  const foodIdsString = JSON.stringify(foodList.map((f) => f.id.uuid).sort());
+  useEffect(() => {
+    if (foodList.length > 0 && !fetchEditableFoodInProgress) {
+      const foodIds = foodList.map((food) => food.id.uuid);
+      const missingFoodIds = foodIds.filter(
+        (id) => editableFoodMap?.[id] === undefined,
+      );
+
+      if (missingFoodIds.length > 0) {
+        dispatch(
+          partnerFoodSliceThunks.fetchEditableFoodsBatch(missingFoodIds),
+        );
+      }
+    }
+  }, [
+    foodIdsString,
+    fetchEditableFoodInProgress,
+    foodList,
+    editableFoodMap,
+    dispatch,
+  ]);
 
   return (
     <Form onSubmit={handleSubmit} className={css.formWrapper}>

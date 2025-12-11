@@ -31,6 +31,7 @@ export { default as user } from './user.slice';
 export { default as walkthrough } from './walkthrough.slice';
 export { default as AdminAttributes } from '@pages/admin/AdminAttributes.slice';
 export { default as AdminManageOrder } from '@pages/admin/order/AdminManageOrder.slice';
+export { default as adminManagePartnersMenus } from '@pages/admin/partner/pending-menus/ManagePartnersMenus.slice';
 export { default as AdminManageClientPayments } from '@pages/admin/payment-client/AdminManageClientPayments.slice';
 export { default as PaymentPartner } from '@pages/admin/payment-partner/PaymentPartner.slice';
 export { default as Nutrition } from '@pages/company/[companyId]/nutrition/Nutrition.slice';

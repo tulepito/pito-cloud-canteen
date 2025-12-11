@@ -26,11 +26,17 @@ import {
 import {
   EListingStates,
   EListingType,
+  EMenuMealType,
   EMenuType,
   EOrderStates,
 } from '@src/utils/enums';
 import { storableAxiosError, storableError } from '@src/utils/errors';
 import type { TCurrentUser, TListing, TObject } from '@src/utils/types';
+
+import {
+  type TDraftMenu,
+  convertCurrentMenuToDraftMenu,
+} from './components/PartnerMenuWizard/utils';
 
 // ================ Initial states ================ //
 type TPartnerManageMenusState = {
@@ -43,7 +49,7 @@ type TPartnerManageMenusState = {
   preDeleteMenusInProgress: boolean;
   deleteMenusInProgress: boolean;
   // create/edit menu
-  draftMenu: TObject;
+  draftMenu: TDraftMenu;
   menu: TListing | null;
   loadMenuDataInProgress: boolean;
   createDraftMenuInProgress: boolean;
@@ -64,7 +70,16 @@ const initialState: TPartnerManageMenusState = {
   preDeleteMenusInProgress: false,
   deleteMenusInProgress: false,
   // create/edit menu
-  draftMenu: {},
+  // default values for draft menu
+  draftMenu: {
+    menuName: '',
+    menuType: EMenuType.fixedMenu,
+    mealType: EMenuMealType.lunch,
+    mealTypes: [EMenuMealType.lunch],
+    startDate: Date.now(),
+    daysOfWeek: [],
+    foodsByDate: {},
+  },
   menu: null,
   loadMenuDataInProgress: false,
   createDraftMenuInProgress: false,
@@ -213,6 +228,8 @@ const createDraftMenu = createAsyncThunk(
         endDate,
         mealTypes = [],
         daysOfWeek = [],
+        menuType,
+        numberOfCycles,
       } = getState().PartnerManageMenus.draftMenu || {};
       const { currentUser } = getState().user;
 
@@ -221,13 +238,14 @@ const createDraftMenu = createAsyncThunk(
       const createMenuResponse = await createDraftMenuApi({
         dataParams: {
           title: menuName,
-          menuType: EMenuType.fixedMenu,
+          menuType,
           startDate,
           endDate,
           mealTypes,
           mealType: mealTypes[0],
           daysOfWeek,
           restaurantId: restaurantListingId,
+          ...(menuType === EMenuType.cycleMenu ? { numberOfCycles } : {}),
         },
         queryParams: {
           expand: true,
@@ -324,6 +342,8 @@ const updateDraftMenu = createAsyncThunk(
         foodsByDate, // init food by date for publish menu
         draftFoodByDate, // init food by date for draft menu
         foodByDate, // update value
+        menuType,
+        numberOfCycles,
       } = getState().PartnerManageMenus.draftMenu || {};
       const menu = getState().PartnerManageMenus.menu || {};
       const { currentUser } = getState().user;
@@ -352,6 +372,8 @@ const updateDraftMenu = createAsyncThunk(
           daysOfWeek,
           restaurantId: restaurantListingId,
           isDraftEditFlow,
+          menuType,
+          ...(menuType === EMenuType.cycleMenu ? { numberOfCycles } : {}),
         },
         queryParams: {
           expand: true,
@@ -380,9 +402,11 @@ const publishDraftMenu = createAsyncThunk(
         menuName,
         startDate,
         endDate,
-        foodByDate = {},
+        draftFoodByDate = {},
         mealTypes = [],
         daysOfWeek = [],
+        menuType,
+        numberOfCycles,
       } = getState().PartnerManageMenus.draftMenu || {};
       const menu = getState().PartnerManageMenus.menu || {};
       const { currentUser } = getState().user;
@@ -394,14 +418,15 @@ const publishDraftMenu = createAsyncThunk(
         dataParams: {
           id: menuGetter.getId(),
           title: menuName,
-          menuType: EMenuType.fixedMenu,
+          menuType,
           startDate,
           endDate,
           mealTypes,
-          draftFoodByDate: foodByDate,
+          draftFoodByDate,
           mealType: mealTypes[0],
           daysOfWeek,
           restaurantId: restaurantListingId,
+          ...(menuType === EMenuType.cycleMenu ? { numberOfCycles } : {}),
         },
         queryParams: {
           expand: true,
@@ -437,6 +462,19 @@ const PartnerManageMenusSlice = createSlice({
   reducers: {
     saveDraft: (state, { payload }) => {
       state.draftMenu = payload;
+    },
+    clearDraft: (state) => {
+      // Reset draftMenu to default values
+      state.draftMenu = {
+        menuName: '',
+        menuType: EMenuType.fixedMenu,
+        mealType: EMenuMealType.lunch,
+        mealTypes: [EMenuMealType.lunch],
+        startDate: Date.now(),
+        daysOfWeek: [],
+        foodsByDate: {},
+      };
+      state.menu = null;
     },
     addPickedFood: (state, { payload }) => {
       state.pickedFood = uniqBy([...state.pickedFood, ...payload], 'id.uuid');
@@ -532,6 +570,11 @@ const PartnerManageMenusSlice = createSlice({
         state.loadMenuDataInProgress = false;
         state.menu = payload.menu;
         state.pickedFood = payload.pickedFood;
+        // Initialize draftMenu from currentMenu when loading existing menu
+        const draftMenuData = convertCurrentMenuToDraftMenu(payload.menu);
+        if (draftMenuData) {
+          state.draftMenu = draftMenuData;
+        }
       })
       .addCase(loadMenuData.rejected, (state) => {
         state.loadMenuDataInProgress = false;

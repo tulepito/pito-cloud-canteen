@@ -1,4 +1,5 @@
 import { Field } from 'react-final-form';
+import classNames from 'classnames';
 import { useRouter } from 'next/router';
 
 import FieldCheckbox from '@components/FormFields/FieldCheckbox/FieldCheckbox';
@@ -55,7 +56,11 @@ const FoodRow: React.FC<TFoodRowProps> = (props) => {
   };
 
   const checkBoxContent = (
-    <div className={css.row} onClick={handleRedirect}>
+    <div
+      className={classNames(css.row, {
+        [css.disabled]: !editableFoodMap[foodId],
+      })}
+      onClick={handleRedirect}>
       <div className={css.contentWrapper}>{foodName}</div>
     </div>
   );

@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 
 import Button from '@components/Button/Button';
 import IconAdd from '@components/Icons/IconAdd/IconAdd';
+import IconUploadFile from '@components/Icons/IconUploadFile/IconUploadFile';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import type { TTabsItem } from '@components/Tabs/Tabs';
 import Tabs from '@components/Tabs/Tabs';
@@ -14,6 +15,8 @@ type TProductLayoutProps = PropsWithChildren<{
   currentPage: string;
   handleAddProduct: () => void;
   shouldHideAddProductButton?: boolean;
+  handleImportProduct?: () => void;
+  shouldHideImportProductButton?: boolean;
 }>;
 
 const PRODUCT_LAYOUT_TABS = [
@@ -32,6 +35,8 @@ const ProductLayout: React.FC<TProductLayoutProps> = (props) => {
     currentPage = PRODUCT_LAYOUT_TAB_KEYS.food,
     shouldHideAddProductButton = false,
     handleAddProduct,
+    handleImportProduct,
+    shouldHideImportProductButton = true,
   } = props;
 
   const router = useRouter();
@@ -75,13 +80,26 @@ const ProductLayout: React.FC<TProductLayoutProps> = (props) => {
           onChange={handleTabChanged}
         />
 
-        <RenderWhen condition={!shouldHideAddProductButton}>
-          <Button className={css.addButton} onClick={handleAddProduct}>
-            <IconAdd className={css.addIcon} />
+        <div className="flex items-center gap-2">
+          <RenderWhen condition={!shouldHideImportProductButton}>
+            <Button
+              type="button"
+              variant="secondary"
+              className={css.lightButton}
+              onClick={handleImportProduct}>
+              <IconUploadFile className="me-1" />
+              Tải món
+            </Button>
+          </RenderWhen>
 
-            <div>Thêm</div>
-          </Button>
-        </RenderWhen>
+          <RenderWhen condition={!shouldHideAddProductButton}>
+            <Button onClick={handleAddProduct}>
+              <IconAdd className={css.addIcon} />
+
+              <div>Thêm</div>
+            </Button>
+          </RenderWhen>
+        </div>
       </div>
 
       <div className={css.contentContainer}>{children}</div>

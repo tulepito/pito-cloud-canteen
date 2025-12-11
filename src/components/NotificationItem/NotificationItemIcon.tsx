@@ -53,6 +53,8 @@ const NotificationItemIcon: React.FC<NotificationItemIconProps> = (props) => {
     case ENotificationType.PARTNER_FOOD_CREATED_BY_ADMIN:
     case ENotificationType.PARTNER_FOOD_ACCEPTED_BY_ADMIN:
     case ENotificationType.PARTNER_FOOD_REJECTED_BY_ADMIN:
+    case ENotificationType.PARTNER_MENU_APPROVED_BY_ADMIN:
+    case ENotificationType.PARTNER_MENU_REJECTED_BY_ADMIN:
       icon = <IconFood />;
       break;
     case ENotificationType.PARTNER_PROFILE_UPDATED_BY_ADMIN:

@@ -9,13 +9,19 @@ import { getDayOfWeekByIndex } from '@utils/dates';
 import css from './CalendarContentStart.module.scss';
 
 const CalendarContentStart = (props: any) => {
-  const { date, events = [], currentMenu, onSetCurrentDate } = props;
+  const {
+    date,
+    events = [],
+    currentMenu,
+    onSetCurrentDate,
+    isReadOnly,
+  } = props;
   const dayAsIndex = new Date(date).getDay() - 1;
   const dayOfWeekToCompare = getDayOfWeekByIndex(dayAsIndex);
 
   const { daysOfWeek: daysOfWeekFromMenu = [] } =
     IntegrationListing(currentMenu).getPublicData();
-  if (!daysOfWeekFromMenu.includes(dayOfWeekToCompare)) {
+  if (isReadOnly || !daysOfWeekFromMenu.includes(dayOfWeekToCompare)) {
     return <></>;
   }
 

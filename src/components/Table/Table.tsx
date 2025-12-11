@@ -65,7 +65,7 @@ type TTableProps = TDefaultProps & {
   extraRows?: ReactNode;
   tableWrapperClassName?: string;
   shouldReplacePathWhenChangePage?: boolean;
-  onCustomPageChange?: (page: number) => void;
+  onCustomPageChange?: (page: number, pageSize?: number) => void;
   paginationProps?: TObject;
 };
 
@@ -108,7 +108,7 @@ const Table = (props: TTableProps) => {
 
   const onPageChange = (page: number, pageSize?: number) => {
     if (typeof onCustomPageChange === 'function') {
-      onCustomPageChange(page);
+      onCustomPageChange(page, pageSize);
     } else {
       const params = {
         pathname: paginationPath,

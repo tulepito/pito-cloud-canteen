@@ -1,13 +1,11 @@
 /* eslint-disable no-await-in-loop */
-import type { ReactNode } from 'react';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { shallowEqual } from 'react-redux';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
 import * as XLSX from 'xlsx';
 
-import { partnerFoodApi } from '@apis/foodApi';
 import Button, { InlineTextButton } from '@components/Button/Button';
 import ErrorMessage from '@components/ErrorMessage/ErrorMessage';
 import IconDelete from '@components/Icons/IconDelete/IconDelete';
@@ -25,13 +23,11 @@ import type { TColumn } from '@components/Table/Table';
 import { TableForm } from '@components/Table/Table';
 import Toggle from '@components/Toggle/Toggle';
 import Tooltip from '@components/Tooltip/Tooltip';
-import { sleep } from '@helpers/index';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
+import { useFoodImportPreview } from '@hooks/useFoodImportPreview';
 import { useViewport } from '@hooks/useViewport';
-import { getImportDataFromCsv } from '@pages/partner/products/food/utils';
 import { foodSliceThunks } from '@redux/slices/foods.slice';
-import { createSdkInstance } from '@sharetribe/sdk';
 import { adminRoutes } from '@src/paths';
 import { formatTimestamp } from '@src/utils/dates';
 import {
@@ -44,10 +40,8 @@ import {
 import type { TIntegrationListing } from '@utils/types';
 
 import FilterForm from './FilterForm/FilterForm';
-import { PastableImageInput } from './PastableImageInput';
-import type { Column } from './PreviewTable';
+import { getFoodImportPreviewColumns } from './getFoodImportPreviewColumns';
 import { PreviewTable } from './PreviewTable';
-import { remoteImageUrlToBase64 } from './remoteImageUrlToBase64';
 
 import css from './ManagePartnerFoods.module.scss';
 
@@ -254,28 +248,10 @@ const parseEntitiesToExportCsv = (
   return foodsToExport;
 };
 
-interface Record {
-  image?: string;
-  name?: string;
-  menuType?: string;
-  category?: string;
-  description?: string;
-  packaging?: string;
-  price?: string;
-  numberOfMainDishes?: string;
-  stirFriedMeal?: string;
-  soup?: string;
-  dessert?: string;
-  drink?: string;
-  allergicIngredients?: string;
-  note?: string;
-  imageBase64?: string;
-  imageBase64Loading?: boolean;
-  status?: 'loading' | 'success' | string;
-}
 const ManagePartnerFoods = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
+  const { restaurantId, page = 1, keywords, pub_category = '' } = router.query;
 
   const categoryOptions = useAppSelector(
     (state) => state.SystemAttributes.categories,
@@ -283,19 +259,28 @@ const ManagePartnerFoods = () => {
 
   const [idsToAction, setIdsToAction] = useState<string[]>([]);
   const [foodToRemove, setFoodToRemove] = useState<any>(null);
-  const [previewRecords, setPreviewRecords] = useState<Record[]>([]);
-  const [isCreatingModeOn, setIsCreatingModeOn] = useState(false);
-  const [
-    isCreatingModeCompletedOneWayFlag,
-    setIsCreatingModeCompletedOneWayFlag,
-  ] = useState(false);
-  const allowRunFetchRecordRef = React.useRef(true);
-
   const {
     value: isImportModalOpen,
     setTrue: openImportModal,
     setFalse: closeImportModal,
   } = useBoolean(false);
+
+  const packagingOptions = useAppSelector(
+    (state) => state.SystemAttributes.packaging,
+  );
+  const {
+    previewRecords,
+    setPreviewRecords,
+    isCreatingModeOn,
+    isCreatingModeCompletedOneWayFlag,
+    numberOfCreatedRecords,
+    totalRecords,
+    handleFileChange,
+    onImportFoodFromCsv,
+  } = useFoodImportPreview({
+    restaurantId,
+    packagingOptions,
+  });
 
   const onCloseImportModal = () => {
     closeImportModal();
@@ -304,17 +289,24 @@ const ManagePartnerFoods = () => {
     }
   };
 
+  const handleConfirmImportModal = () => {
+    if (isCreatingModeCompletedOneWayFlag) {
+      router.push(
+        adminRoutes.CreatePartnerMenu.path.replace(
+          '[restaurantId]',
+          restaurantId as string,
+        ),
+      );
+    } else {
+      onImportFoodFromCsv();
+    }
+  };
+
   const {
     value: removeCheckedModalOpen,
     setTrue: openRemoveCheckedModal,
     setFalse: closeRemoveCheckedModal,
   } = useBoolean(false);
-
-  const packagingOptions = useAppSelector(
-    (state) => state.SystemAttributes.packaging,
-  );
-
-  const { restaurantId, page = 1, keywords, pub_category = '' } = router.query;
 
   const {
     foods,
@@ -431,139 +423,6 @@ const ManagePartnerFoods = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, restaurantId, keywords, categoryString]);
 
-  const onImportFoodFromCsv = async () => {
-    setIsCreatingModeOn(true);
-    for (let i = 0; i < previewRecords.length; i++) {
-      setPreviewRecords((prev) =>
-        prev.map((record, index) => {
-          if (index === i) {
-            return {
-              ...record,
-              status: 'loading',
-            };
-          }
-
-          return record;
-        }),
-      );
-
-      const imageBase64 = previewRecords[i].imageBase64;
-
-      const dataUrlToFile = (dataUrl: string, filename: string) => {
-        const arr = dataUrl.split(',');
-        const mime = arr[0].match(/:(.*?);/)?.[1];
-        const bstr = atob(arr[1]);
-        let n = bstr.length;
-        const u8arr = new Uint8Array(n);
-        while (n--) {
-          u8arr[n] = bstr.charCodeAt(n);
-        }
-
-        return new File([u8arr], filename, { type: mime });
-      };
-
-      try {
-        let imageIdHolder = null;
-
-        if (imageBase64) {
-          const fileFromImageBase64 = dataUrlToFile(imageBase64, 'image.png');
-
-          const uploadRes = await createSdkInstance().images.upload(
-            {
-              image: fileFromImageBase64,
-            },
-            {
-              expand: true,
-              'fields.image': [
-                'variants.squareSmall',
-                'variants.squareSmall2x',
-                'variants.scaledLarge',
-              ],
-            },
-          );
-
-          imageIdHolder = uploadRes.data.data.id.uuid;
-        }
-
-        const {
-          // eslint-disable-next-line unused-imports/no-unused-vars
-          imageBase64: _,
-          // eslint-disable-next-line unused-imports/no-unused-vars
-          status: __,
-          ..._dataParams
-        } = previewRecords[i];
-
-        const dataParams: ReturnType<typeof getImportDataFromCsv> & {
-          images?: string;
-        } = getImportDataFromCsv(
-          {
-            ..._dataParams,
-            restaurantId,
-          },
-          packagingOptions,
-          {
-            title: _dataParams.name,
-            description: _dataParams.description,
-            price: _dataParams.price,
-            allergicIngredients: _dataParams.allergicIngredients,
-            foodType: _dataParams.category,
-            numberOfMainDishes: _dataParams.numberOfMainDishes,
-            menuType: _dataParams.menuType,
-            packaging: _dataParams.packaging,
-            notes: _dataParams.note,
-            'stir-fried-meal': _dataParams.stirFriedMeal,
-            soup: _dataParams.soup,
-            dessert: _dataParams.dessert,
-            drink: _dataParams.drink,
-          },
-        );
-
-        dataParams.images = imageIdHolder;
-
-        const queryParams = {
-          expand: true,
-        };
-
-        await partnerFoodApi.createFood({
-          dataParams,
-          queryParams,
-        });
-
-        // Throttle the requests to avoid rate limiting
-        await sleep(500);
-
-        setPreviewRecords((prev) =>
-          prev.map((record, index) => {
-            if (index === i) {
-              return {
-                ...record,
-                status: 'success',
-              };
-            }
-
-            return record;
-          }),
-        );
-      } catch (error) {
-        setPreviewRecords((prev) =>
-          prev.map((record, index) => {
-            if (index === i) {
-              return {
-                ...record,
-                status: 'error',
-              };
-            }
-
-            return record;
-          }),
-        );
-      }
-    }
-
-    setIsCreatingModeOn(false);
-    setIsCreatingModeCompletedOneWayFlag(true);
-  };
-
   const makeExcelFile = () => {
     const foodsToExport = parseEntitiesToExportCsv(
       foods,
@@ -577,250 +436,12 @@ const ManagePartnerFoods = () => {
     XLSX.writeFile(wb, `${formatTimestamp(new Date().getTime())}_Món_Ăn.xlsx`);
   };
 
-  const onChangeFile = (e: any) => {
-    e.stopPropagation();
-    e.preventDefault();
-    setIsCreatingModeOn(false);
-    const files =
-      e.dataTransfer && e.dataTransfer.files.length > 0
-        ? [...e.dataTransfer.files]
-        : [...e.target.files];
-
-    if (files[0]) {
-      setPreviewRecords([]);
-
-      const reader = new FileReader();
-      reader.onload = async (_e) => {
-        const data = new Uint8Array(_e.target?.result as ArrayBuffer);
-        const workbook = XLSX.read(data, { type: 'array' });
-        const sheet = workbook.Sheets.Template;
-
-        const nameToKeyAdapter = {
-          'Hình ảnh': 'image',
-          'Tên món ăn': 'name',
-          'Loại menu': 'menuType',
-          'Phân loại': 'category',
-          'Mô tả chi tiết': 'description',
-          'Chất liệu bao bì': 'packaging',
-          'Đơn giá (Vnđ)': 'price',
-          'Số món chính (món)': 'numberOfMainDishes',
-          'Món xào': 'sideDish',
-          'Món canh': 'soup',
-          'Tráng miệng': 'dessert',
-          'Nước uống': 'drink',
-          'Thành phần dị ứng': 'allergicIngredients',
-          'Ghi chú': 'note',
-        };
-
-        const sheetRecords = XLSX.utils.sheet_to_json(
-          sheet,
-        ) as unknown as typeof nameToKeyAdapter[];
-
-        const previewRecordsWithMappedProperties = sheetRecords.map(
-          (sheetRecord) => {
-            const mappedRecord: Partial<Record> = {};
-
-            Object.keys(sheetRecord).forEach((key) => {
-              const keyValue = nameToKeyAdapter[
-                key as keyof typeof sheetRecord
-              ] as keyof Record;
-
-              if (keyValue) {
-                mappedRecord[keyValue] = sheetRecord[
-                  key as keyof typeof sheetRecord
-                ] as any;
-              }
-            });
-
-            return mappedRecord;
-          },
-        );
-
-        setPreviewRecords(previewRecordsWithMappedProperties);
-        allowRunFetchRecordRef.current = true;
-      };
-      reader.readAsArrayBuffer(
-        files
-          .filter(
-            (file: any) =>
-              file.type ===
-              'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-          )
-          .pop(),
-      );
-
-      e.target.value = '';
-    }
-  };
-
-  useEffect(() => {
-    if (previewRecords.length === 0) return;
-    if (!allowRunFetchRecordRef.current) return;
-    const fetchImageBase64 = async () => {
-      setPreviewRecords((prev) =>
-        prev.map((record) => ({
-          ...record,
-          imageBase64Loading: true,
-        })),
-      );
-      const previewRecordsWithBase64 = await Promise.all(
-        previewRecords.map(async (record) => {
-          if (!record.image) {
-            return record;
-          }
-
-          try {
-            if (record.image.startsWith('data:image')) {
-              return { ...record, imageBase64: record.image };
-            }
-
-            const imageBase64 = await remoteImageUrlToBase64(record.image);
-
-            return { ...record, imageBase64 };
-          } catch (error) {
-            return { ...record, imageBase64: undefined };
-          }
-        }),
-      );
-
-      setPreviewRecords(previewRecordsWithBase64);
-    };
-
-    fetchImageBase64();
-    allowRunFetchRecordRef.current = false;
-  }, [previewRecords]);
-
-  const columns: Column[] = [
-    {
-      label: 'STT',
-      accessor: 'index',
-      render: (value: string, _, index?: number) => {
-        if (index === undefined) {
-          return <></>;
-        }
-
-        return index + 1;
-      },
-    },
-    {
-      label: 'Tình trạng',
-      accessor: 'status',
-      render: (value: string) => {
-        let _node: ReactNode = '❌';
-        if (!value) {
-          _node = '⚫';
-        }
-
-        if (value === 'loading') {
-          _node = <IconSpinner className="text-blue-500 stroke-blue-500" />;
-        }
-
-        if (value === 'success') {
-          _node = '✅';
-        }
-
-        return (
-          <div className="text-center flex items-center justify-center">
-            {_node}
-          </div>
-        );
-      },
-    },
-    {
-      label: 'Hình ảnh',
-      accessor: 'imageBase64',
-      render: (value: string, record: any, index?: number) => {
-        if (index === undefined) {
-          return <></>;
-        }
-
-        if (record.imageBase64Loading) {
-          return <IconSpinner className="text-blue-500 stroke-blue-500" />;
-        }
-
-        return (
-          <div className="flex gap-2">
-            <div className="min-w-[64px] min-h-[64px] max-w-[64px] max-h-[64px]">
-              {value && (
-                <img
-                  src={value}
-                  alt="Template"
-                  className="min-w-[64px] min-h-[64px] object-cover rounded-md max-w-[64px] max-h-[64px]"
-                />
-              )}
-            </div>
-            <PastableImageInput
-              onChange={(newVal: string) => {
-                const newPreviewRecords = [...previewRecords];
-                newPreviewRecords[index].imageBase64 = newVal;
-                setPreviewRecords(newPreviewRecords);
-              }}
-            />
-          </div>
-        );
-      },
-    },
-    {
-      label: 'Tên món ăn',
-      accessor: 'name',
-      width: 200,
-    },
-    {
-      label: 'Loại menu',
-      accessor: 'menuType',
-    },
-    {
-      label: 'Phân loại',
-      accessor: 'category',
-    },
-    {
-      label: 'Mô tả chi tiết',
-      accessor: 'description',
-      width: 400,
-    },
-    {
-      label: 'Chất liệu bao bì',
-      accessor: 'packaging',
-    },
-    {
-      label: 'Đơn giá (Vnđ)',
-      accessor: 'price',
-    },
-    {
-      label: 'Số món chính (món)',
-      accessor: 'numberOfMainDishes',
-    },
-    {
-      label: 'Món xào',
-      accessor: 'sideDish',
-    },
-    {
-      label: 'Món canh',
-      accessor: 'soup',
-    },
-    {
-      label: 'Tráng miệng',
-      accessor: 'dessert',
-    },
-    {
-      label: 'Nước uống',
-      accessor: 'drink',
-    },
-    {
-      label: 'Thành phần dị ứng',
-      accessor: 'allergicIngredients',
-    },
-    {
-      label: 'Ghi chú',
-      accessor: 'note',
-    },
-  ];
+  const columns = useMemo(
+    () => getFoodImportPreviewColumns(setPreviewRecords),
+    [setPreviewRecords],
+  );
 
   const { isMobileLayout } = useViewport();
-  const numberOfCreatedRecords = previewRecords.filter(
-    (record) => !!record.status && record.status !== 'loading',
-  ).length;
-  const totalRecords = previewRecords.length;
 
   return (
     <div className={css.root}>
@@ -929,13 +550,13 @@ const ManagePartnerFoods = () => {
           containerClassName="!min-w-[80vw] !w-full"
           confirmLabel={
             isCreatingModeCompletedOneWayFlag
-              ? `${numberOfCreatedRecords}/${totalRecords} đã được tạo, tắt dialog`
+              ? 'Tạo menu'
               : isCreatingModeOn
               ? `Đang tạo ${numberOfCreatedRecords}/${totalRecords}...`
               : 'Tạo'
           }
           onCancel={onCloseImportModal}
-          onConfirm={onImportFoodFromCsv}
+          onConfirm={handleConfirmImportModal}
           title={<FormattedMessage id="ManagePartnerFoods.importTitle" />}
           cancelLabel="Hủy"
           confirmInProgress={createPartnerFoodFromCsvInProgress}
@@ -943,8 +564,7 @@ const ManagePartnerFoods = () => {
             previewRecords.some((record) => record.imageBase64Loading) ||
             createPartnerFoodFromCsvInProgress ||
             !previewRecords.length ||
-            (isCreatingModeOn && numberOfCreatedRecords !== totalRecords) ||
-            isCreatingModeCompletedOneWayFlag
+            (isCreatingModeOn && numberOfCreatedRecords !== totalRecords)
           }>
           <p className={css.downloadFileHere}>
             <FormattedMessage
@@ -971,7 +591,7 @@ const ManagePartnerFoods = () => {
             </label>
             <input
               accept=".xlsx,.xls"
-              onChange={onChangeFile}
+              onChange={handleFileChange}
               type="file"
               className={css.inputFile}
               name="file"
@@ -984,6 +604,13 @@ const ManagePartnerFoods = () => {
           </a>
           {!!previewRecords.length && (
             <PreviewTable columns={columns} data={previewRecords} />
+          )}
+          {isCreatingModeCompletedOneWayFlag && (
+            <div className="flex justify-center items-center">
+              <p className="font-bold text-black text-sm">
+                {numberOfCreatedRecords}/{totalRecords} món ăn đã tải lên
+              </p>
+            </div>
           )}
         </AlertModal>
       )}

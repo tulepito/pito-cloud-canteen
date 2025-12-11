@@ -15,7 +15,7 @@ import { denormalisedResponseEntities } from '@services/data';
 import { getIntegrationSdk } from '@services/sdk';
 import { IntegrationListing } from '@src/utils/data';
 import { addWeeksToDate } from '@src/utils/dates';
-import { EMenuType } from '@src/utils/enums';
+import { EListingStates, EMenuType } from '@src/utils/enums';
 import type { TObject, TUpdateMenuApiParams } from '@src/utils/types';
 
 import updateMenuIdListAndMenuWeekDayListForFood from './updateMenuIdListAndMenuWeekDayListForFood.service';
@@ -48,6 +48,9 @@ const updateMenu = async (
   });
 
   const [menu] = denormalisedResponseEntities(menuResponse);
+  if (menu.metadata?.listingState === EListingStates.published) {
+    throw new Error('Menu đã được duyệt. Không thể cập nhật');
+  }
   const {
     mealTypes: mealTypesFromMenu = [],
     daysOfWeek: daysOfWeekFromMenu = [],

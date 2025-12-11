@@ -50,7 +50,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             return res.status(404).json({ message: 'Emails not found' });
           }
 
-          return new SuccessResponse(emails, {
+          return new SuccessResponse({
+            data: emails,
             message: 'Lấy emails thành công',
           }).send(res);
         } catch (error) {

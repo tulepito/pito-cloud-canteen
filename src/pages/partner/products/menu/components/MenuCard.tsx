@@ -1,14 +1,15 @@
-import { useEffect } from 'react';
 import { useField, useForm } from 'react-final-form-hooks';
+import classNames from 'classnames';
 import { DateTime } from 'luxon';
 import { useRouter } from 'next/router';
 
-import Badge from '@components/Badge/Badge';
+import Badge, { EBadgeType } from '@components/Badge/Badge';
 import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import IconClock from '@components/Icons/IconClock/IconClock';
 import IconDanger from '@components/Icons/IconDanger/IconDanger';
 import IconDelete from '@components/Icons/IconDelete/IconDelete';
 import IconEdit from '@components/Icons/IconEdit/IconEdit';
+import IconEye from '@components/Icons/IconEye/IconEye';
 import AlertModal from '@components/Modal/AlertModal';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import Toggle from '@components/Toggle/Toggle';
@@ -18,7 +19,7 @@ import { partnerPaths } from '@src/paths';
 import { Listing } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
 import { EListingStates } from '@src/utils/enums';
-import type { TListing, TObject } from '@src/utils/types';
+import type { TListing, TMenuStateHistory, TObject } from '@src/utils/types';
 
 import { PartnerManageMenusThunks } from '../PartnerManageMenus.slice';
 
@@ -56,7 +57,7 @@ const MenuCard: React.FC<TMenuCardProps> = ({
   const menuId = menuGetter.getId();
   const { title: menuName } = menuGetter.getAttributes();
   const { startDate, endDate } = menuGetter.getPublicData();
-  const { listingState = EListingStates.draft } = menuGetter.getMetadata();
+  const { listingState } = menuGetter.getMetadata();
 
   const isDraftMenu = listingState === EListingStates.draft;
 
@@ -81,26 +82,10 @@ const MenuCard: React.FC<TMenuCardProps> = ({
     startDate,
   )} - ${formatTimestamp(endDate)}`;
 
-  useEffect(() => {
-    if (typeof isActiveValue === 'boolean') {
-      const newListingState = isActiveValue
-        ? EListingStates.published
-        : EListingStates.closed;
-
-      if (
-        newListingState !== listingState &&
-        listingState !== EListingStates.draft
-      ) {
-        dispatch(
-          PartnerManageMenusThunks.toggleMenuActiveStatus({
-            id: menuId,
-            newListingState,
-          }),
-        );
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isActiveValue, listingState]);
+  const menuStateHistory = menuGetter.getMetadata().menuStateHistory;
+  const rejectedReason = menuStateHistory?.findLast(
+    (item: TMenuStateHistory) => item.state === EListingStates.rejected,
+  )?.rejectedReason;
 
   const handleMenuCardClick = (event: any) => {
     event.stopPropagation();
@@ -140,7 +125,27 @@ const MenuCard: React.FC<TMenuCardProps> = ({
   return (
     <div className={css.root}>
       <div className={css.titleContainer} onClick={handleMenuCardClick}>
-        <div>{menuName}</div>
+        <div className={css.titleWrapper}>
+          <div className={css.menuName}>{menuName}</div>
+          {listingState === EListingStates.pendingApproval && (
+            <div className={css.statusBadge}>
+              <Badge
+                type={EBadgeType.warning}
+                labelClassName="text-black"
+                label="Chờ duyệt"
+              />
+            </div>
+          )}
+          {listingState === EListingStates.rejected && (
+            <div className={css.statusBadge}>
+              <Badge
+                type={EBadgeType.danger}
+                labelClassName="text-black"
+                label="Cần chỉnh sửa"
+              />
+            </div>
+          )}
+        </div>
         <IconArrow className={css.arrowIcon} direction="right" />
       </div>
       <div className={css.infoContainer} onClick={handleMenuCardClick}>
@@ -159,29 +164,51 @@ const MenuCard: React.FC<TMenuCardProps> = ({
         </RenderWhen>
       </div>
       <div className={css.actionContainer}>
-        <div
-          onClick={handleEditMenuClick}
-          className={css.iconContainer}
-          aria-disabled={isAnyMenuActionsInProgress}>
-          <IconEdit />
+        {listingState === EListingStates.rejected && rejectedReason && (
+          <div className={css.reasonWrapper}>
+            <span
+              className={classNames(css.reasonText, 'self-start text-black')}>
+              Phản hồi từ admin:
+            </span>
+            <span
+              className={classNames(
+                css.reasonText,
+                'self-start text-black !font-semibold',
+              )}
+              dangerouslySetInnerHTML={{ __html: rejectedReason }}
+            />
+          </div>
+        )}
+
+        <div className={css.actionsRight}>
+          <div
+            onClick={handleEditMenuClick}
+            className={css.iconContainer}
+            aria-disabled={isAnyMenuActionsInProgress}>
+            {listingState === EListingStates.published ? (
+              <IconEye />
+            ) : (
+              <IconEdit />
+            )}
+          </div>
+          <div
+            className={css.iconContainer}
+            aria-disabled={isAnyMenuActionsInProgress}
+            onClick={handleDeleteMenuClick}>
+            <IconDelete />
+          </div>
+          <RenderWhen condition={shouldShowActiveMenuToggle}>
+            <Toggle
+              id={'MealDateForm.orderType'}
+              status={isActiveValue ? 'on' : 'off'}
+              disabled={isAnyMenuActionsInProgress}
+              className={css.isActiveField}
+              onClick={(value) => {
+                isActiveField.input.onChange(value);
+              }}
+            />
+          </RenderWhen>
         </div>
-        <div
-          className={css.iconContainer}
-          aria-disabled={isAnyMenuActionsInProgress}
-          onClick={handleDeleteMenuClick}>
-          <IconDelete />
-        </div>
-        <RenderWhen condition={shouldShowActiveMenuToggle}>
-          <Toggle
-            id={'MealDateForm.orderType'}
-            status={isActiveValue ? 'on' : 'off'}
-            disabled={isAnyMenuActionsInProgress}
-            className={css.isActiveField}
-            onClick={(value) => {
-              isActiveField.input.onChange(value);
-            }}
-          />
-        </RenderWhen>
       </div>
 
       <AlertModal

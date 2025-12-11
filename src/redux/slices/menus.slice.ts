@@ -445,6 +445,10 @@ const menusSliceSlice = createSlice({
       createOrUpdateMenuError: null,
       checkingMenuUnConflictedError: null,
     }),
+    setCurrentMenu: (state, { payload }) => ({
+      ...state,
+      currentMenu: payload,
+    }),
   },
   extraReducers: (builder) => {
     builder

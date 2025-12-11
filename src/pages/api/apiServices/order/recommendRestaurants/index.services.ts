@@ -141,7 +141,7 @@ export const recommendRestaurantForSpecificDay = async ({
 
   if (restaurantsFiltered.length > 0) {
     const randomNumber = Math.floor(
-      Math.random() * (restaurantsFiltered.length - 1),
+      Math.random() * restaurantsFiltered.length - 1,
     );
 
     const otherRandomNumber = Math.abs(
@@ -236,7 +236,6 @@ export const recommendRestaurants = async ({
             params: menuQueryParams,
             orderParams: recommendParams,
           });
-
       const allMenus = await queryAllListings({
         query: menuQuery,
       });
@@ -311,11 +310,10 @@ export const recommendRestaurants = async ({
           },
         ),
       );
-
       if (restaurantsFiltered.length > 0) {
         const randomRestaurant =
           restaurantsFiltered[
-            Math.floor(Math.random() * (restaurantsFiltered.length - 1))
+            Math.floor(Math.random() * restaurantsFiltered.length)
           ];
         const { menu, restaurant } = randomRestaurant;
 

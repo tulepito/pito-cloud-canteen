@@ -151,6 +151,21 @@ type SlackNotificationParams = {
     partnerName: string;
     threadTs?: string;
   };
+  menuPublishedDraftToPendingData?: {
+    menuName: string;
+    restaurantName: string;
+    menuLink: string;
+  };
+  adminApprovePartnerMenuData?: {
+    menuName: string;
+    restaurantName: string;
+    menuLink: string;
+  };
+  adminRejectPartnerMenuData?: {
+    menuName: string;
+    restaurantName: string;
+    menuLink: string;
+  };
 };
 
 export const createSlackNotification = async (
@@ -1018,6 +1033,111 @@ export const createSlackNotification = async (
         break;
       }
 
+      case ESlackNotificationType.PARTNER_MENU_PUBLISHED_DRAFT_TO_PENDING: {
+        if (!notificationParams.menuPublishedDraftToPendingData) return;
+
+        const { menuName, restaurantName, menuLink } =
+          notificationParams.menuPublishedDraftToPendingData;
+        await axios.post(
+          process.env.SLACK_RATING_WEBHOOK_URL,
+          {
+            blocks: [
+              {
+                type: 'section',
+                text: {
+                  type: 'mrkdwn',
+                  text: `:gear::gear::gear: Menu *${menuName}* của nhà hàng *${restaurantName}* đã được tạo và đang chờ duyệt`,
+                },
+              },
+              {
+                type: 'section',
+                text: {
+                  type: 'mrkdwn',
+                  text: `<${menuLink}|Xem menu và duyệt>`,
+                },
+              },
+            ],
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          },
+        );
+        break;
+      }
+
+      case ESlackNotificationType.ADMIN_APPROVE_PARTNER_MENU: {
+        if (!notificationParams.adminApprovePartnerMenuData) return;
+
+        const { menuName, restaurantName, menuLink } =
+          notificationParams.adminApprovePartnerMenuData;
+
+        await axios.post(
+          process.env.SLACK_RATING_WEBHOOK_URL,
+          {
+            blocks: [
+              {
+                type: 'section',
+                text: {
+                  type: 'mrkdwn',
+                  text: `:white_check_mark: Menu *${menuName}* của nhà hàng *${restaurantName}* đã được admin duyệt`,
+                },
+              },
+              {
+                type: 'section',
+                text: {
+                  type: 'mrkdwn',
+                  text: `<${menuLink}|Xem menu>`,
+                },
+              },
+            ],
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          },
+        );
+
+        break;
+      }
+
+      case ESlackNotificationType.ADMIN_REJECT_PARTNER_MENU: {
+        if (!notificationParams.adminRejectPartnerMenuData) return;
+
+        const { menuName, restaurantName, menuLink } =
+          notificationParams.adminRejectPartnerMenuData;
+
+        await axios.post(
+          process.env.SLACK_RATING_WEBHOOK_URL,
+          {
+            blocks: [
+              {
+                type: 'section',
+                text: {
+                  type: 'mrkdwn',
+                  text: `:warning: Menu *${menuName}* của nhà hàng *${restaurantName}* bị admin từ chối duyệt`,
+                },
+              },
+              {
+                type: 'section',
+                text: {
+                  type: 'mrkdwn',
+                  text: `<${menuLink}|Xem menu>`,
+                },
+              },
+            ],
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          },
+        );
+
+        break;
+      }
       default:
         break;
     }
