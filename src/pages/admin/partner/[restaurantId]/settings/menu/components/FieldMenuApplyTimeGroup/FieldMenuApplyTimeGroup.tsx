@@ -78,6 +78,9 @@ const FieldMenuApplyTimeGroup: React.FC<TFieldMenuApplyTimeGroup> = (props) => {
   );
 
   const handleStartDateChange = (value: any, prevValue: any) => {
+    if (form.getState().submitting) {
+      return;
+    }
     if (endDateInitialValue && value !== prevValue) {
       form.batch(() => {
         form.change('endDate', undefined);

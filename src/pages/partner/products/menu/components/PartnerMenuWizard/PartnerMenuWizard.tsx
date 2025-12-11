@@ -92,7 +92,6 @@ const PartnerMenuTab = (props: TPartnerMenuTabProps) => {
           startDate: draftMenu?.startDate,
           daysOfWeek: draftMenu?.daysOfWeek || [],
           numberOfCycles: draftMenu?.numberOfCycles,
-          endDate: draftMenu?.endDate,
         };
       case MENU_PRICING_TAB:
         return {
