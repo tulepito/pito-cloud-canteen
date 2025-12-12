@@ -1159,6 +1159,8 @@
   "PartnerMenuRoute": "Manage Partner Menus",
   "PartnerMenuRoute.title": "Manage Partner Menus",
   "PartnerMenuRoute.description": "Manage Partner Menus",
+  "OrderMenuRoute.title": "Order menu",
+  "OrderMenuRoute.description": "Order menu",
   "RejectMenuModal.title": "Reject menu",
   "RejectMenuModal.message": "You are about to reject menu {menuTitle}. Please enter a reason to notify the partner.",
   "RejectMenuModal.reasonLabel": "Rejection reason",
@@ -2689,5 +2691,8 @@
   "plan-weekly-meals-let-employees-choose-dishes-ensure-on-time-delivery-and-track-transparent-costs-all-on-one-platform": "Plan weekly meals, let employees choose dishes, ensure on-time delivery, and track transparent costs — all on one platform.",
   "automated-corporate-lunch-ordering-solution": "Automated Corporate Lunch Ordering Solution",
   "pcc-helps-companies-plan-lunch-choose-vendors-manage-and-deliver-on-time-without-setup-costs-and-save-time": "PITO Cloud Canteen helps companies plan meals, select vendors, manage orders, and deliver directly - no setup fees, saving time and effort.",
-  "nhap-ghi-chu-cho-don-hang": "Enter order note"
+  "nhap-ghi-chu-cho-don-hang": "Enter order note",
+  "OrderMenuPage.title": "Order {orderName} #{title}",
+  "OrderMenuPage.subtitle": "Menu by day",
+  "OrderMenuPage.emptyMessage": "No menu available for this order"
 }

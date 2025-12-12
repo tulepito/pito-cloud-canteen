@@ -1161,6 +1161,8 @@
   "PartnerMenuRoute.title": "Quản lý menu đối tác",
   "PartnerMenuRoute": "Quản lý menu đối tác",
   "PartnerMenuRoute.description": "Quản lý menu đối tác",
+  "OrderMenuRoute.title": "Thực đơn đơn hàng",
+  "OrderMenuRoute.description": "Thực đơn đơn hàng",
   "RejectMenuModal.title": "Không duyệt menu",
   "RejectMenuModal.message": "Bạn sắp từ chối duyệt menu {menuTitle}. Vui lòng nhập lý do để thông báo cho đối tác.",
   "RejectMenuModal.reasonLabel": "Lý do không duyệt",
@@ -2689,5 +2691,8 @@
   "plan-weekly-meals-let-employees-choose-dishes-ensure-on-time-delivery-and-track-transparent-costs-all-on-one-platform": "Lên kế hoạch tuần ăn, nhân viên tự chọn món, giao đúng giờ, chi phí minh bạch – tất cả trong một nền tảng.",
   "automated-corporate-lunch-ordering-solution": "Giải pháp tự động hóa đặt cơm trưa cho doanh nghiệp",
   "pcc-helps-companies-plan-lunch-choose-vendors-manage-and-deliver-on-time-without-setup-costs-and-save-time": "PITO Cloud Canteen giúp doanh nghiệp lập kế hoạch bữa ăn, chọn nhà cung cấp, quản lý và giao tận nơi – không phí setup, tiết kiệm thời gian.",
-  "nhap-ghi-chu-cho-don-hang": "Nhập ghi chú cho đơn hàng"
+  "nhap-ghi-chu-cho-don-hang": "Nhập ghi chú cho đơn hàng",
+  "OrderMenuPage.title": "Đơn hàng {orderName} #{title}",
+  "OrderMenuPage.subtitle": "Thực đơn theo từng ngày",
+  "OrderMenuPage.emptyMessage": "Chưa có thực đơn cho đơn hàng này"
 }
