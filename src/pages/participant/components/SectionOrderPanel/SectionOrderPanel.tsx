@@ -90,17 +90,12 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
     });
     try {
       const res = await dispatch(
-        ParticipantPlanThunks.updateOrder({ orderId, planId }),
-      );
-      // payload will be true if jobId exists
-      if (
-        res?.payload &&
-        res.type === 'app/ParticipantPlanPage/UPDATE_ORDER/fulfilled'
-      ) {
+        ParticipantPlanThunks.placeOrder({ orderId, planId }),
+      ).unwrap();
+      if (res.status) {
         setIsSubmitSuccess(true);
-      } else {
-        toast.error('Đã có lỗi xảy ra trong chọn món. Vui lòng thử lại sau');
       }
+      console.log('SectionOrderPanel@handleSubmit@res:', res);
     } catch (error) {
       console.error('SectionOrderPanel@handleSubmit@error:', error);
       toast.error('Đã có lỗi xảy ra trong chọn món. Vui lòng thử lại sau');
