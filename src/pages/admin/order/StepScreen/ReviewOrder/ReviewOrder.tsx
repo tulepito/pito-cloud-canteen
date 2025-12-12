@@ -12,6 +12,7 @@ import { last, omit, pickBy, uniq } from 'lodash';
 import compact from 'lodash/compact';
 import isEmpty from 'lodash/isEmpty';
 import isEqual from 'lodash/isEqual';
+import { LinkIcon } from 'lucide-react';
 import { DateTime } from 'luxon';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
@@ -253,6 +254,10 @@ export const ReviewContent: React.FC<any> = (props) => {
 
   const [copyToClipboardTooltip, setCopyToClipboardTooltip] =
     useState(defaultCopyText);
+
+  const [shareMenuLinkTooltip, setShareMenuLinkTooltip] = useState(
+    'Chia sẻ link thực đơn',
+  );
   const allowTriggerGenerateUserLabelFile = useRef(false);
   const thermalPrintSectionRef = useRef<HTMLDivElement>(null);
 
@@ -423,6 +428,15 @@ export const ReviewContent: React.FC<any> = (props) => {
     );
   }, [foodDataList, restaurantName, companyName, timeStamp, orderNote, note]);
 
+  const handleShareMenuLink = () => {
+    const menuLink = `${process.env.NEXT_PUBLIC_CANONICAL_URL}/participant/order/${orderId}/menu`;
+    navigator.clipboard.writeText(menuLink);
+    setShareMenuLinkTooltip('Đã sao chép link thực đơn');
+    setTimeout(() => {
+      setShareMenuLinkTooltip('Chia sẻ link thực đơn');
+    }, 2000);
+  };
+
   return (
     <>
       <div className="flex flex-col w-full gap-2">
@@ -592,9 +606,26 @@ export const ReviewContent: React.FC<any> = (props) => {
         )}
 
         <Collapsible
-          label={intl.formatMessage({
-            id: 'ReviewOrder.menuLabel',
-          })}>
+          label={
+            <div className="flex items-center gap-2">
+              {intl.formatMessage({
+                id: 'ReviewOrder.menuLabel',
+              })}
+              <Tooltip
+                overlayClassName={css.toolTipOverlay}
+                trigger="hover"
+                placement="top"
+                tooltipContent={shareMenuLinkTooltip}>
+                <LinkIcon
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleShareMenuLink();
+                  }}
+                  className="w-4 h-4 text-blue-700"
+                />
+              </Tooltip>
+            </div>
+          }>
           <RenderWhen condition={shouldShowFoodList}>
             <Table
               columns={MenuColumns}
