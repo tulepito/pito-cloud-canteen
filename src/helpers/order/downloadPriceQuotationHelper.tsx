@@ -50,7 +50,36 @@ export const downloadPriceQuotation =
 
     const sections = document.querySelectorAll('.item-line');
 
+    if (!headerEle) return;
+
+    const headerTop = headerEle.getBoundingClientRect().top;
+    const CONTENT_HEIGHT = PAGE_HEIGHT - PADDING_TOP - PADDING_BOTTOM;
     let currentPage = 1;
+
+    /**
+     * Tính padding cần thêm để đẩy element sang trang mới
+     * @returns padding cần thêm (0 nếu không cần xuống trang)
+     */
+    const calculatePageBreak = (element: Element): number => {
+      const rect = element.getBoundingClientRect();
+      const elementTop = rect.top - headerTop;
+      const elementBottom = elementTop + rect.height;
+
+      const currentPageEnd = currentPage * CONTENT_HEIGHT;
+
+      if (elementBottom > currentPageEnd) {
+        const padding = currentPageEnd - elementTop;
+
+        const pagesNeeded = Math.ceil(
+          (elementBottom - currentPageEnd) / CONTENT_HEIGHT,
+        );
+        currentPage += pagesNeeded;
+
+        return padding > 0 ? padding : 0;
+      }
+
+      return 0;
+    };
 
     for (let i = 0; i < sections.length; i++) {
       const section = sections[i];
@@ -58,34 +87,19 @@ export const downloadPriceQuotation =
       const itemTitleEle = document.querySelector(`#${sectionId} .item-title`);
       const items = document.querySelectorAll(`#${sectionId} .item-row`);
 
-      if (itemTitleEle && headerEle) {
-        const remain =
-          itemTitleEle.getBoundingClientRect().top -
-          headerEle.getBoundingClientRect().top +
-          itemTitleEle.getBoundingClientRect().height +
-          PADDING_TOP +
-          PADDING_BOTTOM -
-          PAGE_HEIGHT * currentPage;
-
-        if (remain > 0) {
-          currentPage++;
-          itemTitleEle.setAttribute('style', `padding-top: ${remain}px;`);
+      if (itemTitleEle) {
+        const padding = calculatePageBreak(itemTitleEle);
+        if (padding > 0) {
+          itemTitleEle.setAttribute('style', `padding-top: ${padding}px;`);
         }
       }
 
       for (let j = 0; j < items.length; j++) {
-        if (items[j] && headerEle) {
-          const remain =
-            items[j].getBoundingClientRect().top -
-            headerEle.getBoundingClientRect().top +
-            items[j].getBoundingClientRect().height +
-            PADDING_TOP +
-            PADDING_BOTTOM -
-            PAGE_HEIGHT * currentPage;
-
-          if (remain > 0) {
-            currentPage++;
-            items[j].setAttribute('style', `padding-top: ${remain}px;`);
+        const item = items[j];
+        if (item) {
+          const padding = calculatePageBreak(item);
+          if (padding > 0) {
+            item.setAttribute('style', `padding-top: ${padding}px;`);
           }
         }
       }
