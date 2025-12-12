@@ -4,7 +4,6 @@ import IconClose from '@components/Icons/IconClose/IconClose';
 import IconRefreshing from '@components/Icons/IconRefreshing/IconRefreshing';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { ParticipantPlanThunks } from '@pages/participant/plans/[planId]/ParticipantPlanPage.slice';
-import { SINGLE_PICK_FOOD_NAMES } from '@src/utils/constants';
 
 import css from './CartItem.module.scss';
 
@@ -35,22 +34,15 @@ const CartItem: React.FC<TCartItemProps> = ({
     dispatch(ParticipantPlanThunks.recommendFoodSubOrder(subOrderDate!));
   };
 
-  const isFoodIsSingleSelection = SINGLE_PICK_FOOD_NAMES.some((name) =>
-    value?.toLowerCase()?.includes(name.toLowerCase()),
-  );
-
-  const isShowBottomBorder =
-    (!removeDisabled && isAllowAddSecondaryFood && foodPosition === 'second') ||
-    isFoodIsSingleSelection;
+  const isFirstFoodSelected = foodPosition === 'first';
 
   return (
     <div
       className={classNames(
         'px-[18px]',
-        isShowBottomBorder
-          ? 'border-b border-neutralGray3 pb-[10px]'
-          : 'pt-[10px]',
-        isFoodIsSingleSelection ? 'pt-[10px]' : '',
+        isFirstFoodSelected
+          ? 'border-t border-neutralGray3 pt-[10px] mt-[10px]'
+          : '',
       )}>
       <div className={css.label}>
         <span className="flex items-center gap-2">
