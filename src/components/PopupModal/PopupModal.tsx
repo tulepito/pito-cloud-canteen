@@ -68,6 +68,10 @@ const PopupModal: React.FC<PopupModalProps> = (props) => {
     };
   }, [dispatch, id, isOpen]);
 
+  if (!isOpen) {
+    return null;
+  }
+
   return (
     <div id={id} className={classes}>
       <RenderWhen condition={shouldShowOverlay}>
