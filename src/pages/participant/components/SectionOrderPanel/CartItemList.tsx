@@ -48,7 +48,6 @@ const CartItemList: React.FC<TCartItemList> = ({
 
     const foodList = plan?.[key]?.foodList || [];
 
-    // Món đầu tiên
     const selectedDish =
       foodId === 'notJoined'
         ? null
@@ -60,7 +59,6 @@ const CartItemList: React.FC<TCartItemList> = ({
         ? intl.formatMessage({ id: 'SectionOrderPanel.notJoined' })
         : dishAttributes?.title;
 
-    // Món thứ 2 (nếu có)
     const secondDish =
       secondaryFoodId && secondaryFoodId !== 'notJoined'
         ? foodList.find((food: any) => food?.id?.uuid === secondaryFoodId)

@@ -1,6 +1,4 @@
-import { useRef } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { toast } from 'react-toastify';
 import classNames from 'classnames';
 import { DateTime } from 'luxon';
 import { useRouter } from 'next/router';
@@ -12,10 +10,10 @@ import Tabs from '@components/Tabs/Tabs';
 import Tooltip from '@components/Tooltip/Tooltip';
 import { isOrderOverDeadline as isOverDeadline } from '@helpers/orderHelper';
 import { useAppSelector } from '@hooks/reduxHooks';
+import { hasDishInCart } from '@hooks/useHasDishInCart';
 import { useViewport } from '@hooks/useViewport';
 import type { TPlanData } from '@src/types/order';
 import { Listing } from '@src/utils/data';
-import { formatTimestamp } from '@src/utils/dates';
 import { EOrderStates } from '@src/utils/enums';
 
 import { listingLoading } from './Loading';
@@ -27,12 +25,20 @@ type TSectionOrderListingProps = {
   plan: TPlanData;
   onSelectTab: (restaurant: any) => void;
   orderDay: string;
+  onAddedToCart: ({
+    foodName,
+    timestamp,
+  }: {
+    foodName?: string;
+    timestamp: string;
+  }) => void;
 };
 
 const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
   plan,
   onSelectTab,
   orderDay,
+  onAddedToCart,
 }) => {
   const intl = useIntl();
 
@@ -56,68 +62,16 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
   const submitDataInprogress = useAppSelector(
     (state) => state.ParticipantPlanPage.submitDataInprogress,
   );
+
+  const isAllowAddSecondaryFood = useAppSelector(
+    (state) => state.ParticipantPlanPage.isAllowAddSecondaryFood,
+  );
   const orderListing = Listing(order);
   const { orderState } = orderListing.getMetadata();
   const isOrderDeadlineOver = isOverDeadline(order);
   const isOrderAlreadyStarted = orderState !== EOrderStates.picking;
 
-  const getNextSubOrderDay = (dayId: string) => {
-    const subOrderDates = Object.keys(plan);
-
-    const dayIndex = subOrderDates.findIndex((item) => item === dayId);
-    const firstDayIndexNotHaveDish = subOrderDates.findIndex(
-      (item) => !cartList?.[+item]?.foodId,
-    );
-    const nextDayIndex =
-      subOrderDates.length - 1 === dayIndex
-        ? firstDayIndexNotHaveDish !== -1
-          ? firstDayIndexNotHaveDish
-          : dayIndex
-        : dayIndex + 1;
-
-    return (
-      subOrderDates[nextDayIndex] || subOrderDates[firstDayIndexNotHaveDish]
-    );
-  };
-
-  const scrollTimeoutRef = useRef<any | null>(null);
   const { isMobileLayout } = useViewport();
-
-  const onAddedToCart = ({
-    foodName,
-    timestamp,
-  }: {
-    foodName?: string;
-    timestamp: string;
-  }) => {
-    toast.success(
-      foodName
-        ? `${intl.formatMessage({
-            id: 'da-them-mon',
-          })} ${foodName} ${intl.formatMessage({
-            id: 'cho-ngay',
-          })} ${formatTimestamp(+timestamp)}`
-        : `${intl.formatMessage({
-            id: 'khong-chon-mon-cho-ngay',
-          })} ${formatTimestamp(+timestamp)}`,
-      {
-        position: isMobileLayout ? 'top-center' : 'bottom-center',
-        toastId: 'add-to-cart',
-        updateId: 'add-to-cart',
-        pauseOnHover: false,
-        autoClose: 3000,
-      },
-    );
-
-    scrollTimeoutRef.current = setTimeout(() => {
-      const nextDate = getNextSubOrderDay(timestamp);
-      onSelectTab({ id: nextDate });
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth',
-      });
-    }, 1000);
-  };
 
   const convertDataToTabItem = () => {
     if (loadDataInProgress) {
@@ -128,7 +82,12 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
       const isLast = oIndex === Object.keys(plan).length - 1;
       const { foodList, restaurant } = plan[item];
       const cartItem = cartList?.[item] || {};
-      const hasDishInCart = cartItem.foodId;
+
+      const hasDishInCartValue = hasDishInCart(
+        cartItem,
+        foodList,
+        isAllowAddSecondaryFood,
+      );
       const planDate = DateTime.fromMillis(Number(item)).toJSDate();
       const weekdayLabel = intl.formatMessage({
         id: `Calendar.week.dayHeader.${planDate.getDay()}`,
@@ -153,8 +112,8 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
                 <span className={css.tabMonth}>/{monthNumber}</span>
               </div>
               <div className={css.tabWeekday}>{weekdayLabel}</div>
-              {hasDishInCart &&
-                (hasDishInCart === 'notJoined' ? (
+              {hasDishInCartValue &&
+                (hasDishInCartValue === 'notJoined' ? (
                   <Tooltip tooltipContent={'meow'}>
                     <IconBanned className={css.tabTitleIcon} />
                   </Tooltip>
@@ -175,8 +134,8 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
             <div>
               {weekdayLabel}, {dateNumber}/{monthNumber}
             </div>
-            {hasDishInCart &&
-              (hasDishInCart === 'notJoined' ? (
+            {hasDishInCartValue &&
+              (hasDishInCartValue === 'notJoined' ? (
                 <Tooltip tooltipContent={'meow'}>
                   <IconBanned className={css.tabTitleIcon} />
                 </Tooltip>
@@ -200,7 +159,7 @@ const SectionOrderListing: React.FC<TSectionOrderListingProps> = ({
 
       const childrenList = foodList.map((dish, index) => {
         const dishId = dish?.id?.uuid;
-        const isFirstSelected = hasDishInCart === dishId;
+        const isFirstSelected = cartItem.foodId === dishId;
         const isSecondSelected = cartItem.secondaryFoodId === dishId;
 
         return (

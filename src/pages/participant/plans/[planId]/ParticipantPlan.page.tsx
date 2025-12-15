@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
+import { toast } from 'react-toastify';
 import classNames from 'classnames';
 import isEmpty from 'lodash/isEmpty';
 import { ShoppingCartIcon } from 'lucide-react';
@@ -20,6 +21,7 @@ import { useViewport } from '@hooks/useViewport';
 import { UIActions } from '@redux/slices/UI.slice';
 import type { RootState } from '@redux/store';
 import { participantPaths } from '@src/paths';
+import { formatTimestamp } from '@src/utils/dates';
 import { EOrderType } from '@src/utils/enums';
 import { Listing } from '@utils/data';
 
@@ -164,6 +166,63 @@ const ParticipantPlan = () => {
     });
   };
 
+  const getNextSubOrderDay = (dayId: string) => {
+    const subOrderDates = Object.keys(plan);
+
+    const dayIndex = subOrderDates.findIndex((item) => item === dayId);
+    const firstDayIndexNotHaveDish = subOrderDates.findIndex(
+      (item) => !cartList?.[+item]?.foodId,
+    );
+    const nextDayIndex =
+      subOrderDates.length - 1 === dayIndex
+        ? firstDayIndexNotHaveDish !== -1
+          ? firstDayIndexNotHaveDish
+          : dayIndex
+        : dayIndex + 1;
+
+    return (
+      subOrderDates[nextDayIndex] || subOrderDates[firstDayIndexNotHaveDish]
+    );
+  };
+
+  const scrollTimeoutRef = useRef<any | null>(null);
+
+  const onAddedToCart = ({
+    foodName,
+    timestamp,
+  }: {
+    foodName?: string;
+    timestamp: string;
+  }) => {
+    toast.success(
+      foodName
+        ? `${intl.formatMessage({
+            id: 'da-them-mon',
+          })} ${foodName} ${intl.formatMessage({
+            id: 'cho-ngay',
+          })} ${formatTimestamp(+timestamp)}`
+        : `${intl.formatMessage({
+            id: 'khong-chon-mon-cho-ngay',
+          })} ${formatTimestamp(+timestamp)}`,
+      {
+        position: isMobileLayout ? 'top-center' : 'bottom-center',
+        toastId: 'add-to-cart',
+        updateId: 'add-to-cart',
+        pauseOnHover: false,
+        autoClose: 3000,
+      },
+    );
+
+    scrollTimeoutRef.current = setTimeout(() => {
+      const nextDate = getNextSubOrderDay(timestamp);
+      handleSelectRestaurant({ id: nextDate });
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      });
+    }, 1000);
+  };
+
   const isAllDaysHaveDishInCart =
     !!Object.keys(plan).length &&
     Object.keys(plan).every((timestamp) => cartList?.[+timestamp]?.foodId);
@@ -210,6 +269,7 @@ const ParticipantPlan = () => {
             plan={plan}
             onSelectTab={handleSelectRestaurant}
             orderDay={`${orderDayState}`}
+            onAddedToCart={onAddedToCart}
           />
         </div>
         <div className={css.rightSection}>
@@ -267,6 +327,7 @@ const ParticipantPlan = () => {
               orderId={orderId}
               orderDay={`${orderDayState}`}
               isOrderDeadlineOver={isOrderDeadlineOver}
+              onAddedToCart={onAddedToCart}
             />
           )}
         </div>

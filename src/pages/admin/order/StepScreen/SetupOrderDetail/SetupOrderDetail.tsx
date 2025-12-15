@@ -26,6 +26,7 @@ import { getItem } from '@helpers/localStorageHelpers';
 import { findSuitableAnchorDate } from '@helpers/order/prepareDataHelper';
 import {
   adjustFoodListPrice,
+  getIsAllowAddSecondaryFood,
   getRestaurantListFromOrderDetail,
   getSelectedRestaurantAndFoodList,
   getUpdateLineItems,
@@ -33,7 +34,6 @@ import {
 } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
-import { getIsAllowAddSecondFood } from '@hooks/useIsAllowAddSecondFood';
 import { normalizePlanDetailsToEvent } from '@pages/company/booker/orders/draft/[orderId]/helpers/normalizeData';
 import { BookerSelectRestaurantThunks } from '@pages/company/booker/orders/draft/[orderId]/restaurants/BookerSelectRestaurant.slice';
 import { useGetCalendarExtraResources } from '@pages/company/booker/orders/draft/[orderId]/restaurants/hooks/calendar';
@@ -188,7 +188,6 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     daySession,
     orderStateHistory,
     orderType = EOrderType.group,
-    companyId,
   } = orderGetter.getMetadata();
   const { title: orderTitle } = orderGetter.getAttributes();
   const orderId = orderGetter.getId();
@@ -312,7 +311,10 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     const { restaurant, selectedFoodList } = values;
     const foodIds = Object.keys(selectedFoodList);
     const subOrderDate = (selectedDate as Date).getTime();
-    const adjustedFoodList = adjustFoodListPrice(selectedFoodList, companyId);
+    const adjustedFoodList = adjustFoodListPrice(
+      selectedFoodList,
+      order as TListing,
+    );
     const restaurantData = {
       restaurant: {
         id: restaurant.id,
@@ -396,8 +398,10 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
       );
     } else {
       dispatch(setCanNotGoAfterOderDetail(true));
-      const isCompanyAllowDualSelection = getIsAllowAddSecondFood(companyId);
-      const lineItems = isCompanyAllowDualSelection
+      const isOrderAllowAddSecondaryFood = getIsAllowAddSecondaryFood(
+        order as TListing,
+      );
+      const lineItems = isOrderAllowAddSecondaryFood
         ? Object.entries(adjustedFoodList).map(
             ([foodId, { foodName, foodPrice }]: [string, any]) => {
               return {
@@ -863,7 +867,9 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
           ),
         );
 
-        const isCompanyAllowDualSelection = getIsAllowAddSecondFood(companyId);
+        const isOrderAllowAddSecondaryFood = getIsAllowAddSecondaryFood(
+          order as TListing,
+        );
 
         const newOrderDetail = totalDates.reduce((result, curr) => {
           const currWeekday = convertWeekDay(
@@ -910,8 +916,8 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
               );
 
               // Adjust the food list price if the company is allowed to add a second food
-              const adjustedFoodList = isCompanyAllowDualSelection
-                ? adjustFoodListPrice(newFoodList, companyId)
+              const adjustedFoodList = isOrderAllowAddSecondaryFood
+                ? adjustFoodListPrice(newFoodList, order as TListing)
                 : newFoodList;
 
               return {

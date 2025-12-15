@@ -7,6 +7,7 @@ import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
 import { isOrderOverDeadline } from '@helpers/orderHelper';
 import Tracker from '@helpers/tracker';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
+import { hasDishInCart } from '@hooks/useHasDishInCart';
 import { useViewport } from '@hooks/useViewport';
 import { totalFoodPickedWithParticipant } from '@pages/participant/helpers';
 import { shoppingCartThunks } from '@redux/slices/shoppingCart.slice';
@@ -47,10 +48,19 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
     (state) => state.ParticipantPlanPage.submitDataInprogress,
   );
 
-  const orderDays = Object.keys(plan);
-  const cartListKeys = Object.keys(cartList || []).filter(
-    (cartKey) => !!cartList[Number(cartKey)]?.foodId,
+  const isAllowAddSecondaryFood = useAppSelector(
+    (state) => state.ParticipantPlanPage.isAllowAddSecondaryFood,
   );
+
+  const orderDays = Object.keys(plan);
+  const cartListKeys = Object.keys(cartList || []).filter((cartKey) => {
+    const cartItem = cartList[Number(cartKey)];
+    const dayId = cartKey;
+    const foodList = plan[dayId]?.foodList || [];
+    const hasDish = hasDishInCart(cartItem, foodList, isAllowAddSecondaryFood);
+
+    return Boolean(hasDish);
+  });
 
   const isOrderDeadlineOver = isOrderOverDeadline(order);
   const { deadlineDate = Date.now(), deadlineHour } =
@@ -133,7 +143,12 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
   return (
     <div className={classNames(css.root, isMobileLayout ? 'mb-[180px]' : '')}>
       <OrderPanelHeader
-        selectedDays={totalFoodPickedWithParticipant(orderDetailIds, cartList)}
+        selectedDays={totalFoodPickedWithParticipant(
+          orderDetailIds,
+          cartList,
+          plan,
+          isAllowAddSecondaryFood,
+        )}
         sumDays={orderDays.length}
       />
       <OrderPanelBody

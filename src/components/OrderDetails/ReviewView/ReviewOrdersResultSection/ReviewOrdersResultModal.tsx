@@ -1034,6 +1034,7 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
                 id: 'ReviewOrdersResultModal.tableHead.foodName',
               })}
             </div>
+            <div className="flex-1">MÓN ĂN 2</div>
             <div className="flex-1">
               {intl.formatMessage({
                 id: 'ReviewOrdersResultModal.tableHead.price',

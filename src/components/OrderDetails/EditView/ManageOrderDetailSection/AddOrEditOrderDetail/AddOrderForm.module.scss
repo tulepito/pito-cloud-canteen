@@ -98,6 +98,24 @@
     column-gap: 8px;
     align-items: center;
   }
+
+  .fieldRequirementContainer {
+    margin-top: 12px;
+    padding: 12px 0;
+
+    &:not(:first-of-type) {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(141, 141, 141, 0.12);
+    }
+  }
+
+  .requirementFoodLabel {
+    font-size: 14px;
+    font-weight: $fontWeightSemiBold;
+    color: rgba(0, 0, 0, 0.88);
+    margin-bottom: 8px;
+  }
 }
 
 .error {
