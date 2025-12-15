@@ -108,6 +108,10 @@ const Modal: React.FC<TModalProps> = (props) => {
     };
   }, [dispatch, id, isOpen]);
 
+  if (!isOpen) {
+    return null;
+  }
+
   return (
     <div id={id} className={classes}>
       <div className={scrollLayerClasses}>
