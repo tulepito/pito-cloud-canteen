@@ -211,11 +211,18 @@ export const useDualFoodSelection = ({
       const firstFoodName = cartItem.foodId
         ? foodList.find((f) => f.id?.uuid === cartItem.foodId)?.attributes
             ?.title || ''
-        : '';
-      _onAddedToCart?.({
-        foodName: `${firstFoodName} + ${mealTitle}`,
-        timestamp: dayId,
-      });
+        : undefined;
+      if (firstFoodName) {
+        _onAddedToCart?.({
+          foodName: `${firstFoodName} + ${mealTitle}`,
+          timestamp: dayId,
+        });
+      } else {
+        _onAddedToCart?.({
+          foodName: mealTitle,
+          timestamp: dayId,
+        });
+      }
     } else {
       toast.success(
         intl.formatMessage({

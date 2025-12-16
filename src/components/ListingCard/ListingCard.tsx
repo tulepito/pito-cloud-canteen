@@ -247,7 +247,7 @@ const ListingCard: React.FC<TListCardProps> = ({
               <Badge
                 className={css.badge}
                 label="Chọn 1 món"
-                type={EBadgeType.info}
+                type={EBadgeType.success}
               />
             )}
           </div>
@@ -257,7 +257,7 @@ const ListingCard: React.FC<TListCardProps> = ({
                 <Badge
                   className="flex-shrink-0 text-[11px] px-2 py-0.5 rounded-xl"
                   label="Món 1"
-                  type={EBadgeType.success}
+                  type={EBadgeType.info}
                 />
               )}
             {isAllowAddSecondaryFood &&
@@ -265,7 +265,7 @@ const ListingCard: React.FC<TListCardProps> = ({
                 <Badge
                   className="flex-shrink-0 text-[11px] px-2 py-0.5 rounded-xl"
                   label="Món 2"
-                  type={EBadgeType.success}
+                  type={EBadgeType.info}
                 />
               )}
           </div>

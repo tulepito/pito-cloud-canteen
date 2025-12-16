@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -14,10 +15,11 @@ import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import IconArrowFull from '@components/Icons/IconArrow/IconArrowFull';
 import ParticipantLayout from '@components/ParticipantLayout/ParticipantLayout';
 import { prepareOrderDeadline } from '@helpers/order/prepareDataHelper';
-import { isOrderOverDeadline } from '@helpers/orderHelper';
+import { getIsAllowAddSecondaryFood, isOrderOverDeadline } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { useViewport } from '@hooks/useViewport';
+import { totalFoodPickedWithParticipant } from '@pages/participant/helpers';
 import { UIActions } from '@redux/slices/UI.slice';
 import type { RootState } from '@redux/store';
 import { participantPaths } from '@src/paths';
@@ -61,15 +63,13 @@ const ParticipantPlan = () => {
   const orderId = order?.id?.uuid;
 
   const orderDays = Object.keys(plan);
-  const cartListKeys = Object.keys(cartList || []).filter(
-    (cartKey) => !!cartList[Number(cartKey)]?.foodId,
-  );
 
   const {
     deadlineDate = Date.now(),
     deadlineHour,
     orderType = EOrderType.group,
   } = Listing(order).getMetadata();
+  const isAllowAddSecondaryFood = getIsAllowAddSecondaryFood(order);
   const isGroupOrder = orderType === EOrderType.group;
   const isOrderDeadlineOver = isOrderOverDeadline(order);
 
@@ -197,13 +197,13 @@ const ParticipantPlan = () => {
     toast.success(
       foodName
         ? `${intl.formatMessage({
-            id: 'da-them-mon',
-          })} ${foodName} ${intl.formatMessage({
-            id: 'cho-ngay',
-          })} ${formatTimestamp(+timestamp)}`
+          id: 'da-them-mon',
+        })} ${foodName} ${intl.formatMessage({
+          id: 'cho-ngay',
+        })} ${formatTimestamp(+timestamp)}`
         : `${intl.formatMessage({
-            id: 'khong-chon-mon-cho-ngay',
-          })} ${formatTimestamp(+timestamp)}`,
+          id: 'khong-chon-mon-cho-ngay',
+        })} ${formatTimestamp(+timestamp)}`,
       {
         position: isMobileLayout ? 'top-center' : 'bottom-center',
         toastId: 'add-to-cart',
@@ -222,10 +222,14 @@ const ParticipantPlan = () => {
       });
     }, 1000);
   };
-
+  const selectedDays = totalFoodPickedWithParticipant(
+    orderDays,
+    cartList,
+    plan,
+    isAllowAddSecondaryFood,
+  );
   const isAllDaysHaveDishInCart =
-    !!Object.keys(plan).length &&
-    Object.keys(plan).every((timestamp) => cartList?.[+timestamp]?.foodId);
+    selectedDays === orderDays.length;
 
   const selectedDayDate =
     orderDayState && Number(orderDayState)
@@ -233,8 +237,8 @@ const ParticipantPlan = () => {
       : null;
   const selectedDayLabel = selectedDayDate
     ? `${intl.formatMessage({
-        id: `Calendar.week.dayHeader.${selectedDayDate.getDay()}`,
-      })}, ${selectedDayDate.getDate()}/${selectedDayDate.getMonth() + 1}`
+      id: `Calendar.week.dayHeader.${selectedDayDate.getDay()}`,
+    })}, ${selectedDayDate.getDate()}/${selectedDayDate.getMonth() + 1}`
     : '';
 
   return (
@@ -247,7 +251,8 @@ const ParticipantPlan = () => {
             onClick={showMobileInfoSection}>
             <ShoppingCartIcon className="w-4 h-4" />
             <span className={css.cartCornerBadge}>
-              {cartListKeys.length}/{orderDays.length}
+              {selectedDays}
+              /{orderDays.length}
             </span>
           </button>
         )}
@@ -315,7 +320,7 @@ const ParticipantPlan = () => {
                 {intl.formatMessage(
                   { id: 'ParticipantPlan.summary.selections' },
                   {
-                    selectedDays: cartListKeys.length,
+                    selectedDays,
                     totalDays: orderDays.length,
                   },
                 )}

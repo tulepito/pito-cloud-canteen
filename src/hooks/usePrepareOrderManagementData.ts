@@ -357,6 +357,10 @@ export const usePrepareOrderDetailPageData = ({
       orderNote,
       disabled: orderState !== EOrderStates.picking,
     },
+    isSecondaryFoodAllowedOrder:
+      orderType === EOrderType.group
+        ? getIsAllowAddSecondaryFood(orderData as TListing)
+        : false,
   };
   /* =============== Price quotation data =============== */
   const priceQuotationData = {

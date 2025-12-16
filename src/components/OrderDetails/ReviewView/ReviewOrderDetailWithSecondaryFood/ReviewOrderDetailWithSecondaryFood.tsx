@@ -158,7 +158,6 @@ const ReviewOrderDetailWithSecondaryFood: React.FC<
         {foodOrderGroupedByDate.map((dateData: TObject) => {
           const {
             date,
-            totalDishes,
             totalPrice,
             foodDataList,
             restaurantName = '',
@@ -252,7 +251,9 @@ const ReviewOrderDetailWithSecondaryFood: React.FC<
                         {nonRiceDishes.map(
                           (food: TFoodDataValue, idx: number) => (
                             <div className={css.row} key={food.foodId}>
-                              <div>{(index as number) + 1}.1.{idx + 1}</div>
+                              <div>
+                                {(index as number) + 1}.1.{idx + 1}
+                              </div>
                               <div>{food.foodName}</div>
                               <div></div>
                               <div>
@@ -324,32 +325,32 @@ const ReviewOrderDetailWithSecondaryFood: React.FC<
                     {/* Note + detail rows for rice dishes */}
                     <RenderWhen condition={!subState.rice}>
                       <div className={css.subRows}>
-                        {riceDishes.map(
-                          (food: TFoodDataValue, idx: number) => (
-                            <div className={css.row} key={food.foodId}>
-                              <div>{(index as number) + 1}.2.{idx + 1}</div>
-                              <div>{food.foodName}</div>
-                              <div></div>
-                              <div>
-                                <RenderWhen condition={isMobileLayout}>
-                                  <span>
-                                    {intl.formatMessage(
-                                      {
-                                        id: 'ReviewOrderDetailWithSecondaryFood.quantityLabel',
-                                      },
-                                      { quantity: food.frequency },
-                                    )}
-                                  </span>
-                                  <RenderWhen.False>
-                                    {food.frequency}
-                                  </RenderWhen.False>
-                                </RenderWhen>
-                              </div>
-                              <div></div>
-                              <div></div>
+                        {riceDishes.map((food: TFoodDataValue, idx: number) => (
+                          <div className={css.row} key={food.foodId}>
+                            <div>
+                              {(index as number) + 1}.2.{idx + 1}
                             </div>
-                          ),
-                        )}
+                            <div>{food.foodName}</div>
+                            <div></div>
+                            <div>
+                              <RenderWhen condition={isMobileLayout}>
+                                <span>
+                                  {intl.formatMessage(
+                                    {
+                                      id: 'ReviewOrderDetailWithSecondaryFood.quantityLabel',
+                                    },
+                                    { quantity: food.frequency },
+                                  )}
+                                </span>
+                                <RenderWhen.False>
+                                  {food.frequency}
+                                </RenderWhen.False>
+                              </RenderWhen>
+                            </div>
+                            <div></div>
+                            <div></div>
+                          </div>
+                        ))}
                       </div>
                     </RenderWhen>
                   </>

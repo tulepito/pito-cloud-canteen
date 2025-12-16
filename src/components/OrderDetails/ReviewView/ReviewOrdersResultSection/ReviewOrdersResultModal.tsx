@@ -1034,7 +1034,6 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
                 id: 'ReviewOrdersResultModal.tableHead.foodName',
               })}
             </div>
-            <div className="flex-1">MÓN ĂN 2</div>
             <div className="flex-1">
               {intl.formatMessage({
                 id: 'ReviewOrdersResultModal.tableHead.price',
@@ -1174,96 +1173,104 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
                             </div>
                             <RenderWhen condition={isExpanding}>
                               <div className="w-full">
-                                {group?.orderData?.map((row: TObject) => {
-                                  const {
-                                    memberData,
-                                    foodData: {
-                                      foodId,
-                                      foodName,
-                                      foodPrice = 0,
-                                      requirement,
-                                    },
-                                  } = row;
-                                  const {
-                                    name: memberName,
-                                    id: memberId,
-                                    email,
-                                  } = memberData || {};
+                                {group?.orderData
+                                  .sort((a: TObject, b: TObject) => {
+                                    return (
+                                      a.memberData.memberName -
+                                      b.memberData.memberName
+                                    );
+                                  })
+                                  ?.map((row: TObject) => {
+                                    const {
+                                      memberData,
+                                      foodData: {
+                                        foodId,
+                                        foodName,
+                                        foodPrice = 0,
+                                        requirement,
+                                      },
+                                    } = row;
+                                    const {
+                                      name: memberName,
+                                      id: memberId,
+                                      email,
+                                    } = memberData || {};
 
-                                  const isMealItemFailed = (
-                                    mealItemsFailed[date] || []
-                                  ).some(
-                                    (item) =>
-                                      item.memberId === memberId &&
-                                      item.foodId === foodId,
-                                  );
+                                    const isMealItemFailed = (
+                                      mealItemsFailed[date] || []
+                                    ).some(
+                                      (item) =>
+                                        item.memberId === memberId &&
+                                        item.foodId === foodId,
+                                    );
 
-                                  return (
-                                    <div
-                                      key={`${memberId}-${foodId}`}
-                                      className="flex items-center w-full">
-                                      <div className="flex items-center flex-1 text-xs p-2 gap-2">
-                                        <div className="flex-1 basis-[80px] font-semibold">
-                                          {memberName}
-                                          <br />
-                                          <span className="text-gray-500">
-                                            {email}
-                                          </span>
-                                        </div>
+                                    return (
+                                      <div
+                                        key={`${memberId}-${foodId}`}
+                                        className="flex items-center w-full">
+                                        <div className="flex items-center flex-1 text-xs p-2 gap-2">
+                                          <div className="flex-1 basis-[80px] font-semibold">
+                                            {memberName}
+                                            <br />
+                                            <span className="text-gray-500">
+                                              {email}
+                                            </span>
+                                          </div>
 
-                                        <div className="text-xs flex-1 font-semibold">
-                                          {foodName}
-                                        </div>
-                                        <div className="text-xs flex-1">{`${parseThousandNumber(
-                                          foodPrice,
-                                        )}đ`}</div>
-                                        {requirement ? (
-                                          <Tooltip
-                                            overlayClassName={
-                                              css.requirementTooltip
-                                            }
-                                            tooltipContent={requirement}
-                                            placement="bottomLeft">
-                                            <div className="flex-1">
-                                              {requirement}
-                                            </div>
-                                          </Tooltip>
-                                        ) : (
-                                          <div className="flex-1">-</div>
-                                        )}
-                                        <div className="text-xs flex-1">
-                                          <ReasonFieldMealItemFailed
-                                            readOnly={!isAdmin}
-                                            checked={isMealItemFailed}
-                                            initialReason={
-                                              (
-                                                mealItemsFailed[date] || []
-                                              ).find(
-                                                (i) => i.memberId === memberId,
-                                              )?.reason ?? ''
-                                            }
-                                            onChange={(checked, reason) =>
-                                              onCheckMealItemFailed({
-                                                timestamp: date,
-                                                foodId,
-                                                memberId,
-                                                reason: checked ? reason : '',
-                                              })
-                                            }
-                                            onChangeReasonInput={(reason) =>
-                                              onChangeReasonInput({
-                                                timestamp: date,
-                                                foodId,
-                                                memberId,
-                                                reason,
-                                              })
-                                            }
-                                          />
+                                          <div className="text-xs flex-1 font-semibold">
+                                            {foodName}
+                                          </div>
+                                          <div className="text-xs flex-1">{`${parseThousandNumber(
+                                            foodPrice,
+                                          )}đ`}</div>
+                                          {requirement ? (
+                                            <Tooltip
+                                              overlayClassName={
+                                                css.requirementTooltip
+                                              }
+                                              tooltipContent={requirement}
+                                              placement="bottomLeft">
+                                              <div className="flex-1">
+                                                {requirement}
+                                              </div>
+                                            </Tooltip>
+                                          ) : (
+                                            <div className="flex-1">-</div>
+                                          )}
+                                          <div className="text-xs flex-1">
+                                            <ReasonFieldMealItemFailed
+                                              readOnly={!isAdmin}
+                                              checked={isMealItemFailed}
+                                              initialReason={
+                                                (
+                                                  mealItemsFailed[date] || []
+                                                ).find(
+                                                  (i) =>
+                                                    i.memberId === memberId,
+                                                )?.reason ?? ''
+                                              }
+                                              onChange={(checked, reason) =>
+                                                onCheckMealItemFailed({
+                                                  timestamp: date,
+                                                  foodId,
+                                                  memberId,
+                                                  reason: checked ? reason : '',
+                                                })
+                                              }
+                                              onChangeReasonInput={(reason) =>
+                                                onChangeReasonInput({
+                                                  timestamp: date,
+                                                  foodId,
+                                                  memberId,
+                                                  reason,
+                                                })
+                                              }
+                                            />
+                                          </div>
                                         </div>
                                       </div>
-                                    </div>
-                                  );
-                                })}
+                                    );
+                                  })}
                               </div>
                             </RenderWhen>
                           </React.Fragment>

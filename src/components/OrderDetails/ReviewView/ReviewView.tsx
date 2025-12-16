@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import classNames from 'classnames';
 
 import RenderWhen from '@components/RenderWhen/RenderWhen';
-import { getIsAllowAddSecondaryFood } from '@helpers/orderHelper';
 import { useAppDispatch } from '@hooks/reduxHooks';
 import { useViewport } from '@hooks/useViewport';
 import OrderDetailTrackingSection from '@pages/company/orders/[orderId]/components/OrderDetailTrackingSection';
@@ -80,9 +79,11 @@ const ReviewView: React.FC<TReviewViewProps> = (props) => {
 
   const { quotationId } = Listing(orderData!).getMetadata();
 
-  const isSecondaryFoodAllowedOrder = getIsAllowAddSecondaryFood(
-    orderData as TListing,
-  );
+  const isSecondaryFoodAllowedOrder =
+    reviewViewData?.isSecondaryFoodAllowedOrder;
+
+  console.log('orderData', orderData);
+  console.log('isSecondaryFoodAllowedOrder', isSecondaryFoodAllowedOrder);
 
   const isGroupOrder = reviewViewData?.isGroupOrder;
   const rootClasses = classNames(rootClassName || css.root, className);
