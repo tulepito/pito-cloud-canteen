@@ -3,11 +3,11 @@ import classNames from 'classnames';
 import Badge, { EBadgeType } from '@components/Badge/Badge';
 import IconCheckmarkWithCircle from '@components/Icons/IconCheckmark/IconCheckmarkWithCircle';
 import IconPlusDish from '@components/Icons/IconPlusDish/IconPlusDish';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { useDualFoodSelection } from '@hooks/useDualFoodSelection';
 import { useSingleFoodSelection } from '@hooks/useSingleFoodSelection';
-import { useViewport } from '@hooks/useViewport';
 import { getLabelByKey, useFoodTypeOptionsByLocale } from '@src/utils/options';
 import { Listing } from '@utils/data';
 
@@ -115,8 +115,6 @@ const ListingCard: React.FC<TListCardProps> = ({
     }
   };
 
-  const { isMobileLayout } = useViewport();
-
   return (
     <div className={classes}>
       <div
@@ -125,51 +123,118 @@ const ListingCard: React.FC<TListCardProps> = ({
           'transition-all duration-200',
         )}>
         <div className={css.listingCardInfo} onClick={viewListingDetail}>
-          <div
-            className={classNames(
-              'items-center gap-2 mb-1',
-              isMobileLayout
-                ? 'grid grid-cols-[minmax(0,1fr)_auto]'
-                : 'grid grid-cols-1',
-            )}>
-            <h6 className={css.title}>{title}</h6>
+          <div className={classNames('items-center gap-2 mb-1 flex')}>
+            <h6 className={classNames(css.title, 'flex-1')}>{title}</h6>
             <div className="flex items-center justify-start gap-2">
-              {isMobileLayout && !isAllowAddSecondaryFood && (
-                <>
-                  {(selection.isFoodSelected || isSelected) && (
-                    <span
-                      className={classNames(css.removeDish, css.flip)}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        selection.handleRemoveFromCart();
-                      }}
-                      title={selection.getRemoveDishTooltip()}>
-                      <IconCheckmarkWithCircle className="items-center" />
-                    </span>
-                  )}
-                  {!selection.isFoodSelected &&
-                    !isSelected &&
-                    singleFoodSelection.canShowAddButton && (
+              <div className="flex items-center gap-2">
+                {(selection.isFoodSelected || isSelected) && (
+                  <span
+                    className={classNames(css.removeDish, css.flip)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      selection.handleRemoveFromCart();
+                    }}
+                    title={selection.getRemoveDishTooltip()}>
+                    <IconCheckmarkWithCircle className="items-center" />
+                  </span>
+                )}
+                {isAllowAddSecondaryFood && (
+                  <>
+                    {dualFoodSelection.canShowAddAsSecondFood &&
+                      !dualFoodSelection.isSecondaryAddDisabled && (
+                        <span
+                          className={classNames(
+                            css.addDish,
+                            'ml-auto',
+                            dualFoodSelection.isSecondaryAddDisabled &&
+                              css.selectDisabled,
+                          )}
+                          onClick={
+                            dualFoodSelection.isSecondaryAddDisabled
+                              ? undefined
+                              : (e) => {
+                                  e.stopPropagation();
+                                  dualFoodSelection.handleAddToCart();
+                                }
+                          }
+                          title={
+                            dualFoodSelection.isSecondaryAddDisabled
+                              ? 'Không thể chọn thêm món này'
+                              : 'Thêm món này lần nữa (x2 định lượng)'
+                          }>
+                          <IconPlusDish />
+                        </span>
+                      )}
+                    {dualFoodSelection.canShowAddSecondOption && (
                       <span
-                        className={classNames(css.addDish)}
+                        className={classNames(
+                          css.addDish,
+                          dualFoodSelection.isSecondaryAddDisabled &&
+                            css.selectDisabled,
+                        )}
                         onClick={
-                          singleFoodSelection.isAddDisabled
+                          dualFoodSelection.isSecondaryAddDisabled
                             ? undefined
                             : (e) => {
                                 e.stopPropagation();
-                                singleFoodSelection.handleAddToCart();
+                                dualFoodSelection.handleAddToCart();
                               }
                         }
                         title={
-                          singleFoodSelection.isAddDisabled
+                          dualFoodSelection.isSecondaryAddDisabled
+                            ? 'Không thể chọn thêm món thứ 2'
+                            : 'Thêm món thứ 2 (tùy chọn)'
+                        }>
+                        <IconPlusDish />
+                      </span>
+                    )}
+                    {dualFoodSelection.canShowPrimaryAdd && (
+                      <span
+                        className={classNames(
+                          css.addDish,
+                          dualFoodSelection.isPrimaryAddDisabled &&
+                            css.selectDisabled,
+                        )}
+                        onClick={
+                          dualFoodSelection.isPrimaryAddDisabled
+                            ? undefined
+                            : (e) => {
+                                e.stopPropagation();
+                                dualFoodSelection.handleAddToCart();
+                              }
+                        }
+                        title={
+                          dualFoodSelection.isPrimaryAddDisabled
                             ? 'Không thể chọn món này'
                             : 'Thêm món'
                         }>
                         <IconPlusDish />
                       </span>
                     )}
-                </>
-              )}
+                  </>
+                )}
+                {/* Logic cho single food selection */}
+                {!isAllowAddSecondaryFood &&
+                  singleFoodSelection.canShowAddButton && (
+                    <span
+                      className={classNames(css.addDish)}
+                      onClick={
+                        singleFoodSelection.isAddDisabled
+                          ? undefined
+                          : (e) => {
+                              e.stopPropagation();
+                              singleFoodSelection.handleAddToCart();
+                            }
+                      }
+                      title={
+                        singleFoodSelection.isAddDisabled
+                          ? 'Không thể chọn món này'
+                          : 'Thêm món'
+                      }>
+                      <IconPlusDish />
+                    </span>
+                  )}
+              </div>
             </div>
           </div>
           <div className={css.categories} style={{ marginTop: '8px' }}>
@@ -206,105 +271,15 @@ const ListingCard: React.FC<TListCardProps> = ({
           </div>
           <p className={css.description}>{description}</p>
         </div>
-        <div className={css.listingCardFooter}>
-          <p className={css.allergiesLabel}>
-            {allergicIngredients.map((item: string) => `Có ${item}`).join(', ')}
-          </p>
-          <div className="flex items-center gap-2">
-            {(selection.isFoodSelected || isSelected) && (
-              <span
-                className={classNames(css.removeDish, css.flip)}
-                onClick={selection.handleRemoveFromCart}
-                title={selection.getRemoveDishTooltip()}>
-                <IconCheckmarkWithCircle className="items-center" />
-              </span>
-            )}
-            {isAllowAddSecondaryFood && (
-              <>
-                {dualFoodSelection.canShowAddAsSecondFood &&
-                  !dualFoodSelection.isSecondaryAddDisabled && (
-                    <span
-                      className={classNames(
-                        css.addDish,
-                        'ml-auto',
-                        dualFoodSelection.isSecondaryAddDisabled &&
-                          css.selectDisabled,
-                      )}
-                      onClick={
-                        dualFoodSelection.isSecondaryAddDisabled
-                          ? undefined
-                          : dualFoodSelection.handleAddToCart
-                      }
-                      title={
-                        dualFoodSelection.isSecondaryAddDisabled
-                          ? 'Không thể chọn thêm món này'
-                          : 'Thêm món này lần nữa (x2 định lượng)'
-                      }>
-                      <IconPlusDish />
-                    </span>
-                  )}
-                {dualFoodSelection.canShowAddSecondOption && (
-                  <span
-                    className={classNames(
-                      css.addDish,
-                      dualFoodSelection.isSecondaryAddDisabled &&
-                        css.selectDisabled,
-                    )}
-                    onClick={
-                      dualFoodSelection.isSecondaryAddDisabled
-                        ? undefined
-                        : dualFoodSelection.handleAddToCart
-                    }
-                    title={
-                      dualFoodSelection.isSecondaryAddDisabled
-                        ? 'Không thể chọn thêm món thứ 2'
-                        : 'Thêm món thứ 2 (tùy chọn)'
-                    }>
-                    <IconPlusDish />
-                  </span>
-                )}
-                {dualFoodSelection.canShowPrimaryAdd && (
-                  <span
-                    className={classNames(
-                      css.addDish,
-                      dualFoodSelection.isPrimaryAddDisabled &&
-                        css.selectDisabled,
-                    )}
-                    onClick={
-                      dualFoodSelection.isPrimaryAddDisabled
-                        ? undefined
-                        : dualFoodSelection.handleAddToCart
-                    }
-                    title={
-                      dualFoodSelection.isPrimaryAddDisabled
-                        ? 'Không thể chọn món này'
-                        : 'Thêm món'
-                    }>
-                    <IconPlusDish />
-                  </span>
-                )}
-              </>
-            )}
-            {/* Logic cho single food selection */}
-            {!isAllowAddSecondaryFood &&
-              singleFoodSelection.canShowAddButton && (
-                <span
-                  className={classNames(css.addDish)}
-                  onClick={
-                    singleFoodSelection.isAddDisabled
-                      ? undefined
-                      : singleFoodSelection.handleAddToCart
-                  }
-                  title={
-                    singleFoodSelection.isAddDisabled
-                      ? 'Không thể chọn món này'
-                      : 'Thêm món'
-                  }>
-                  <IconPlusDish />
-                </span>
-              )}
+        <RenderWhen condition={allergicIngredients.length > 0}>
+          <div className={css.listingCardFooter}>
+            <p className={css.allergiesLabel}>
+              {allergicIngredients
+                .map((item: string) => `Có ${item}`)
+                .join(', ')}
+            </p>
           </div>
-        </div>
+        </RenderWhen>
       </div>
       <ListingDetailModal
         listing={listing}
