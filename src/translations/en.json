@@ -1736,6 +1736,7 @@
   "ReviewOrderDetailsSection.tableHead.price": "Price",
   "ReviewOrderDetailsSection.tableHead.quantity": "Qty",
   "ReviewOrderDetailsSection.tableHead.unit": "Unit",
+  "ReviewOrderDetailWithSecondaryFood.title": "Order details",
   "ReviewOrderDetailsSection.title": "Order details",
   "ReviewOrderProcessSection.title": "Track order",
   "ReviewOrdersResultModal.dateTitle": "Date {date}",

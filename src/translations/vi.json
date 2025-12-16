@@ -1737,6 +1737,7 @@
   "ReviewOrderDetailsSection.tableHead.price": "Đơn giá",
   "ReviewOrderDetailsSection.tableHead.quantity": "SL",
   "ReviewOrderDetailsSection.tableHead.unit": "ĐVT",
+  "ReviewOrderDetailWithSecondaryFood.title": "Chi tiết đặt hàng",
   "ReviewOrderDetailsSection.title": "Chi tiết đặt hàng",
   "ReviewOrderProcessSection.title": "Theo dõi đơn hàng",
   "ReviewOrdersResultModal.dateTitle": "Ngày {date}",

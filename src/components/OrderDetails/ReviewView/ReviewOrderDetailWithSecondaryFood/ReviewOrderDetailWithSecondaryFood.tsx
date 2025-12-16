@@ -116,7 +116,6 @@ const ReviewOrderDetailWithSecondaryFood: React.FC<
 
   useEffect(() => {
     setIsCollapsed(initialCollapseStates);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialCollapseStates.length]);
 
   const getFormattedPrice = (price: number) => {
@@ -199,6 +198,10 @@ const ReviewOrderDetailWithSecondaryFood: React.FC<
             rice: false,
           };
 
+          const riceMealCount =
+            totalRiceMainFrequency / RICE_MEAL_MAIN_DISHES_COUNT;
+          const adjustedTotalDishes = totalNonRiceQuantity + riceMealCount;
+
           return (
             <div className={css.tableRowGroup} key={date as string}>
               <div className={groupTitleClasses}>
@@ -207,8 +210,8 @@ const ReviewOrderDetailWithSecondaryFood: React.FC<
                   {formattedDate}
                   <div className={css.restaurantName}>{restaurantName}</div>
                 </div>
-                <div>{''}</div>
-                <div>{totalDishes}</div>
+                <div></div>
+                <div>{adjustedTotalDishes}</div>
                 <div>{getFormattedPrice(totalPrice || 0)}</div>
                 <div
                   className={css.actionCell}
@@ -231,7 +234,7 @@ const ReviewOrderDetailWithSecondaryFood: React.FC<
                           id: 'ReviewOrderDetailWithSecondaryFood.nonRiceTitle',
                         })}
                       </div>
-                      <div>{''}</div>
+                      <div></div>
                       <div>{totalNonRiceQuantity}</div>
                       <div>{getFormattedPrice(nonRiceUnitPrice)}</div>
                       <div className={css.actionCell}>
@@ -247,31 +250,28 @@ const ReviewOrderDetailWithSecondaryFood: React.FC<
                     <RenderWhen condition={!subState.nonRice}>
                       <div className={css.subRows}>
                         {nonRiceDishes.map(
-                          (food: TFoodDataValue, foodIndex: number) => (
+                          (food: TFoodDataValue, idx: number) => (
                             <div className={css.row} key={food.foodId}>
-                              <div>
-                                {(index as number) + 1}.1.{foodIndex + 1}
-                              </div>
+                              <div>{(index as number) + 1}.1.{idx + 1}</div>
                               <div>{food.foodName}</div>
-                              <div>{''}</div>
+                              <div></div>
                               <div>
                                 <RenderWhen condition={isMobileLayout}>
                                   <span>
                                     {intl.formatMessage(
                                       {
                                         id: 'ReviewOrderDetailWithSecondaryFood.quantityLabel',
-                                        defaultMessage: '{quantity} phần',
                                       },
-                                      { quantity: food.frequency || 0 },
+                                      { quantity: food.frequency },
                                     )}
                                   </span>
                                   <RenderWhen.False>
-                                    {food.frequency || 0}
+                                    {food.frequency}
                                   </RenderWhen.False>
                                 </RenderWhen>
                               </div>
-                              <div>{''}</div>
-                              <div>{''}</div>
+                              <div></div>
+                              <div></div>
                             </div>
                           ),
                         )}
@@ -307,7 +307,7 @@ const ReviewOrderDetailWithSecondaryFood: React.FC<
                           )}
                         </span>
                       </div>
-                      <div>{''}</div>
+                      <div></div>
                       <div>
                         {totalRiceMainFrequency / RICE_MEAL_MAIN_DISHES_COUNT}
                       </div>
@@ -324,33 +324,29 @@ const ReviewOrderDetailWithSecondaryFood: React.FC<
                     {/* Note + detail rows for rice dishes */}
                     <RenderWhen condition={!subState.rice}>
                       <div className={css.subRows}>
-                        {/* Detail rows for each rice dish */}
                         {riceDishes.map(
-                          (food: TFoodDataValue, foodIndex: number) => (
+                          (food: TFoodDataValue, idx: number) => (
                             <div className={css.row} key={food.foodId}>
-                              <div>
-                                {(index as number) + 1}.2.{foodIndex + 1}
-                              </div>
+                              <div>{(index as number) + 1}.2.{idx + 1}</div>
                               <div>{food.foodName}</div>
-                              <div>{''}</div>
+                              <div></div>
                               <div>
                                 <RenderWhen condition={isMobileLayout}>
                                   <span>
                                     {intl.formatMessage(
                                       {
                                         id: 'ReviewOrderDetailWithSecondaryFood.quantityLabel',
-                                        defaultMessage: '{quantity} phần',
                                       },
-                                      { quantity: food.frequency || 0 },
+                                      { quantity: food.frequency },
                                     )}
                                   </span>
                                   <RenderWhen.False>
-                                    {food.frequency || 0}
+                                    {food.frequency}
                                   </RenderWhen.False>
                                 </RenderWhen>
                               </div>
-                              <div>{''}</div>
-                              <div>{''}</div>
+                              <div></div>
+                              <div></div>
                             </div>
                           ),
                         )}
@@ -376,7 +372,6 @@ const ReviewOrderDetailWithSecondaryFood: React.FC<
           className={rootClasses}
           label={intl.formatMessage({
             id: 'ReviewOrderDetailWithSecondaryFood.title',
-            defaultMessage: 'Chi tiết đặt hàng',
           })}>
           {dataTable}
         </Collapsible>
