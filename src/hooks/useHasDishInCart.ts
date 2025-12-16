@@ -39,12 +39,10 @@ export const hasDishInCart = (
     // Nếu món đầu là single selection, chỉ cần foodId
     // Nếu không, cần cả foodId và secondaryFoodId
     return Boolean(
-      cartItem.foodId &&
-        (isPrimarySingleSelection || cartItem.secondaryFoodId),
+      cartItem.foodId && (isPrimarySingleSelection || cartItem.secondaryFoodId),
     );
   }
 
   // Không cho phép chọn món thứ 2, chỉ cần foodId
   return Boolean(cartItem.foodId);
 };
-
