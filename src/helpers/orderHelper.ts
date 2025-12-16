@@ -15,7 +15,12 @@ import {
   EOrderType,
 } from '@utils/enums';
 import type { TFoodList, TPlan } from '@utils/orderTypes';
-import type { TListing, TObject, TOrderStateHistoryItem } from '@utils/types';
+import type {
+  TFoodDataValue,
+  TListing,
+  TObject,
+  TOrderStateHistoryItem,
+} from '@utils/types';
 
 import { isJoinedPlan } from './order/orderPickingHelper';
 import {
@@ -233,14 +238,6 @@ export const isOrderDetailFullDatePickingFood = (orderDetail: TObject) => {
   });
 };
 
-type TFoodDataValue = {
-  foodId: string;
-  foodName: string;
-  foodPrice: number;
-  frequency: number;
-  notes?: string[];
-};
-
 type TFoodDataMap = TObject<string, TFoodDataValue>;
 
 export const getFoodDataMap = ({
@@ -263,6 +260,7 @@ export const getFoodDataMap = ({
           const {
             foodName,
             foodPrice,
+            numberOfMainDishes,
             requirement = '',
           } = foodListOfDate[id] || {};
           const current = result[id] as TObject;
@@ -279,6 +277,7 @@ export const getFoodDataMap = ({
               foodId: id,
               foodName,
               foodPrice,
+              numberOfMainDishes,
               notes,
               frequency: nextFrequency,
             },

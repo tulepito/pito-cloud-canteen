@@ -772,3 +772,12 @@ export type TMenuStateHistory = {
   reason: string;
   updatedAt: number;
 };
+
+export type TFoodDataValue = {
+  foodId: string;
+  foodName: string;
+  foodPrice: number;
+  frequency: number;
+  numberOfMainDishes: number;
+  notes?: string[];
+};

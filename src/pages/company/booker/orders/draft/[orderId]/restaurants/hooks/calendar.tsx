@@ -121,8 +121,6 @@ export const useGetCalendarExtraResources = ({
           order as TListing,
         );
 
-        console.log('isCompanyAllowDualSelection', isCompanyAllowDualSelection);
-
         const newOrderDetail = totalDates.reduce((result, curr) => {
           if (
             selectedDates.includes(

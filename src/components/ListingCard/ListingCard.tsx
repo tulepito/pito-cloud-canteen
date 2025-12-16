@@ -3,12 +3,11 @@ import classNames from 'classnames';
 import Badge, { EBadgeType } from '@components/Badge/Badge';
 import IconCheckmarkWithCircle from '@components/Icons/IconCheckmark/IconCheckmarkWithCircle';
 import IconPlusDish from '@components/Icons/IconPlusDish/IconPlusDish';
-import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
 import { useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { useDualFoodSelection } from '@hooks/useDualFoodSelection';
 import { useSingleFoodSelection } from '@hooks/useSingleFoodSelection';
-import { EImageVariants } from '@src/utils/enums';
+import { useViewport } from '@hooks/useViewport';
 import { getLabelByKey, useFoodTypeOptionsByLocale } from '@src/utils/options';
 import { Listing } from '@utils/data';
 
@@ -54,9 +53,11 @@ const ListingCard: React.FC<TListCardProps> = ({
 
   const mealId = listing?.id?.uuid;
   const { title, description } = Listing(listing).getAttributes();
-  const { allergicIngredients = [], foodType } =
-    Listing(listing).getPublicData();
-  const listingImage = Listing(listing).getImages()[0];
+  const {
+    allergicIngredients = [],
+    foodType,
+    numberOfMainDishes,
+  } = Listing(listing).getPublicData();
 
   const FOOD_TYPE_OPTIONS = useFoodTypeOptionsByLocale();
 
@@ -114,41 +115,61 @@ const ListingCard: React.FC<TListCardProps> = ({
     }
   };
 
+  const { isMobileLayout } = useViewport();
+
   return (
     <div className={classes}>
-      <div className={css.listingImage} onClick={viewListingDetail}>
-        <ResponsiveImage
-          image={listingImage}
-          alt={title}
-          variants={[EImageVariants.landscapeCrop]}
-          emptyType="food"
-        />
-      </div>
       <div
         className={classNames(
           css.listingCardContent,
           'transition-all duration-200',
         )}>
         <div className={css.listingCardInfo} onClick={viewListingDetail}>
-          <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-2 mb-1">
+          <div
+            className={classNames(
+              'items-center gap-2 mb-1',
+              isMobileLayout
+                ? 'grid grid-cols-[minmax(0,1fr)_auto]'
+                : 'grid grid-cols-1',
+            )}>
             <h6 className={css.title}>{title}</h6>
-            <div className="flex items-center md:justify-end justify-start">
-              {isAllowAddSecondaryFood &&
-                dualFoodSelection.isFirstFoodSelected && (
-                  <Badge
-                    className="flex-shrink-0 text-[11px] px-2 py-0.5 rounded-xl"
-                    label="Món 1"
-                    type={EBadgeType.success}
-                  />
-                )}
-              {isAllowAddSecondaryFood &&
-                dualFoodSelection.isSecondFoodSelected && (
-                  <Badge
-                    className="flex-shrink-0 text-[11px] px-2 py-0.5 rounded-xl"
-                    label="Món 2"
-                    type={EBadgeType.success}
-                  />
-                )}
+            <div className="flex items-center justify-start gap-2">
+              {isMobileLayout && !isAllowAddSecondaryFood && (
+                <>
+                  {(selection.isFoodSelected || isSelected) && (
+                    <span
+                      className={classNames(css.removeDish, css.flip)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        selection.handleRemoveFromCart();
+                      }}
+                      title={selection.getRemoveDishTooltip()}>
+                      <IconCheckmarkWithCircle className="items-center" />
+                    </span>
+                  )}
+                  {!selection.isFoodSelected &&
+                    !isSelected &&
+                    singleFoodSelection.canShowAddButton && (
+                      <span
+                        className={classNames(css.addDish)}
+                        onClick={
+                          singleFoodSelection.isAddDisabled
+                            ? undefined
+                            : (e) => {
+                                e.stopPropagation();
+                                singleFoodSelection.handleAddToCart();
+                              }
+                        }
+                        title={
+                          singleFoodSelection.isAddDisabled
+                            ? 'Không thể chọn món này'
+                            : 'Thêm món'
+                        }>
+                        <IconPlusDish />
+                      </span>
+                    )}
+                </>
+              )}
             </div>
           </div>
           <div className={css.categories} style={{ marginTop: '8px' }}>
@@ -157,6 +178,31 @@ const ListingCard: React.FC<TListCardProps> = ({
               label={getLabelByKey(FOOD_TYPE_OPTIONS, foodType)}
               type={EBadgeType.success}
             />
+            {numberOfMainDishes === 1 && isAllowAddSecondaryFood && (
+              <Badge
+                className={css.badge}
+                label="Chọn 1 món"
+                type={EBadgeType.info}
+              />
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            {isAllowAddSecondaryFood &&
+              dualFoodSelection.isFirstFoodSelected && (
+                <Badge
+                  className="flex-shrink-0 text-[11px] px-2 py-0.5 rounded-xl"
+                  label="Món 1"
+                  type={EBadgeType.success}
+                />
+              )}
+            {isAllowAddSecondaryFood &&
+              dualFoodSelection.isSecondFoodSelected && (
+                <Badge
+                  className="flex-shrink-0 text-[11px] px-2 py-0.5 rounded-xl"
+                  label="Món 2"
+                  type={EBadgeType.success}
+                />
+              )}
           </div>
           <p className={css.description}>{description}</p>
         </div>

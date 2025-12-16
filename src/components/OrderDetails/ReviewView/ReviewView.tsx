@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import classNames from 'classnames';
 
 import RenderWhen from '@components/RenderWhen/RenderWhen';
+import { getIsAllowAddSecondaryFood } from '@helpers/orderHelper';
 import { useAppDispatch } from '@hooks/reduxHooks';
 import { useViewport } from '@hooks/useViewport';
 import OrderDetailTrackingSection from '@pages/company/orders/[orderId]/components/OrderDetailTrackingSection';
@@ -15,6 +16,7 @@ import type { TReviewInfoFormValues } from './ReviewInfoSection/ReviewInfoForm';
 import ReviewInfoSection from './ReviewInfoSection/ReviewInfoSection';
 import ReviewNoteSection from './ReviewNoteSection/ReviewNoteSection';
 import ReviewOrderDetailsSection from './ReviewOrderDetailsSection/ReviewOrderDetailsSection';
+import ReviewOrderDetailWithSecondaryFood from './ReviewOrderDetailWithSecondaryFood/ReviewOrderDetailWithSecondaryFood';
 import ReviewOrderProcessSection from './ReviewOrderProcessSection/ReviewOrderProcessSection';
 import ReviewOrdersResultSection from './ReviewOrdersResultSection/ReviewOrdersResultSection';
 import ReviewOrderStatesSection from './ReviewOrderStatesSection/ReviewOrderStatesSection';
@@ -78,6 +80,10 @@ const ReviewView: React.FC<TReviewViewProps> = (props) => {
 
   const { quotationId } = Listing(orderData!).getMetadata();
 
+  const isSecondaryFoodAllowedOrder = getIsAllowAddSecondaryFood(
+    orderData as TListing,
+  );
+
   const isGroupOrder = reviewViewData?.isGroupOrder;
   const rootClasses = classNames(rootClassName || css.root, className);
   const leftPartClasses = classNames(css.leftPart, leftClassName);
@@ -127,9 +133,15 @@ const ReviewView: React.FC<TReviewViewProps> = (props) => {
             />
           </RenderWhen>
 
-          <ReviewOrderDetailsSection
-            foodOrderGroupedByDate={reviewViewData.foodOrderGroupedByDate}
-          />
+          {isSecondaryFoodAllowedOrder ? (
+            <ReviewOrderDetailWithSecondaryFood
+              foodOrderGroupedByDate={reviewViewData.foodOrderGroupedByDate}
+            />
+          ) : (
+            <ReviewOrderDetailsSection
+              foodOrderGroupedByDate={reviewViewData.foodOrderGroupedByDate}
+            />
+          )}
 
           <RenderWhen condition={!isMobileLayout}>
             {isGroupOrder && (
