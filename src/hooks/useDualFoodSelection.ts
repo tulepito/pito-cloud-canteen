@@ -6,7 +6,6 @@ import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { shoppingCartThunks } from '@redux/slices/shoppingCart.slice';
 import type { FoodListing } from '@src/types';
 import type { TCartItem } from '@src/types/order';
-import { SINGLE_PICK_FOOD_NAMES } from '@src/utils/constants';
 import { CurrentUser } from '@utils/data';
 
 import { useViewport } from './useViewport';
@@ -49,11 +48,25 @@ type TUseDualFoodSelectionReturn = {
 };
 
 /**
- * Kiểm tra xem có chỉ được chọn 1 món không (dựa trên SINGLE_PICK_FOOD_NAMES)
+ * Kiểm tra món ăn có phải là single selection (numberOfMainDishes === 1)
+ */
+const isSingleSelectionFood = (food: FoodListing | undefined): boolean => {
+  if (!food) return false;
+  const numberOfMainDishes = food.attributes?.publicData?.numberOfMainDishes;
+  // Mặc định cho phép chọn 2 món nếu không có numberOfMainDishes
+  if (numberOfMainDishes === undefined || numberOfMainDishes === null) {
+    return false;
+  }
+
+  return Number(numberOfMainDishes) === 1;
+};
+
+/**
+ * Kiểm tra xem có chỉ được chọn 1 món không (dựa trên numberOfMainDishes)
  */
 const isOnlyAllowPickOneFood = (
   cartItem: TCartItem | null | undefined,
-  pickingFoodName: string | undefined,
+  pickingFood: FoodListing | undefined,
   hasFirstFood: boolean,
   hasSecondFood: boolean,
   foodList: FoodListing[],
@@ -65,23 +78,13 @@ const isOnlyAllowPickOneFood = (
   const { foodId, secondaryFoodId } = cartItem;
   const food = foodList.find((f) => f.id?.uuid === foodId);
   const secondaryFood = foodList.find((f) => f.id?.uuid === secondaryFoodId);
-  const hasRestrictedSelected = SINGLE_PICK_FOOD_NAMES.some((name) => {
-    if (food?.attributes?.title?.includes(name)) {
-      return true;
-    }
-    if (secondaryFood?.attributes?.title?.includes(name)) {
-      return true;
-    }
 
-    return false;
-  });
-  const isPickingRestricted = SINGLE_PICK_FOOD_NAMES.some((name) => {
-    if (pickingFoodName?.includes(name)) {
-      return true;
-    }
+  // Kiểm tra món đã chọn có phải là single selection không
+  const hasRestrictedSelected =
+    isSingleSelectionFood(food) || isSingleSelectionFood(secondaryFood);
 
-    return false;
-  });
+  // Kiểm tra món đang chọn có phải là single selection không
+  const isPickingRestricted = isSingleSelectionFood(pickingFood);
 
   return Boolean(
     hasRestrictedSelected ||
@@ -125,9 +128,12 @@ export const useDualFoodSelection = ({
   const hasSecondFood = !!cartItem.secondaryFoodId;
   const isFoodSelected = isFirstFoodSelected || isSecondFoodSelected;
 
+  // Lấy thông tin món đang chọn để kiểm tra numberOfMainDishes
+  const pickingFood = foodList.find((f) => f.id?.uuid === mealId);
+
   const isRestrictedForThisListing = isOnlyAllowPickOneFood(
     cartItem,
-    mealTitle,
+    pickingFood,
     hasFirstFood,
     hasSecondFood,
     foodList,
@@ -187,7 +193,7 @@ export const useDualFoodSelection = ({
     const nextState = buildNextCartState(isSecondFood);
     const willTriggerSingleSelection = isOnlyAllowPickOneFood(
       nextState.cart,
-      mealTitle,
+      pickingFood,
       nextState.hasFirst,
       nextState.hasSecond,
       foodList,
@@ -205,11 +211,18 @@ export const useDualFoodSelection = ({
       const firstFoodName = cartItem.foodId
         ? foodList.find((f) => f.id?.uuid === cartItem.foodId)?.attributes
             ?.title || ''
-        : '';
-      _onAddedToCart?.({
-        foodName: `${firstFoodName} + ${mealTitle}`,
-        timestamp: dayId,
-      });
+        : undefined;
+      if (firstFoodName) {
+        _onAddedToCart?.({
+          foodName: `${firstFoodName} + ${mealTitle}`,
+          timestamp: dayId,
+        });
+      } else {
+        _onAddedToCart?.({
+          foodName: mealTitle,
+          timestamp: dayId,
+        });
+      }
     } else {
       toast.success(
         intl.formatMessage({
@@ -220,7 +233,7 @@ export const useDualFoodSelection = ({
           toastId: 'add-to-cart',
           updateId: 'add-to-cart',
           pauseOnHover: false,
-          autoClose: 3000,
+          autoClose: false,
         },
       );
     }

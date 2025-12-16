@@ -10,12 +10,11 @@ import Modal from '@components/Modal/Modal';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
 import SlideModal from '@components/SlideModal/SlideModal';
 import { calculateDistance } from '@helpers/mapHelpers';
+import { getIsAllowAddSecondaryFood } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
-import { getIsAllowAddSecondFood } from '@hooks/useIsAllowAddSecondFood';
 import { useViewport } from '@hooks/useViewport';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
-import { SINGLE_PICK_FOOD_NAMES } from '@src/utils/constants';
 import { Listing } from '@utils/data';
 import { EImageVariants, EOrderType } from '@utils/enums';
 import type { TListing } from '@utils/types';
@@ -198,9 +197,9 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
       return;
     }
 
-    const orderListing = Listing(order as TListing);
-    const { companyId } = orderListing.getMetadata();
-    const isSecondaryFoodAllowedCompany = getIsAllowAddSecondFood(companyId);
+    const isSecondaryFoodAllowedCompany = getIsAllowAddSecondaryFood(
+      order as TListing,
+    );
 
     const updateFoodList = selectedFoods.reduce((acc: any, foodId: string) => {
       const food = foodList?.find((item) => item.id?.uuid === foodId);
@@ -209,9 +208,12 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
         const originalPrice = foodListingGetter.price?.amount || 0;
         const foodName = foodListingGetter.title || '';
 
-        const isSinglePickFood = SINGLE_PICK_FOOD_NAMES.some((name) =>
-          foodName.toLowerCase()?.includes(name.toLowerCase()),
-        );
+        const numberOfMainDishes =
+          foodListingGetter.publicData?.numberOfMainDishes;
+        const isSinglePickFood =
+          numberOfMainDishes !== undefined &&
+          numberOfMainDishes !== null &&
+          Number(numberOfMainDishes) === 1;
 
         const finalPrice =
           isSecondaryFoodAllowedCompany && !isSinglePickFood

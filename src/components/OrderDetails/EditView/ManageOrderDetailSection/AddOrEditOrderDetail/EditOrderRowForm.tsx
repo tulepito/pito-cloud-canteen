@@ -13,7 +13,6 @@ import IconMinus from '@components/Icons/IconMinus/IconMinus';
 import IconPlusWithoutBorder from '@components/Icons/IconPlusWithoutBorder/IconPlusWithoutBorder';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import { useAppSelector } from '@hooks/reduxHooks';
-import { SINGLE_PICK_FOOD_NAMES } from '@src/utils/constants';
 
 import css from './EditOrderRowForm.module.scss';
 
@@ -25,8 +24,14 @@ export type TEditOrderRowFormValues = {
   secondaryRequirement?: string;
 };
 
+type TFoodOption = {
+  foodId: string;
+  foodName: string;
+  numberOfMainDishes: number | string;
+};
+
 type TExtraProps = {
-  foodOptions: { foodId: string; foodName: string }[];
+  foodOptions: TFoodOption[];
 };
 type TEditOrderRowFormComponentProps =
   FormRenderProps<TEditOrderRowFormValues> & Partial<TExtraProps>;
@@ -52,21 +57,17 @@ const EditOrderRowFormComponent: React.FC<TEditOrderRowFormComponentProps> = (
     (state) => state.OrderManagement.isAllowAddSecondaryFood,
   );
 
-  const selectedFoodName = useMemo(() => {
-    if (!values?.foodId) return '';
+  const selectedFood = useMemo(() => {
+    if (!values?.foodId) return null;
 
-    return (
-      foodOptions?.find((food) => food.foodId === values.foodId)?.foodName || ''
-    );
+    return foodOptions?.find((food) => food.foodId === values.foodId) || null;
   }, [values?.foodId, JSON.stringify(foodOptions)]);
 
   const isSingleSelectionFood = useMemo(() => {
-    if (!selectedFoodName) return false;
+    if (!selectedFood) return false;
 
-    return SINGLE_PICK_FOOD_NAMES.some((name) =>
-      selectedFoodName?.includes(name),
-    );
-  }, [selectedFoodName]);
+    return Number(selectedFood.numberOfMainDishes) === 1;
+  }, [selectedFood]);
 
   const isRequireSecondFood =
     Boolean(isAllowAddSecondaryFood) &&
@@ -177,9 +178,7 @@ const EditOrderRowFormComponent: React.FC<TEditOrderRowFormComponentProps> = (
   const parsedFoodOptionsForSecondaryFood = useMemo(
     () =>
       foodOptions?.map((f) => {
-        const isSingleSelectOnlyOneFood = SINGLE_PICK_FOOD_NAMES.some((name) =>
-          f.foodName?.includes(name),
-        );
+        const isSingleSelectOnlyOneFood = Number(f.numberOfMainDishes) === 1;
         const disabled = isSingleSelectOnlyOneFood && values?.foodId !== '';
 
         return {

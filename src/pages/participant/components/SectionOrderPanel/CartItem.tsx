@@ -1,3 +1,4 @@
+import { useIntl } from 'react-intl';
 import classNames from 'classnames';
 
 import IconClose from '@components/Icons/IconClose/IconClose';
@@ -25,6 +26,7 @@ const CartItem: React.FC<TCartItemProps> = ({
   onRemove,
   foodPosition,
 }) => {
+  const intl = useIntl();
   const dispatch = useAppDispatch();
   const isAllowAddSecondaryFood = useAppSelector(
     (state) => state.ParticipantPlanPage.isAllowAddSecondaryFood,
@@ -54,12 +56,14 @@ const CartItem: React.FC<TCartItemProps> = ({
       </div>
       {isAllowAddSecondaryFood && (
         <div>
-          {foodPosition === 'first' && (
-            <span className="text-primaryPri2 text-xs font-medium">
-              (Món 1)
-            </span>
-          )}
-          {foodPosition === 'second' && (
+          {foodPosition === 'first' &&
+            value !==
+              intl.formatMessage({ id: 'SectionOrderPanel.notJoined' }) && (
+              <span className="text-primaryPri2 text-xs font-medium">
+                (Món 1)
+              </span>
+            )}
+          {foodPosition === 'second' && value !== 'notJoined' && (
             <span className="text-sematicGreen2 text-xs font-medium">
               (Món 2)
             </span>

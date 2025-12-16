@@ -1,5 +1,6 @@
 import { parseThousandNumber } from '@helpers/format';
 import { groupFoodOrderByDateFromQuotation } from '@helpers/order/orderDetailHelper';
+import { getIsAllowAddSecondaryFood } from '@helpers/orderHelper';
 import { Listing, User } from '@src/utils/data';
 import { EOrderType } from '@src/utils/enums';
 import type {
@@ -191,6 +192,7 @@ export const formatPriceQuotationData = ({
       foodOrderGroupedByDate: groupFoodOrderByDateFromQuotation({
         quotation: quotation!,
       }),
+      isAllowAddSecondaryFood: getIsAllowAddSecondaryFood(order),
     },
   };
 };
@@ -268,6 +270,7 @@ export const formatPriceQuotationDataPartner = ({
         quotationDetail,
         restaurantId,
       ),
+      isAllowAddSecondaryFood: getIsAllowAddSecondaryFood(order),
     },
   };
 };

@@ -29,7 +29,7 @@
 
 .listingImage {
   cursor: pointer;
-  width: 80px;
+  width: 100px;
   height: 100%;
   overflow: hidden;
   position: relative;
@@ -77,25 +77,11 @@
     }
   }
   .description {
-    @include textTemplate(14px, 400, 24px);
+    @include textTemplate(12px, 400, 24px);
     color: $neutralGray6;
     margin: 0;
     @include lineClamp(2, 24px);
     letter-spacing: 0.028px;
-  }
-}
-
-.listingCardFooter {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 0;
-  border-top: 1px solid $neutralGray3;
-
-  .allergiesLabel {
-    color: $neutralGray6;
-    @include textTemplate(12px, 500, 16px, '');
-    margin: 0;
   }
 
   .addDish {
@@ -124,6 +110,20 @@
     cursor: pointer;
     width: 24px;
     height: 24px;
+  }
+}
+
+.listingCardFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-top: 1px solid $neutralGray3;
+
+  .allergiesLabel {
+    color: $neutralGray6;
+    @include textTemplate(12px, 500, 16px, '');
+    margin: 0;
   }
 }
 

@@ -9,7 +9,7 @@ import {
   pickRandomFoodExcludingIds,
 } from '@helpers/foodPickerHelpers';
 import { sleep } from '@helpers/index';
-import { useIsAllowAddSecondFood } from '@hooks/useIsAllowAddSecondFood';
+import { getIsAllowAddSecondaryFood } from '@helpers/orderHelper';
 import { createAsyncThunk } from '@redux/redux.helper';
 import {
   shoppingCartActions,
@@ -21,7 +21,6 @@ import type {
   TShoppingCartMemberPlan,
   TUpdateParticipantOrderBody,
 } from '@src/types/order';
-import { SINGLE_PICK_FOOD_NAMES } from '@src/utils/constants';
 import { CurrentUser, Listing } from '@src/utils/data';
 import type { TListing } from '@src/utils/types';
 import { EParticipantOrderStatus } from '@utils/enums';
@@ -99,9 +98,12 @@ const recommendFoodForShoppingCart = ({
   );
 
   const primaryFoodTitle = mostSuitableFoodListing.getAttributes().title || '';
-  const isPrimarySingleSelectionFood = SINGLE_PICK_FOOD_NAMES.some((name) =>
-    primaryFoodTitle?.toLowerCase()?.includes(name.toLowerCase()),
-  );
+  const primaryNumberOfMainDishes =
+    mostSuitableFoodListing.getPublicData()?.numberOfMainDishes;
+  const isPrimarySingleSelectionFood =
+    primaryNumberOfMainDishes !== undefined &&
+    primaryNumberOfMainDishes !== null &&
+    Number(primaryNumberOfMainDishes) === 1;
 
   // remove secondary food if it is a single selection food
   if (isAllowAddSecondaryFood && isPrimarySingleSelectionFood) {
@@ -125,10 +127,11 @@ const recommendFoodForShoppingCart = ({
     const secondaryCandidates = suitablePriceFoodList.filter(
       (food: TListing) => {
         const listing = Listing(food);
-        const title = listing.getAttributes().title || '';
-        const isSingleSelectionFood = SINGLE_PICK_FOOD_NAMES.some((name) =>
-          title?.toLowerCase()?.includes(name.toLowerCase()),
-        );
+        const numberOfMainDishes = listing.getPublicData()?.numberOfMainDishes;
+        const isSingleSelectionFood =
+          numberOfMainDishes !== undefined &&
+          numberOfMainDishes !== null &&
+          Number(numberOfMainDishes) === 1;
 
         return (
           listing.getId() !== mostSuitableFoodListing.getId() &&
@@ -208,7 +211,9 @@ const loadData = createAsyncThunk(
     const response = await loadPlanDataApi(planId);
     const { plan, order } = response?.data?.data || {};
     const orderDays = Object.keys(plan);
-    const isAllowAddSecondaryFood = useIsAllowAddSecondFood(order as TListing);
+    const isAllowAddSecondaryFood = getIsAllowAddSecondaryFood(
+      order as TListing,
+    );
 
     orderDays.forEach((day) => {
       const {

@@ -43,6 +43,7 @@ type TPriceQuotationProps = TDefaultProps & {
     };
     orderDetailData: {
       foodOrderGroupedByDate: TObject[];
+      isAllowAddSecondaryFood?: boolean;
     };
   };
 };
@@ -117,6 +118,9 @@ const PriceQuotation: React.FC<TPriceQuotationProps> = ({
           itemId="quoteItem"
           subOrderDate={subOrderDate}
           shouldResponsive={shouldResponsive}
+          isAllowAddSecondaryFood={
+            orderDetailData.isAllowAddSecondaryFood || false
+          }
           {...orderDetailData}
         />
       </div>

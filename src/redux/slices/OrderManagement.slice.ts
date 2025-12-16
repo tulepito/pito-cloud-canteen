@@ -43,7 +43,7 @@ import {
   calculateClientQuotation,
   calculatePartnerQuotation,
 } from '@helpers/order/quotationHelper';
-import { useIsAllowAddSecondFood } from '@hooks/useIsAllowAddSecondFood';
+import { getIsAllowAddSecondaryFood } from '@helpers/orderHelper';
 import { AdminManageOrderActions } from '@pages/admin/order/AdminManageOrder.slice';
 import type { POSTRemindMemberBody } from '@pages/api/orders/[orderId]/remind-member/index.api';
 import { buildParticipantSubOrderDocumentId } from '@pages/api/participants/document/document.service';
@@ -323,7 +323,7 @@ const loadData = createAsyncThunk(
     const response: any = await getBookerOrderDataApi(orderId);
     dispatch(SystemAttributesThunks.fetchVATPercentageByOrderId(orderId));
     // Check if company is allowing add second food
-    const isAllowAddSecondaryFood = useIsAllowAddSecondFood(
+    const isAllowAddSecondaryFood = getIsAllowAddSecondaryFood(
       response.data.orderListing as TListing,
     );
     if (isAdminFlow) {

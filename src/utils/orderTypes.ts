@@ -6,6 +6,7 @@ export type TFoodList = {
     foodName: string;
     foodPrice: number;
     foodUnit?: string;
+    numberOfMainDishes: number | string;
   };
 };
 

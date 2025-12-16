@@ -18,11 +18,10 @@ import {
 } from '@apis/participantApi';
 import { disableWalkthroughApi } from '@apis/userApi';
 import { getFoodQuery } from '@helpers/listingSearchQuery';
-import { markColorForOrder } from '@helpers/orderHelper';
 import {
-  getIsAllowAddSecondFood,
-  useIsAllowAddSecondFood,
-} from '@hooks/useIsAllowAddSecondFood';
+  getIsAllowAddSecondaryFood,
+  markColorForOrder,
+} from '@helpers/orderHelper';
 import type { POSTParticipantRating } from '@pages/api/participants/ratings/index.api';
 import { createAsyncThunk } from '@redux/redux.helper';
 import { ParticipantOrderManagementActions } from '@redux/slices/ParticipantOrderManagementPage.slice';
@@ -30,7 +29,6 @@ import { userThunks } from '@redux/slices/user.slice';
 import type { FoodListing, ParticipantSubOrderDocument } from '@src/types';
 import type { TUpdateParticipantOrderBody } from '@src/types/order';
 import type { Image, VariantKey } from '@src/types/utils';
-import { SINGLE_PICK_FOOD_NAMES } from '@src/utils/constants';
 import {
   CurrentUser,
   denormalisedResponseEntities,
@@ -310,10 +308,12 @@ const buildRecommendedMealsForSubOrder = ({
 
   const primaryListing = Listing(primaryFood as TListing);
   const primaryFoodId = primaryListing.getId();
-  const primaryTitle = primaryListing.getAttributes().title || '';
-  const isPrimarySingleSelectionFood = SINGLE_PICK_FOOD_NAMES.some((name) =>
-    primaryTitle?.includes(name),
-  );
+  const primaryNumberOfMainDishes =
+    primaryListing.getPublicData()?.numberOfMainDishes;
+  const isPrimarySingleSelectionFood =
+    primaryNumberOfMainDishes !== undefined &&
+    primaryNumberOfMainDishes !== null &&
+    Number(primaryNumberOfMainDishes) === 1;
 
   if (isPrimarySingleSelectionFood) {
     return { primary: primaryFood };
@@ -334,10 +334,11 @@ const buildRecommendedMealsForSubOrder = ({
       return false;
     }
 
-    const title = listing.getAttributes().title || '';
-    const isSingleSelectionFood = SINGLE_PICK_FOOD_NAMES.some((name) =>
-      title?.includes(name),
-    );
+    const numberOfMainDishes = listing.getPublicData()?.numberOfMainDishes;
+    const isSingleSelectionFood =
+      numberOfMainDishes !== undefined &&
+      numberOfMainDishes !== null &&
+      Number(numberOfMainDishes) === 1;
 
     return !isSingleSelectionFood;
   });
@@ -586,7 +587,7 @@ const pickFoodForSubOrders = createAsyncThunk(
         }
 
         // Get isAllowAddSecondaryFood from the correct order for this subOrder
-        const isAllowAddSecondaryFood = useIsAllowAddSecondFood(
+        const isAllowAddSecondaryFood = getIsAllowAddSecondaryFood(
           targetOrder as TListing,
         );
 
@@ -711,7 +712,7 @@ const pickFoodForSpecificSubOrder = createAsyncThunk(
     const { allergies = [] } = currentUserGetter.getPublicData();
 
     // Get isAllowAddSecondaryFood from the correct order, not from detailOrderOrder
-    const isAllowAddSecondaryFood = useIsAllowAddSecondFood(
+    const isAllowAddSecondaryFood = getIsAllowAddSecondaryFood(
       targetOrder as TListing,
     );
 
@@ -894,9 +895,6 @@ const OrderListSlice = createSlice({
           ...payload.mappingSubOrderToOrder,
         };
         state.company = payload.company;
-        state.isAllowAddSecondaryFood = getIsAllowAddSecondFood(
-          payload.company,
-        );
         state.foodsInPlans = payload.foodsInPlans;
       })
       .addCase(fetchOrders.rejected, (state, { error }) => {

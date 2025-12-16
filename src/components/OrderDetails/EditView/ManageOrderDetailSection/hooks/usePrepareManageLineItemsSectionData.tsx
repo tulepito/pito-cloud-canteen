@@ -54,12 +54,17 @@ export const usePrepareManageLineItemsSectionData = (
   const { foodList = {} } = restaurant;
   const foodOptions = Object.entries<TObject>(foodList).map(
     ([foodId, foodData]) => {
-      const { foodName = '', foodPrice = 0 } = foodData || {};
+      const {
+        foodName = '',
+        foodPrice = 0,
+        numberOfMainDishes = 2,
+      } = foodData || {};
 
       return {
         foodId,
         foodName,
         foodPrice,
+        numberOfMainDishes,
       };
     },
   );

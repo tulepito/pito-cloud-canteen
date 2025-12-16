@@ -7,6 +7,7 @@ import {
   getAllCompanyMembers,
 } from '@helpers/company';
 import { generateUncountableIdForOrder } from '@helpers/generateUncountableId';
+import { getIsAllowAddSecondaryFoodInCreateOrder } from '@helpers/orderHelper';
 import {
   createScheduler,
   getScheduler,
@@ -137,6 +138,8 @@ const createOrder = async ({
   const booker = await fetchUser(bookerId);
   const bookerUser = User(booker);
   const { isAutoPickFood } = bookerUser.getPublicData();
+  const canAddSecondaryFood =
+    getIsAllowAddSecondaryFoodInCreateOrder(companyId);
 
   // Call api to create order listing
   const orderListingResponse = await integrationSdk.listings.create(
@@ -166,6 +169,7 @@ const createOrder = async ({
         companyName,
         daySession,
         isAutoPickFood,
+        canAddSecondaryFood,
       },
       ...(shouldUpdateOrderName
         ? {

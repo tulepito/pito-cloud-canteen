@@ -2,10 +2,9 @@ import isEmpty from 'lodash/isEmpty';
 import uniq from 'lodash/uniq';
 import { DateTime } from 'luxon';
 
-import { getIsAllowAddSecondFood } from '@hooks/useIsAllowAddSecondFood';
 import type { FoodListing } from '@src/types';
 import type { TOrderDetail } from '@src/types/order';
-import { SINGLE_PICK_FOOD_NAMES } from '@src/utils/constants';
+import { SECONDARY_FOOD_ALLOWED_COMPANIES } from '@src/utils/constants';
 import { ETransition } from '@src/utils/transaction';
 import { Listing } from '@utils/data';
 import { generateTimeRangeItems, isOver, renderDateRange } from '@utils/dates';
@@ -16,7 +15,12 @@ import {
   EOrderType,
 } from '@utils/enums';
 import type { TFoodList, TPlan } from '@utils/orderTypes';
-import type { TListing, TObject, TOrderStateHistoryItem } from '@utils/types';
+import type {
+  TFoodDataValue,
+  TListing,
+  TObject,
+  TOrderStateHistoryItem,
+} from '@utils/types';
 
 import { isJoinedPlan } from './order/orderPickingHelper';
 import {
@@ -234,14 +238,6 @@ export const isOrderDetailFullDatePickingFood = (orderDetail: TObject) => {
   });
 };
 
-type TFoodDataValue = {
-  foodId: string;
-  foodName: string;
-  foodPrice: number;
-  frequency: number;
-  notes?: string[];
-};
-
 type TFoodDataMap = TObject<string, TFoodDataValue>;
 
 export const getFoodDataMap = ({
@@ -264,6 +260,7 @@ export const getFoodDataMap = ({
           const {
             foodName,
             foodPrice,
+            numberOfMainDishes,
             requirement = '',
           } = foodListOfDate[id] || {};
           const current = result[id] as TObject;
@@ -280,6 +277,7 @@ export const getFoodDataMap = ({
               foodId: id,
               foodName,
               foodPrice,
+              numberOfMainDishes,
               notes,
               frequency: nextFrequency,
             },
@@ -471,6 +469,7 @@ export const getSelectedRestaurantAndFoodList = ({
     const { id, attributes } = item || {};
     const { title, price } = attributes;
     const foodUnit = attributes?.publicData?.unit || '';
+    const numberOfMainDishes = attributes?.publicData?.numberOfMainDishes;
 
     return id?.uuid
       ? {
@@ -479,6 +478,7 @@ export const getSelectedRestaurantAndFoodList = ({
             foodName: title,
             foodPrice: price?.amount || 0,
             foodUnit,
+            numberOfMainDishes,
           },
         }
       : result;
@@ -557,9 +557,12 @@ export const getUpdateLineItemsInDualSelectionOrder = (
     );
     if (food) {
       const foodListingGetter = Listing(food as TListing).getAttributes();
-      const isSingleSelectionFood = SINGLE_PICK_FOOD_NAMES.some((name) =>
-        foodListingGetter.title?.toLowerCase()?.includes(name.toLowerCase()),
-      );
+      const numberOfMainDishes =
+        foodListingGetter.publicData?.numberOfMainDishes;
+      const isSingleSelectionFood =
+        numberOfMainDishes !== undefined &&
+        numberOfMainDishes !== null &&
+        Number(numberOfMainDishes) === 1;
       const foodPrice = isSingleSelectionFood
         ? foodListingGetter.price?.amount || 0
         : (foodListingGetter.price?.amount || 0) / 2;
@@ -717,22 +720,51 @@ export const confirmFirstTimeParticipant = (
 };
 
 /**
+ * Get whether to allow adding a second food
+ * @param orderListing - Order listing
+ * @returns True if the company is allowed to add a second food, false if not
+ */
+export const getIsAllowAddSecondaryFood = (orderListing: TListing) => {
+  if (!orderListing || !Listing(orderListing).getMetadata().companyId)
+    return false;
+
+  const { canAddSecondaryFood } = Listing(orderListing).getMetadata();
+
+  return canAddSecondaryFood || false;
+};
+
+/**
+ * Get whether to allow adding a second food in create order
+ * @param companyId - The company id
+ * @returns True if the company is allowed to add a second food, false if not
+ */
+export const getIsAllowAddSecondaryFoodInCreateOrder = (companyId: string) => {
+  if (!companyId) return false;
+
+  return SECONDARY_FOOD_ALLOWED_COMPANIES.includes(companyId) ?? false;
+};
+
+/**
  * Adjust the food list price
  * @param foodList - The food list
- * @param companyId - The company id
+ * @param order - The order
  * @returns The adjusted food list
  */
 export const adjustFoodListPrice = (
   foodList: TFoodList,
-  companyId: string,
+  order: TListing,
 ): TFoodList => {
-  const isSecondaryFoodAllowedCompany = getIsAllowAddSecondFood(companyId);
+  const isSecondaryFoodAllowedCompany = getIsAllowAddSecondaryFood(order);
 
   return Object.entries(foodList).reduce(
-    (acc: TObject, [foodId, { foodName, foodPrice, foodUnit }]) => {
-      const isSingleSelectionFood = SINGLE_PICK_FOOD_NAMES.some((name) =>
-        foodName.toLowerCase()?.includes(name.toLowerCase()),
-      );
+    (
+      acc: TObject,
+      [foodId, { foodName, foodPrice, foodUnit, numberOfMainDishes }],
+    ) => {
+      const isSingleSelectionFood =
+        numberOfMainDishes !== undefined &&
+        numberOfMainDishes !== null &&
+        Number(numberOfMainDishes) === 1;
       if (isSecondaryFoodAllowedCompany && !isSingleSelectionFood) {
         return {
           ...acc,
@@ -740,6 +772,7 @@ export const adjustFoodListPrice = (
             foodName,
             foodPrice: foodPrice / 2,
             foodUnit,
+            numberOfMainDishes,
           },
         };
       }
@@ -750,6 +783,7 @@ export const adjustFoodListPrice = (
           foodName,
           foodPrice,
           foodUnit,
+          numberOfMainDishes,
         },
       };
     },
@@ -760,12 +794,12 @@ export const adjustFoodListPrice = (
 /**
  * Adjust the food list price of the recommend order detail
  * @param recommendOrderDetail - The recommend order detail
- * @param companyId - The company id
+ * @param order - The order
  * @returns The adjusted recommend order detail
  */
 export const adjustRecommendOrderDetailWithFoodListPrice = (
   recommendOrderDetail: TOrderDetail,
-  companyId: string,
+  order: TListing,
 ): TOrderDetail => {
   return Object.entries(recommendOrderDetail).reduce(
     (acc: TOrderDetail, [dayId, curr]: [string, any]) => {
@@ -773,7 +807,7 @@ export const adjustRecommendOrderDetailWithFoodListPrice = (
         ...curr,
         restaurant: {
           ...curr.restaurant,
-          foodList: adjustFoodListPrice(curr?.restaurant?.foodList, companyId),
+          foodList: adjustFoodListPrice(curr?.restaurant?.foodList, order),
         },
       };
 

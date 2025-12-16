@@ -47,6 +47,10 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
     (state) => state.ParticipantPlanPage.submitDataInprogress,
   );
 
+  const isAllowAddSecondaryFood = useAppSelector(
+    (state) => state.ParticipantPlanPage.isAllowAddSecondaryFood,
+  );
+
   const orderDays = Object.keys(plan);
   const cartListKeys = Object.keys(cartList || []).filter(
     (cartKey) => !!cartList[Number(cartKey)]?.foodId,
@@ -128,7 +132,12 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
   return (
     <div className={classNames(css.root, isMobileLayout ? 'mb-[180px]' : '')}>
       <OrderPanelHeader
-        selectedDays={totalFoodPickedWithParticipant(orderDetailIds, cartList)}
+        selectedDays={totalFoodPickedWithParticipant(
+          orderDetailIds,
+          cartList,
+          plan,
+          isAllowAddSecondaryFood,
+        )}
         sumDays={orderDays.length}
       />
       <OrderPanelBody

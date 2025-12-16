@@ -211,6 +211,8 @@ const OrderDetailPage = () => {
     VATPercentage: isPickingOrder ? systemVATPercentage : orderVATPercentage,
   });
 
+  console.log('reviewViewData', reviewViewData);
+
   const editViewClasses = classNames(css.editViewRoot, {
     [css.editNormalOrderView]: isNormalOrder,
     [css.editNormalOrderViewWithHistorySection]:

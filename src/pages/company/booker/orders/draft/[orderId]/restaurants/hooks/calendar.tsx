@@ -7,9 +7,11 @@ import { useRouter } from 'next/router';
 
 import AddMorePlan from '@components/CalendarDashboard/components/MealPlanCard/components/AddMorePlan';
 import IconCheckWithBackground from '@components/Icons/IconCheckWithBackground/IconCheckWithBackground';
-import { adjustFoodListPrice } from '@helpers/orderHelper';
+import {
+  adjustFoodListPrice,
+  getIsAllowAddSecondaryFood,
+} from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
-import { getIsAllowAddSecondFood } from '@hooks/useIsAllowAddSecondFood';
 import { useViewport } from '@hooks/useViewport';
 import {
   orderAsyncActions,
@@ -51,6 +53,7 @@ export const useGetCalendarExtraResources = ({
     (state) => state.Order.orderDetail,
     shallowEqual,
   );
+
   const fetchOrderDetailInProgress = useAppSelector(
     (state) => state.Order.fetchOrderDetailInProgress,
   );
@@ -114,7 +117,9 @@ export const useGetCalendarExtraResources = ({
           ),
         );
 
-        const isCompanyAllowDualSelection = getIsAllowAddSecondFood(companyId);
+        const isCompanyAllowDualSelection = getIsAllowAddSecondaryFood(
+          order as TListing,
+        );
 
         const newOrderDetail = totalDates.reduce((result, curr) => {
           if (
@@ -154,7 +159,7 @@ export const useGetCalendarExtraResources = ({
 
               // Adjust the food list price if the company is allowed to add a second food
               const adjustedFoodList = isCompanyAllowDualSelection
-                ? adjustFoodListPrice(foodList, companyId)
+                ? adjustFoodListPrice(foodList, order as TListing)
                 : foodList;
 
               return {

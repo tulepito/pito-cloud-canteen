@@ -1727,11 +1727,16 @@
   "ReviewOrder.tableHead.type": "CATEGORY",
   "ReviewOrder.tableHead.unit": "Unit",
   "ReviewOrder.title": "Review order information and create order",
+  "ReviewOrderDetailWithSecondaryFood.nonRiceTitle": "Other dishes",
+  "ReviewOrderDetailWithSecondaryFood.riceSummary": "Rice dishes",
+  "ReviewOrderDetailWithSecondaryFood.quantityLabel": "{quantity} portions",
+  "ReviewOrderDetailWithSecondaryFood.riceNote": "(Each rice meal selects {mainPerMeal} main dishes)",
   "ReviewOrderDetailsSection.tableHead.foodType": "Category",
   "ReviewOrderDetailsSection.tableHead.no": "No.",
   "ReviewOrderDetailsSection.tableHead.price": "Price",
   "ReviewOrderDetailsSection.tableHead.quantity": "Qty",
   "ReviewOrderDetailsSection.tableHead.unit": "Unit",
+  "ReviewOrderDetailWithSecondaryFood.title": "Order details",
   "ReviewOrderDetailsSection.title": "Order details",
   "ReviewOrderProcessSection.title": "Track order",
   "ReviewOrdersResultModal.dateTitle": "Date {date}",
@@ -2691,8 +2696,8 @@
   "plan-weekly-meals-let-employees-choose-dishes-ensure-on-time-delivery-and-track-transparent-costs-all-on-one-platform": "Plan weekly meals, let employees choose dishes, ensure on-time delivery, and track transparent costs — all on one platform.",
   "automated-corporate-lunch-ordering-solution": "Automated Corporate Lunch Ordering Solution",
   "pcc-helps-companies-plan-lunch-choose-vendors-manage-and-deliver-on-time-without-setup-costs-and-save-time": "PITO Cloud Canteen helps companies plan meals, select vendors, manage orders, and deliver directly - no setup fees, saving time and effort.",
-  "nhap-ghi-chu-cho-don-hang": "Enter order note",
   "OrderMenuPage.title": "Order {orderName} #{title}",
   "OrderMenuPage.subtitle": "Menu by day",
-  "OrderMenuPage.emptyMessage": "No menu available for this order"
+  "OrderMenuPage.emptyMessage": "No menu available for this order",
+  "nhap-ghi-chu-cho-don-hang": "Enter order note"
 }

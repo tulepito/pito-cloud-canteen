@@ -40,9 +40,9 @@ import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
 import { getMenuQueryInSpecificDay } from '@helpers/listingSearchQuery';
 import {
   adjustRecommendOrderDetailWithFoodListPrice,
+  getIsAllowAddSecondaryFood,
   mergeRecommendOrderDetailWithCurrentOrderDetail,
 } from '@helpers/orderHelper';
-import { getIsAllowAddSecondFood } from '@hooks/useIsAllowAddSecondFood';
 import { createAsyncThunk } from '@redux/redux.helper';
 import config from '@src/configs';
 import { CompanyPermissions } from '@src/types/UserPermission';
@@ -480,11 +480,15 @@ const recommendRestaurants = createAsyncThunk(
     });
 
     // // Adjust the food list price if the company is allowed to add a second food
-    const companyId = Listing(order).getMetadata().companyId;
-    const isCompanyAllowDualSelection = getIsAllowAddSecondFood(companyId);
+    const isCompanyAllowDualSelection = getIsAllowAddSecondaryFood(
+      order as TListing,
+    );
     if (isCompanyAllowDualSelection) {
       const adjustedRecommendOrderDetail =
-        adjustRecommendOrderDetailWithFoodListPrice(orderDetail, companyId);
+        adjustRecommendOrderDetailWithFoodListPrice(
+          orderDetail,
+          order as TListing,
+        );
 
       return adjustedRecommendOrderDetail;
     }
@@ -506,8 +510,9 @@ const recommendRestaurantForSpecificDay = createAsyncThunk(
     const { order, draftEditOrderData } = getState().Order;
 
     const orderId = Listing(order).getId();
-    const companyId = Listing(order).getMetadata().companyId;
-    const isCompanyAllowDualSelection = getIsAllowAddSecondFood(companyId);
+    const isCompanyAllowDualSelection = getIsAllowAddSecondaryFood(
+      order as TListing,
+    );
 
     const { plans = [] } = Listing(order).getMetadata();
 
@@ -521,7 +526,10 @@ const recommendRestaurantForSpecificDay = createAsyncThunk(
 
     // Adjust the food list price if the company is allowed to add a second food
     const adjustedOrderDetail = isCompanyAllowDualSelection
-      ? adjustRecommendOrderDetailWithFoodListPrice(newOrderDetail, companyId)
+      ? adjustRecommendOrderDetailWithFoodListPrice(
+          newOrderDetail,
+          order as TListing,
+        )
       : newOrderDetail;
 
     if (shouldUpdatePlanOrderOrderDetail) {
