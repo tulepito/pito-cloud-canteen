@@ -2002,6 +2002,7 @@
   "UserPermission.participant": "Member",
   "HomeRoute.description": "Home page",
   "HomeRoute.title": "Home page",
+  "BookerDraftOrderPage.reachMaxNumberOfParticipants": "The number of participants in the order has exceeded the maximum limit. Please split the order.",
   "bang-cach-tham-gia-ban-da-doc-va-dong-y": "By participating, you have read and agreed",
   "dieu-khoan-dich-vu-va-dieu-kien-su-dung": "Terms of service and conditions of use",
   "cua-pito": "of PITO.",
