@@ -228,7 +228,7 @@ const ReviewOrderDetailWithSecondaryFood: React.FC<
                         'nonRice',
                       )}>
                       <div>{(index as number) + 1}.1</div>
-                      <div>
+                      <div className="font-semibold italic">
                         {intl.formatMessage({
                           id: 'ReviewOrderDetailWithSecondaryFood.nonRiceTitle',
                         })}
@@ -254,7 +254,7 @@ const ReviewOrderDetailWithSecondaryFood: React.FC<
                               <div>
                                 {(index as number) + 1}.1.{idx + 1}
                               </div>
-                              <div>{food.foodName}</div>
+                              <div className="ps-2">{food.foodName}</div>
                               <div></div>
                               <div>
                                 <RenderWhen condition={isMobileLayout}>
@@ -292,7 +292,7 @@ const ReviewOrderDetailWithSecondaryFood: React.FC<
                         'rice',
                       )}>
                       <div>{(index as number) + 1}.2</div>
-                      <div>
+                      <div className="font-semibold italic">
                         {intl.formatMessage({
                           id: 'ReviewOrderDetailWithSecondaryFood.riceSummary',
                         })}
@@ -330,7 +330,7 @@ const ReviewOrderDetailWithSecondaryFood: React.FC<
                             <div>
                               {(index as number) + 1}.2.{idx + 1}
                             </div>
-                            <div>{food.foodName}</div>
+                            <div className="ps-2">{food.foodName}</div>
                             <div></div>
                             <div>
                               <RenderWhen condition={isMobileLayout}>

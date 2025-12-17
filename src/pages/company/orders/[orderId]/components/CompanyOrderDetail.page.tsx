@@ -27,7 +27,6 @@ const CompanyOrderDetailPage: React.FC<TCompanyOrderDetailPageProps> = () => {
   const isViewCartDetailMode = viewMode === EPageViewMode.cartDetail;
 
   const orderData = useAppSelector((state) => state.OrderManagement.orderData);
-  console.log('orderData', JSON.stringify(orderData, null, 2));
   const systemVATPercentage = useAppSelector(
     (state) => state.SystemAttributes.systemVATPercentage,
   );

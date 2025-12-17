@@ -82,9 +82,6 @@ const ReviewView: React.FC<TReviewViewProps> = (props) => {
   const isSecondaryFoodAllowedOrder =
     reviewViewData?.isSecondaryFoodAllowedOrder;
 
-  console.log('orderData', orderData);
-  console.log('isSecondaryFoodAllowedOrder', isSecondaryFoodAllowedOrder);
-
   const isGroupOrder = reviewViewData?.isGroupOrder;
   const rootClasses = classNames(rootClassName || css.root, className);
   const leftPartClasses = classNames(css.leftPart, leftClassName);

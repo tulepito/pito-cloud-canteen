@@ -236,25 +236,30 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
 
   const parsedFoodOptionsForSecondaryFood = useMemo(
     () =>
-      foodOptions?.map((f) => {
-        const isSingleSelectOnlyOneFood = Number(f.numberOfMainDishes) === 1;
-        const disabled = isSingleSelectOnlyOneFood && values?.foodId !== '';
+      foodOptions
+        ?.map((f) => {
+          const isSingleSelectOnlyOneFood = Number(f.numberOfMainDishes) === 1;
+          const disabled = isSingleSelectOnlyOneFood && values?.foodId !== '';
 
-        return {
-          key: f.foodId,
-          label: (
-            <p
-              style={{
-                lineHeight: 1.4,
-                margin: 0,
-              }}
-              title={f.foodName}>
-              {f.foodName}
-            </p>
-          ),
-          disabled,
-        };
-      }),
+          return {
+            key: f.foodId,
+            label: (
+              <p
+                style={{
+                  lineHeight: 1.4,
+                  margin: 0,
+                }}
+                title={f.foodName}>
+                {f.foodName}
+              </p>
+            ),
+            disabled,
+          };
+        })
+        .sort(
+          (a: { disabled: boolean }, b: { disabled: boolean }) =>
+            Number(a.disabled) - Number(b.disabled),
+        ),
 
     [JSON.stringify(foodOptions)],
   );
@@ -333,7 +338,7 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
             </div>
           )}
         </div>
-        <div className="flex flex-col gap-4">
+        <div className="flex w-full lg:w-auto flex-col gap-4">
           <div className={css.fieldContainer}>
             <FieldDropdownSelect
               className={css.fieldSelect}
