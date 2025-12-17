@@ -192,10 +192,17 @@ function BookerDraftOrderPage() {
     companyId,
     orderDeadline,
     nonAccountEmails = [],
+    participants = [],
   } = orderListing.getMetadata();
   const { title: orderTitle } = orderListing.getAttributes();
   const planId = plans.length > 0 ? plans[0] : undefined;
   const isGroupOrder = orderType === EOrderType.group;
+  const maxNumberOfParticipants =
+    process.env.NEXT_PUBLIC_MAX_NUMBER_OF_PARTICIPANTS_IN_AN_ORDER;
+  const isReachMaxNumberOfParticipants = useMemo(
+    () => participants.length > Number(maxNumberOfParticipants),
+    [participants],
+  );
 
   const isFinishOrderDisabled =
     addOrderParticipantsInProgress ||
@@ -205,7 +212,8 @@ function BookerDraftOrderPage() {
       orderDetail,
       availableOrderDetailCheckList,
       ['deadlineDate', 'deadlineHour'],
-    );
+    ) ||
+    isReachMaxNumberOfParticipants;
 
   const companyGeoOrigin = useMemo(
     () => ({
@@ -358,6 +366,20 @@ function BookerDraftOrderPage() {
       selectedTimestamp === timestamp
     );
   };
+
+  useEffect(() => {
+    if (isReachMaxNumberOfParticipants) {
+      toast.error(
+        intl.formatMessage({
+          id: 'BookerDraftOrderPage.reachMaxNumberOfParticipants',
+        }),
+        {
+          autoClose: 10000,
+          position: toast.POSITION.TOP_CENTER,
+        },
+      );
+    }
+  }, [participants]);
 
   const calendarProps = {
     renderEvent: (props: any) => {
