@@ -171,7 +171,7 @@ const OrderDetailSection: React.FC<TOrderDetailSectionProps> = ({
                                 className={classNames(css.row, 'item-row')}
                                 id={`${itemId}-${parentIndex}-${rowIndex++}`}>
                                 <div>{(index as number) + 1}.1</div>
-                                <div>
+                                <div className="font-semibold italic">
                                   {intl.formatMessage({
                                     id: 'ReviewOrderDetailWithSecondaryFood.nonRiceTitle',
                                   })}
@@ -186,7 +186,7 @@ const OrderDetailSection: React.FC<TOrderDetailSectionProps> = ({
                                   key={food.foodId}
                                   id={`${itemId}-${parentIndex}-${rowIndex++}`}>
                                   <div></div>
-                                  <div>{food.foodName}</div>
+                                  <div className="ps-2">{food.foodName}</div>
                                   <div>{food.frequency}</div>
                                   <div></div>
                                 </div>
@@ -200,7 +200,7 @@ const OrderDetailSection: React.FC<TOrderDetailSectionProps> = ({
                                 className={classNames(css.row, 'item-row')}
                                 id={`${itemId}-${parentIndex}-${rowIndex++}`}>
                                 <div>{(index as number) + 1}.2</div>
-                                <div>
+                                <div className="font-semibold italic">
                                   {intl.formatMessage({
                                     id: 'ReviewOrderDetailWithSecondaryFood.riceSummary',
                                   })}
@@ -232,7 +232,7 @@ const OrderDetailSection: React.FC<TOrderDetailSectionProps> = ({
                                   key={food.foodId}
                                   id={`${itemId}-${parentIndex}-${rowIndex++}`}>
                                   <div></div>
-                                  <div>{food.foodName}</div>
+                                  <div className="ps-2">{food.foodName}</div>
                                   <div>{food.frequency}</div>
                                   <div></div>
                                 </div>
@@ -249,7 +249,7 @@ const OrderDetailSection: React.FC<TOrderDetailSectionProps> = ({
 
                     return (
                       <div
-                        className={classNames(css.row, 'item-row')}
+                        className={classNames(css.row, 'item-row !text-[14px]')}
                         key={foodId}
                         id={`${itemId}-${parentIndex}-${childIndex}`}>
                         <div></div>

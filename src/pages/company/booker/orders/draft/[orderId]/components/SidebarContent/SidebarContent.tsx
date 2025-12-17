@@ -300,7 +300,6 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
       mealType: mealTypeValue,
       memberAmount: memberAmountValue,
     } = values;
-    console.log('handleSubmit@values:', values);
     const finalStartDate = startDateValue || startDate;
     const finalEndDate = endDateValue || endDate;
 
