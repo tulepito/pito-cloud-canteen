@@ -15,6 +15,7 @@ import type { TReviewInfoFormValues } from './ReviewInfoSection/ReviewInfoForm';
 import ReviewInfoSection from './ReviewInfoSection/ReviewInfoSection';
 import ReviewNoteSection from './ReviewNoteSection/ReviewNoteSection';
 import ReviewOrderDetailsSection from './ReviewOrderDetailsSection/ReviewOrderDetailsSection';
+import ReviewOrderDetailWithSecondaryFood from './ReviewOrderDetailWithSecondaryFood/ReviewOrderDetailWithSecondaryFood';
 import ReviewOrderProcessSection from './ReviewOrderProcessSection/ReviewOrderProcessSection';
 import ReviewOrdersResultSection from './ReviewOrdersResultSection/ReviewOrdersResultSection';
 import ReviewOrderStatesSection from './ReviewOrderStatesSection/ReviewOrderStatesSection';
@@ -78,6 +79,9 @@ const ReviewView: React.FC<TReviewViewProps> = (props) => {
 
   const { quotationId } = Listing(orderData!).getMetadata();
 
+  const isSecondaryFoodAllowedOrder =
+    reviewViewData?.isSecondaryFoodAllowedOrder;
+
   const isGroupOrder = reviewViewData?.isGroupOrder;
   const rootClasses = classNames(rootClassName || css.root, className);
   const leftPartClasses = classNames(css.leftPart, leftClassName);
@@ -127,9 +131,15 @@ const ReviewView: React.FC<TReviewViewProps> = (props) => {
             />
           </RenderWhen>
 
-          <ReviewOrderDetailsSection
-            foodOrderGroupedByDate={reviewViewData.foodOrderGroupedByDate}
-          />
+          {isSecondaryFoodAllowedOrder ? (
+            <ReviewOrderDetailWithSecondaryFood
+              foodOrderGroupedByDate={reviewViewData.foodOrderGroupedByDate}
+            />
+          ) : (
+            <ReviewOrderDetailsSection
+              foodOrderGroupedByDate={reviewViewData.foodOrderGroupedByDate}
+            />
+          )}
 
           <RenderWhen condition={!isMobileLayout}>
             {isGroupOrder && (

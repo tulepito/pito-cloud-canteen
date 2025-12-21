@@ -29,13 +29,18 @@ export type TAddOrderFormValues = {
   participantId: { key: string; label: string };
   foodId: string;
   requirement: string;
+  secondaryFoodId?: string;
+  secondaryRequirement?: string;
+};
+
+type TFoodOption = {
+  foodId: string;
+  foodName: string;
+  numberOfMainDishes: number | string;
 };
 
 type TExtraProps = {
-  foodOptions: {
-    foodId: string;
-    foodName: string;
-  }[];
+  foodOptions: TFoodOption[];
   memberOptions: {
     memberId: string;
     memberName: string;
@@ -77,24 +82,101 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
     currentViewDate,
   } = props;
 
+  const isAllowAddSecondaryFood = useAppSelector(
+    (state) => state.OrderManagement.isAllowAddSecondaryFood,
+  );
+
   const fieldSelectMemberDisable = isLoading || !ableToUpdateOrder;
   const fieldSelectFoodDisable =
     fieldSelectMemberDisable || foodOptions?.length === 0;
+
+  const selectedPrimaryFood = useMemo(() => {
+    if (!values?.foodId) return null;
+
+    return foodOptions?.find((food) => food.foodId === values.foodId) || null;
+  }, [values?.foodId, JSON.stringify(foodOptions)]);
+
+  const isPrimarySingleSelectionFood = useMemo(() => {
+    if (!selectedPrimaryFood) return false;
+
+    return Number(selectedPrimaryFood.numberOfMainDishes) === 1;
+  }, [selectedPrimaryFood]);
+
+  // Clear secondaryFoodId and secondaryRequirement when primary food is single selection
+  useEffect(() => {
+    if (isPrimarySingleSelectionFood && values?.secondaryFoodId) {
+      form.change('secondaryFoodId', undefined);
+      form.change('secondaryRequirement', undefined);
+    }
+  }, [isPrimarySingleSelectionFood, values?.secondaryFoodId, form]);
+
+  const isRequireSecondFood =
+    Boolean(isAllowAddSecondaryFood) &&
+    Boolean(values?.foodId) &&
+    values?.foodId !== 'notJoined' &&
+    !values?.secondaryFoodId &&
+    !isPrimarySingleSelectionFood;
+
   const submitDisabled =
     invalid ||
     addOrUpdateMemberOrderInProgress ||
     fieldSelectFoodDisable ||
     !values?.participantId ||
-    !values?.foodId;
+    !values?.foodId ||
+    isRequireSecondFood;
+
+  // Get food names for requirement text
+  const primaryFoodName = useMemo(() => {
+    if (!values?.foodId) {
+      return '';
+    }
+
+    const primaryFood = foodOptions?.find(
+      (food) => food.foodId === values?.foodId,
+    );
+
+    return primaryFood?.foodName || '';
+  }, [values?.foodId, foodOptions]);
+
+  const secondaryFoodName = useMemo(() => {
+    if (!values?.secondaryFoodId) {
+      return '';
+    }
+
+    const secondaryFood = foodOptions?.find(
+      (food) => food.foodId === values?.secondaryFoodId,
+    );
+
+    return secondaryFood?.foodName || '';
+  }, [values?.secondaryFoodId, foodOptions]);
 
   const showRequirementText = intl.formatMessage({
     id: 'AddOrderForm.addRequirement.show',
   });
-
   const hideRequirementText = intl.formatMessage({
     id: 'AddOrderForm.addRequirement.hide',
   });
-  const [isRequirementInputShow, setIsRequirementInputShow] = useState(false);
+
+  const primaryRequirementLabel = primaryFoodName
+    ? intl.formatMessage(
+        {
+          id: 'AddOrderForm.addRequirement.showWithFood',
+        },
+        { foodName: primaryFoodName },
+      )
+    : '';
+
+  const secondaryRequirementLabel = secondaryFoodName
+    ? intl.formatMessage(
+        {
+          id: 'AddOrderForm.addRequirement.showWithFood',
+        },
+        { foodName: secondaryFoodName },
+      )
+    : '';
+
+  const [isRequirementSectionExpanded, setIsRequirementSectionExpanded] =
+    useState(false);
   const [
     currentRequirementFieldActionText,
     setCurrentRequirementFieldActionText,
@@ -104,8 +186,8 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
     id: 'AddOrderForm.participantIdField.invalid',
   });
 
-  const handleToggleShowHideRequirementField = () => {
-    setIsRequirementInputShow(!isRequirementInputShow);
+  const handleToggleRequirementSection = () => {
+    setIsRequirementSectionExpanded(!isRequirementSectionExpanded);
   };
 
   useEffect(() => {
@@ -115,12 +197,19 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
   }, [currentViewDate]);
 
   useEffect(() => {
-    if (isRequirementInputShow) {
-      setCurrentRequirementFieldActionText(hideRequirementText);
-    } else {
-      setCurrentRequirementFieldActionText(showRequirementText);
+    const text = isRequirementSectionExpanded
+      ? hideRequirementText
+      : showRequirementText;
+    setCurrentRequirementFieldActionText(text);
+  }, [isRequirementSectionExpanded, hideRequirementText, showRequirementText]);
+
+  useEffect(() => {
+    if (!values?.secondaryFoodId) {
+      if (values?.secondaryRequirement) {
+        form.change('secondaryRequirement', undefined);
+      }
     }
-  }, [isRequirementInputShow]);
+  }, [values?.secondaryFoodId, values?.secondaryRequirement, form]);
 
   const selectMemberOptions = useMemo(
     () =>
@@ -144,6 +233,36 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
     ),
     key: f.foodId,
   }));
+
+  const parsedFoodOptionsForSecondaryFood = useMemo(
+    () =>
+      foodOptions
+        ?.map((f) => {
+          const isSingleSelectOnlyOneFood = Number(f.numberOfMainDishes) === 1;
+          const disabled = isSingleSelectOnlyOneFood && values?.foodId !== '';
+
+          return {
+            key: f.foodId,
+            label: (
+              <p
+                style={{
+                  lineHeight: 1.4,
+                  margin: 0,
+                }}
+                title={f.foodName}>
+                {f.foodName}
+              </p>
+            ),
+            disabled,
+          };
+        })
+        .sort(
+          (a: { disabled: boolean }, b: { disabled: boolean }) =>
+            Number(a.disabled) - Number(b.disabled),
+        ),
+
+    [JSON.stringify(foodOptions)],
+  );
 
   const customHandleSubmit = (event: any) => {
     return handleSubmit(event)?.then((submitResult) => {
@@ -219,20 +338,41 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
             </div>
           )}
         </div>
-        <div className={css.fieldContainer}>
-          <FieldDropdownSelect
-            className={css.fieldSelect}
-            dropdownWrapperClassName={css.fieldSelectDropdownWrapper}
-            options={parsedFoodOptions}
-            disabled={fieldSelectFoodDisable}
-            id={'addOrder.foodId'}
-            name="foodId"
-            placeholder={intl.formatMessage({
-              id: 'AddOrderForm.foodIdField.placeholder',
-            })}
-            fieldWrapperClassName={css.fieldSelectWrapper}
-          />
+        <div className="flex w-full lg:w-auto flex-col gap-4">
+          <div className={css.fieldContainer}>
+            <FieldDropdownSelect
+              className={css.fieldSelect}
+              dropdownWrapperClassName={css.fieldSelectDropdownWrapper}
+              options={parsedFoodOptions}
+              disabled={fieldSelectFoodDisable}
+              id={'addOrder.foodId'}
+              name="foodId"
+              placeholder={intl.formatMessage({
+                id: 'AddOrderForm.foodIdField.placeholder',
+              })}
+              fieldWrapperClassName={css.fieldSelectWrapper}
+            />
+          </div>
+          <RenderWhen condition={isAllowAddSecondaryFood}>
+            <div className={css.fieldContainer}>
+              <FieldDropdownSelect
+                className={css.fieldSelect}
+                dropdownWrapperClassName={css.fieldSelectDropdownWrapper}
+                options={parsedFoodOptionsForSecondaryFood}
+                disabled={
+                  fieldSelectFoodDisable || isPrimarySingleSelectionFood
+                }
+                id={'addOrder.secondaryFoodId'}
+                name="secondaryFoodId"
+                placeholder={intl.formatMessage({
+                  id: 'AddOrderForm.secondaryFoodIdField.placeholder',
+                })}
+                fieldWrapperClassName={css.fieldSelectWrapper}
+              />
+            </div>
+          </RenderWhen>
         </div>
+
         <Button
           disabled={submitDisabled}
           inProgress={addOrUpdateMemberOrderInProgress}
@@ -252,10 +392,10 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
           type="button"
           variant="inline"
           disabled={fieldSelectFoodDisable}
-          onClick={handleToggleShowHideRequirementField}
+          onClick={handleToggleRequirementSection}
           className={css.toggleRequirementBtn}>
           <div className={css.buttonContent}>
-            <RenderWhen condition={isRequirementInputShow}>
+            <RenderWhen condition={isRequirementSectionExpanded}>
               <IconMinus />
               <RenderWhen.False>
                 <IconPlusWithoutBorder />
@@ -264,20 +404,56 @@ const AddOrderFormComponent: React.FC<TAddOrderFormComponentProps> = (
             <div>{currentRequirementFieldActionText}</div>
           </div>
         </Button>
-        {isRequirementInputShow && (
-          <div className={css.fieldRequirementContainer}>
-            <FieldTextArea
-              id="AddOrderForm.requirement"
-              name="requirement"
-              label={intl.formatMessage({
-                id: 'AddOrderForm.requirementField.label',
-              })}
-              placeholder={intl.formatMessage({
-                id: 'AddOrderForm.requirementField.placeholder',
-              })}
-              disabled={!ableToUpdateOrder}
-            />
-          </div>
+
+        {isRequirementSectionExpanded && (
+          <>
+            {/* Primary food requirement */}
+            <div className={css.fieldRequirementContainer}>
+              {primaryRequirementLabel && (
+                <div className={css.requirementFoodLabel}>
+                  {primaryRequirementLabel}
+                </div>
+              )}
+              <FieldTextArea
+                id="AddOrderForm.requirement"
+                name="requirement"
+                label={intl.formatMessage({
+                  id: 'AddOrderForm.requirementField.label',
+                })}
+                placeholder={intl.formatMessage({
+                  id: 'AddOrderForm.requirementField.placeholder',
+                })}
+                disabled={!ableToUpdateOrder}
+              />
+            </div>
+
+            {/* Secondary food requirement */}
+            <RenderWhen
+              condition={
+                isAllowAddSecondaryFood &&
+                Boolean(values?.secondaryFoodId) &&
+                !isPrimarySingleSelectionFood
+              }>
+              <div className={css.fieldRequirementContainer}>
+                {secondaryRequirementLabel && (
+                  <div className={css.requirementFoodLabel}>
+                    {secondaryRequirementLabel}
+                  </div>
+                )}
+                <FieldTextArea
+                  id="AddOrderForm.secondaryRequirement"
+                  name="secondaryRequirement"
+                  label={intl.formatMessage({
+                    id: 'AddOrderForm.requirementField.label',
+                  })}
+                  placeholder={intl.formatMessage({
+                    id: 'AddOrderForm.requirementField.placeholder',
+                  })}
+                  disabled={!ableToUpdateOrder}
+                />
+              </div>
+            </RenderWhen>
+          </>
         )}
       </div>
 

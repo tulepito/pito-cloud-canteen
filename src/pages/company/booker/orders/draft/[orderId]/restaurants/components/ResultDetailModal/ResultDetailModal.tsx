@@ -10,6 +10,7 @@ import Modal from '@components/Modal/Modal';
 import ResponsiveImage from '@components/ResponsiveImage/ResponsiveImage';
 import SlideModal from '@components/SlideModal/SlideModal';
 import { calculateDistance } from '@helpers/mapHelpers';
+import { getIsAllowAddSecondaryFood } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { useViewport } from '@hooks/useViewport';
@@ -84,6 +85,7 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
   );
   const { restaurant: preselectedRestaurant } = useGetRestaurant();
   const { orderId, planId, planDetail, orderType } = useGetPlanDetails();
+  const order = useAppSelector((state) => state.BookerSelectRestaurant.order);
   const { orderDetail } = Listing(planDetail).getMetadata();
   const initialFoodIds = useMemo(() => {
     const detail =
@@ -195,14 +197,32 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
       return;
     }
 
+    const isSecondaryFoodAllowedCompany = getIsAllowAddSecondaryFood(
+      order as TListing,
+    );
+
     const updateFoodList = selectedFoods.reduce((acc: any, foodId: string) => {
       const food = foodList?.find((item) => item.id?.uuid === foodId);
       if (food) {
         const foodListingGetter = Listing(food).getAttributes();
+        const originalPrice = foodListingGetter.price?.amount || 0;
+        const foodName = foodListingGetter.title || '';
+
+        const numberOfMainDishes =
+          foodListingGetter.publicData?.numberOfMainDishes;
+        const isSinglePickFood =
+          numberOfMainDishes !== undefined &&
+          numberOfMainDishes !== null &&
+          Number(numberOfMainDishes) === 1;
+
+        const finalPrice =
+          isSecondaryFoodAllowedCompany && !isSinglePickFood
+            ? originalPrice / 2
+            : originalPrice;
 
         acc[foodId] = {
-          foodName: foodListingGetter.title,
-          foodPrice: foodListingGetter.price?.amount || 0,
+          foodName,
+          foodPrice: finalPrice,
           foodUnit: foodListingGetter.publicData?.unit || '',
         };
       }

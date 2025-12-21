@@ -5,6 +5,8 @@ import isEmpty from 'lodash/isEmpty';
 
 import ReviewCartSection from '@components/OrderDetails/ReviewView/ReviewCartSection/ReviewCartSection';
 import ReviewOrderDetailsSection from '@components/OrderDetails/ReviewView/ReviewOrderDetailsSection/ReviewOrderDetailsSection';
+import ReviewOrderDetailWithSecondaryFood from '@components/OrderDetails/ReviewView/ReviewOrderDetailWithSecondaryFood/ReviewOrderDetailWithSecondaryFood';
+import RenderWhen from '@components/RenderWhen/RenderWhen';
 import Tabs from '@components/Tabs/Tabs';
 import { calculatePriceQuotationInfoFromQuotation } from '@helpers/order/cartInfoHelper';
 import { groupFoodOrderByDateFromQuotation } from '@helpers/order/orderDetailHelper';
@@ -12,6 +14,7 @@ import {
   ensureVATSetting,
   vatPercentageBaseOnVatSetting,
 } from '@helpers/order/prepareDataHelper';
+import { getIsAllowAddSecondaryFood } from '@helpers/orderHelper';
 import { useDownloadPriceQuotation } from '@hooks/useDownloadPriceQuotation';
 import { Listing } from '@src/utils/data';
 import type { TListing, TObject, TUser } from '@src/utils/types';
@@ -189,6 +192,8 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
     vatSetting: partnerVATSetting,
   });
 
+  const isSecondaryFoodAllowedOrder = getIsAllowAddSecondaryFood(order);
+
   return (
     <div className={css.container}>
       <div className={css.leftCol}>
@@ -203,12 +208,21 @@ const OrderQuotationDetail: React.FC<OrderQuotationDetailProps> = (props) => {
         ) : (
           <>
             <div className={css.clientTitle}>Báo giá khách hàng</div>
-            <ReviewOrderDetailsSection
-              outsideCollapsible
-              foodOrderGroupedByDate={groupFoodOrderByDateFromQuotation({
-                quotation: quotation!,
-              })}
-            />
+            <RenderWhen condition={isSecondaryFoodAllowedOrder}>
+              <ReviewOrderDetailWithSecondaryFood
+                foodOrderGroupedByDate={groupFoodOrderByDateFromQuotation({
+                  quotation: quotation!,
+                })}
+              />
+            </RenderWhen>
+            <RenderWhen condition={!isSecondaryFoodAllowedOrder}>
+              <ReviewOrderDetailsSection
+                outsideCollapsible
+                foodOrderGroupedByDate={groupFoodOrderByDateFromQuotation({
+                  quotation: quotation!,
+                })}
+              />
+            </RenderWhen>
           </>
         )}
       </div>

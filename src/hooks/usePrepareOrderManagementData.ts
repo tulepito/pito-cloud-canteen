@@ -12,7 +12,10 @@ import {
   groupFoodOrderByDate,
   groupFoodOrderByDateFromQuotation,
 } from '@helpers/order/orderDetailHelper';
-import { isEnableToStartOrder } from '@helpers/orderHelper';
+import {
+  getIsAllowAddSecondaryFood,
+  isEnableToStartOrder,
+} from '@helpers/orderHelper';
 import { useAppSelector } from '@hooks/reduxHooks';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { companyPaths } from '@src/paths';
@@ -188,7 +191,7 @@ export const usePrepareOrderDetailPageData = ({
       }),
     [JSON.stringify(draftOrderDetail), isGroupOrder],
   );
-
+  // cho nay
   const foodOrderGroupedByDate = isOrderIsPicking
     ? foodOrderGroupedByDateFromOrderDetail
     : isOrderEditing
@@ -354,6 +357,10 @@ export const usePrepareOrderDetailPageData = ({
       orderNote,
       disabled: orderState !== EOrderStates.picking,
     },
+    isSecondaryFoodAllowedOrder:
+      orderType === EOrderType.group
+        ? getIsAllowAddSecondaryFood(orderData as TListing)
+        : false,
   };
   /* =============== Price quotation data =============== */
   const priceQuotationData = {
@@ -380,6 +387,9 @@ export const usePrepareOrderDetailPageData = ({
     },
     orderDetailData: {
       foodOrderGroupedByDate,
+      isAllowAddSecondaryFood: getIsAllowAddSecondaryFood(
+        orderData as TListing,
+      ),
     },
   };
 

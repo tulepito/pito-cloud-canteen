@@ -77,32 +77,37 @@ const OrderDateFieldModalMobile: React.FC<TOrderDateFieldModalMobileProps> = (
         startDate={startDate}
         endDate={endDate}
       />
-      <div className={css.bottomBtns}>
-        <Button className={'flex-1'} variant="secondary" onClick={onClose}>
-          {intl.formatMessage({
-            id: 'ManageParticipantsSection.deleteParticipantPopup.cancel',
-          })}
-        </Button>
-        {props.allowClear && (
-          <Button
-            variant="secondary"
-            type="button"
-            className={'flex-1'}
-            onClick={handleClearDateRange}>
+      <div className="flex gap-2 items-center">
+        <p className="font-bold text-xs flex-1 ms-2 text-gray-700">
+          {intl.formatMessage({ id: 'QuizMealDate.note' })}
+        </p>
+        <div className={css.bottomBtns}>
+          <Button className={'flex-1'} variant="secondary" onClick={onClose}>
             {intl.formatMessage({
-              id: 'ManageCompanyOrdersPage.deleteDraftOrderModal.confirmBtn',
+              id: 'ManageParticipantsSection.deleteParticipantPopup.cancel',
             })}
           </Button>
-        )}
-        <Button
-          type="button"
-          className={'flex-1'}
-          variant="primary"
-          onClick={onSubmitOrderDate}>
-          {intl.formatMessage({
-            id: 'MoveFoodToMenuForm.formStep.selectDays.submitText',
-          })}
-        </Button>
+          {props.allowClear && (
+            <Button
+              variant="secondary"
+              type="button"
+              className={'flex-1'}
+              onClick={handleClearDateRange}>
+              {intl.formatMessage({
+                id: 'ManageCompanyOrdersPage.deleteDraftOrderModal.confirmBtn',
+              })}
+            </Button>
+          )}
+          <Button
+            type="button"
+            className={'flex-1'}
+            variant="primary"
+            onClick={onSubmitOrderDate}>
+            {intl.formatMessage({
+              id: 'MoveFoodToMenuForm.formStep.selectDays.submitText',
+            })}
+          </Button>
+        </div>
       </div>
     </SlideModal>
   );

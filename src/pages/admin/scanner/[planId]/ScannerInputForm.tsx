@@ -41,6 +41,16 @@ import type { TObject, TUser } from '@src/utils/types';
 
 import { LoadingWrapper } from './LoadingWrapper';
 
+const getFoodName = (memberOrder: TObject, restaurant: TObject) => {
+  return memberOrder?.secondaryFoodId
+    ? memberOrder.foodId === memberOrder.secondaryFoodId
+      ? `${restaurant?.foodList?.[memberOrder?.foodId]?.foodName} x2 định lượng`
+      : `${restaurant?.foodList?.[memberOrder?.foodId]?.foodName} + ${
+          restaurant?.foodList?.[memberOrder?.secondaryFoodId]?.foodName
+        }`
+    : restaurant?.foodList?.[memberOrder?.foodId]?.foodName || '';
+};
+
 const prepareDataGroups = ({
   orderDetailPerDate = {},
   participantDataMap = {},
@@ -56,6 +66,7 @@ const prepareDataGroups = ({
   return memberIds.reduce((results, memberId) => {
     const memberOrder = memberOrders[memberId];
     const participant = participantDataMap[memberId];
+    const foodName = getFoodName(memberOrder, restaurant);
 
     if (
       memberOrder &&
@@ -66,7 +77,7 @@ const prepareDataGroups = ({
         name: participant.name,
         email: participant.email,
         memberId,
-        foodName: restaurant?.foodList?.[memberOrder?.foodId]?.foodName || '',
+        foodName,
       });
     }
 

@@ -43,6 +43,7 @@ import {
   calculateClientQuotation,
   calculatePartnerQuotation,
 } from '@helpers/order/quotationHelper';
+import { getIsAllowAddSecondaryFood } from '@helpers/orderHelper';
 import { AdminManageOrderActions } from '@pages/admin/order/AdminManageOrder.slice';
 import type { POSTRemindMemberBody } from '@pages/api/orders/[orderId]/remind-member/index.api';
 import { buildParticipantSubOrderDocumentId } from '@pages/api/participants/document/document.service';
@@ -106,6 +107,8 @@ export const prepareOrderDetail = ({
   memberId,
   requirement,
   memberOrderValues,
+  secondaryFoodId,
+  secondaryRequirement,
 }: {
   orderDetail: TPlan['orderDetail'];
   currentViewDate: number;
@@ -113,6 +116,8 @@ export const prepareOrderDetail = ({
   memberId: string;
   requirement: string;
   memberOrderValues: TObject;
+  secondaryFoodId?: string;
+  secondaryRequirement?: string;
 }) => {
   let newMemberOrderValues = memberOrderValues;
 
@@ -124,6 +129,7 @@ export const prepareOrderDetail = ({
       newMemberOrderValues = {
         ...newMemberOrderValues,
         foodId,
+        ...(secondaryFoodId && { secondaryFoodId }),
       };
       break;
     case EParticipantOrderStatus.empty:
@@ -131,6 +137,7 @@ export const prepareOrderDetail = ({
       newMemberOrderValues = {
         ...newMemberOrderValues,
         foodId,
+        ...(secondaryFoodId && { secondaryFoodId }),
         status: EParticipantOrderStatus.joined,
       };
       break;
@@ -139,7 +146,11 @@ export const prepareOrderDetail = ({
     default:
       break;
   }
-  newMemberOrderValues = { ...newMemberOrderValues, requirement };
+  newMemberOrderValues = {
+    ...newMemberOrderValues,
+    requirement,
+    ...(secondaryRequirement ? { secondaryRequirement } : {}),
+  };
 
   const newOrderDetail = addNewMemberToOrderDetail(
     orderDetail,
@@ -223,6 +234,8 @@ type TOrderManagementState = {
 
   toggleScannerModeInProgress: boolean;
   toggleScannerModeError: string;
+
+  isAllowAddSecondaryFood: boolean;
 };
 
 const initialState: TOrderManagementState = {
@@ -271,6 +284,7 @@ const initialState: TOrderManagementState = {
 
   toggleScannerModeInProgress: false,
   toggleScannerModeError: '',
+  isAllowAddSecondaryFood: false,
 };
 
 // ================ Thunk types ================ //
@@ -290,8 +304,6 @@ const queryTransactions = createAsyncThunk(
         const [subOrderDate, subOrderDateData] = entry;
         const { transactionId } = (subOrderDateData as TObject) || {};
 
-        console.log('transactionId', transactionId);
-
         if (transactionId) {
           const txResponse = await fetchTxApi(transactionId);
 
@@ -310,7 +322,10 @@ const loadData = createAsyncThunk(
     const { orderId, isAdminFlow = false } = payload;
     const response: any = await getBookerOrderDataApi(orderId);
     dispatch(SystemAttributesThunks.fetchVATPercentageByOrderId(orderId));
-
+    // Check if company is allowing add second food
+    const isAllowAddSecondaryFood = getIsAllowAddSecondaryFood(
+      response.data.orderListing as TListing,
+    );
     if (isAdminFlow) {
       const { orderListing: orderData = {}, planListing: planData = {} } =
         response.data || {};
@@ -322,7 +337,7 @@ const loadData = createAsyncThunk(
       dispatch(AdminManageOrderActions.saveOrderDetail(orderDetail));
     }
 
-    return response.data;
+    return { ...response.data, isAllowAddSecondaryFood };
   },
 );
 
@@ -441,8 +456,15 @@ const addOrUpdateMemberOrder = createAsyncThunk(
   'app/OrderManagement/ADD_OR_UPDATE_MEMBER_ORDER',
   async (params: TObject, { getState, rejectWithValue }) => {
     try {
-      const { currentViewDate, foodId, memberId, requirement, memberEmail } =
-        params;
+      const {
+        currentViewDate,
+        foodId,
+        memberId,
+        requirement,
+        memberEmail,
+        secondaryFoodId,
+        secondaryRequirement,
+      } = params;
       const orderGetter = Listing(
         getState().OrderManagement.orderData! as TListing,
       );
@@ -499,6 +521,7 @@ const addOrUpdateMemberOrder = createAsyncThunk(
           newMemberOrderValues = {
             ...newMemberOrderValues,
             foodId,
+            ...(secondaryFoodId && { secondaryFoodId }),
           };
           break;
         case EParticipantOrderStatus.empty:
@@ -506,6 +529,7 @@ const addOrUpdateMemberOrder = createAsyncThunk(
           newMemberOrderValues = {
             ...newMemberOrderValues,
             foodId,
+            ...(secondaryFoodId && { secondaryFoodId }),
             status: EParticipantOrderStatus.joined,
           };
           break;
@@ -514,7 +538,11 @@ const addOrUpdateMemberOrder = createAsyncThunk(
         default:
           break;
       }
-      newMemberOrderValues = { ...newMemberOrderValues, requirement };
+      newMemberOrderValues = {
+        ...newMemberOrderValues,
+        requirement,
+        ...(secondaryRequirement ? { secondaryRequirement } : {}),
+      };
 
       const updateParams = {
         currentViewDate,
@@ -549,6 +577,7 @@ const addOrUpdateMemberOrder = createAsyncThunk(
             subOrderId,
             params: {
               foodId,
+              secondaryFoodId,
             },
           });
         }
@@ -1232,6 +1261,8 @@ const OrderManagementSlice = createSlice({
         memberEmail,
         requirement,
         isAdminFlow = false,
+        secondaryFoodId,
+        secondaryRequirement,
       } = payload;
 
       const {
@@ -1245,13 +1276,14 @@ const OrderManagementSlice = createSlice({
         planData as TListing,
       ).getMetadata();
 
-      const { foodId: defaultFoodId } =
+      const { foodId: defaultFoodId, secondaryFoodId: defaultSecondaryFoodId } =
         defaultOrderDetail[currentViewDate].memberOrders[memberId] || {};
 
       const memberOrderBeforeUpdate =
         draftOrderDetail[currentViewDate].memberOrders[memberId];
 
-      const { foodId: oldFoodId } = memberOrderBeforeUpdate || {};
+      const { foodId: oldFoodId, secondaryFoodId: oldSecondaryFoodId } =
+        memberOrderBeforeUpdate || {};
 
       const newOrderDetail =
         prepareOrderDetail({
@@ -1261,6 +1293,8 @@ const OrderManagementSlice = createSlice({
           memberId,
           requirement,
           memberOrderValues: memberOrderBeforeUpdate,
+          secondaryFoodId,
+          secondaryRequirement,
         }) || {};
 
       const orderValidationsInProgressState =
@@ -1302,8 +1336,17 @@ const OrderManagementSlice = createSlice({
         (i) => i.memberId === memberId,
       );
 
-      if (defaultFoodId === foodId && orderHistoryByMemberIndex > -1) {
-        currentDraftSubOrderChanges.splice(orderHistoryByMemberIndex, 0);
+      const isFoodIdBackToDefault = defaultFoodId === foodId;
+      const isSecondaryFoodIdBackToDefault =
+        (defaultSecondaryFoodId || undefined) ===
+        (secondaryFoodId || undefined);
+
+      if (
+        isFoodIdBackToDefault &&
+        isSecondaryFoodIdBackToDefault &&
+        orderHistoryByMemberIndex > -1
+      ) {
+        currentDraftSubOrderChanges.splice(orderHistoryByMemberIndex, 1);
 
         return {
           ...state,
@@ -1316,28 +1359,24 @@ const OrderManagementSlice = createSlice({
         };
       }
 
-      if (defaultFoodId === foodId && orderHistoryByMemberIndex > -1) {
-        currentDraftSubOrderChanges.splice(orderHistoryByMemberIndex, 0);
-
-        return {
-          ...state,
-          orderDetail: newOrderDetail,
-          draftSubOrderChangesHistory: {
-            ...state.draftSubOrderChangesHistory,
-            [currentViewDate]: currentDraftSubOrderChanges,
-          },
-          orderValidationsInProgressState,
-        };
-      }
-
       const { foodList = {} } =
         newOrderDetail[currentViewDate]?.restaurant || {};
 
       const { foodName: oldFoodName, foodPrice: oldFoodPrice } =
         foodList[oldFoodId] || {};
 
+      const {
+        foodName: oldSecondaryFoodName,
+        foodPrice: oldSecondaryFoodPrice,
+      } = oldSecondaryFoodId ? foodList[oldSecondaryFoodId] : {};
+
       const { foodName: newFooldName, foodPrice: newFoodPrice } =
         foodList[foodId] || {};
+
+      const {
+        foodName: newSecondaryFoodName,
+        foodPrice: newSecondaryFoodPrice,
+      } = secondaryFoodId ? foodList[secondaryFoodId] : {};
 
       const newDraftSubOrderChangesHistory = {
         ...draftSubOrderChangesHistory,
@@ -1361,12 +1400,23 @@ const OrderManagementSlice = createSlice({
                   foodId: oldFoodId,
                   foodName: oldFoodName,
                   foodPrice: oldFoodPrice,
+                  ...(oldSecondaryFoodId && {
+                    secondaryFoodId: oldSecondaryFoodId,
+                    secondaryFoodName: oldSecondaryFoodName,
+                    secondaryFoodPrice: oldSecondaryFoodPrice,
+                  }),
                 }
               : null,
             newValue: {
               foodId,
               foodName: newFooldName,
               foodPrice: newFoodPrice,
+
+              ...(secondaryFoodId && {
+                secondaryFoodId,
+                secondaryFoodName: newSecondaryFoodName,
+                secondaryFoodPrice: newSecondaryFoodPrice,
+              }),
             },
           },
           ...(draftSubOrderChangesHistory[currentViewDate] || []),
@@ -1771,6 +1821,9 @@ const OrderManagementSlice = createSlice({
         planData: newPlanData,
       };
     },
+    setIsAllowAddSecondFood: (state, { payload }) => {
+      state.isAllowAddSecondaryFood = payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -1803,6 +1856,7 @@ const OrderManagementSlice = createSlice({
           const {
             orderListing: orderData,
             planListing: planData,
+            isAllowAddSecondaryFood,
             // eslint-disable-next-line unused-imports/no-unused-vars
             statusCode,
             ...restPayload
@@ -1825,6 +1879,7 @@ const OrderManagementSlice = createSlice({
             draftOrderDetail: orderDetail,
             orderValidationsInProgressState,
             isAdminFlow,
+            isAllowAddSecondaryFood,
             fetchOrderInProgress: false,
             ...restPayload,
           };

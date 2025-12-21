@@ -2,8 +2,10 @@ import { useIntl } from 'react-intl';
 import classNames from 'classnames';
 
 import Button from '@components/Button/Button';
+import { useAppSelector } from '@hooks/reduxHooks';
 import { useViewport } from '@hooks/useViewport';
 import { verifyAllFoodPickedWithParticipant } from '@pages/participant/helpers';
+import type { TMemberPlan } from '@redux/slices/shoppingCart.slice';
 
 import css from './SectionOrderPanel.module.scss';
 
@@ -15,12 +17,7 @@ type TOrderPanelFooter = {
   handleRemoveAllItem: () => void;
   cartListKeys?: string[];
   orderDetailIds: string[];
-  cartList: {
-    [dayId: number]: {
-      foodId: string;
-      requirement: string;
-    };
-  };
+  cartList: TMemberPlan;
 };
 
 const OrderPanelFooter: React.FC<TOrderPanelFooter> = ({
@@ -33,11 +30,24 @@ const OrderPanelFooter: React.FC<TOrderPanelFooter> = ({
   cartList,
 }) => {
   const intl = useIntl();
+
+  const plan = useAppSelector((state) => state.ParticipantPlanPage.plan);
+
+  const isAllowAddSecondaryFood = useAppSelector(
+    (state) => state.ParticipantPlanPage.isAllowAddSecondaryFood,
+  );
+  const isRequireSecondFood = true; // TODO: need to handle this flag after second food feature is applied to all companies
   const submitDisabled =
     isOrderDeadlineOver ||
     submitDataInprogress ||
     cartListKeys.length === 0 ||
-    verifyAllFoodPickedWithParticipant(orderDetailIds, cartList);
+    verifyAllFoodPickedWithParticipant(
+      orderDetailIds,
+      cartList,
+      plan,
+      isAllowAddSecondaryFood,
+      isRequireSecondFood,
+    );
 
   const removeAllDisabled = isOrderDeadlineOver || cartListKeys.length === 0;
 

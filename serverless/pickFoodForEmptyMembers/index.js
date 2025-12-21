@@ -20,6 +20,7 @@ const createParticipantSubOrderFirebase = require('./services/createParticipantS
 const sendEmailToParticipants = require('./services/sendEmailToParticipants');
 const sendNativeNotificationToParticipants = require('./services/sendNativeNotificationToParticipants');
 const { VEGETARIAN_ONLY_USER_IDS } = require('./utils/constants');
+const { isSingleSelectionFood } = require('./utils/helper');
 
 exports.handler = async (_event) => {
   try {
@@ -43,7 +44,12 @@ exports.handler = async (_event) => {
 
     console.log('LOG ~ exports.handler= ~ orderResponse:', orderResponse);
 
-    const { orderState, orderType } = Listing(orderResponse).getMetadata();
+    const orderMetadata = Listing(orderResponse).getMetadata();
+    const {
+      orderState,
+      orderType,
+      canAddSecondaryFood = false,
+    } = orderMetadata;
 
     if (orderType !== EOrderType.group) {
       console.error('Cannot pick food for non-group order');
@@ -178,24 +184,68 @@ exports.handler = async (_event) => {
                 `LOG ~ User ${memberId} for order ${orderId} is in vegetarian-only list, will pick vegetarian food only`,
               );
             }
+
+            const subOrderFoodIds =
+              groupFoodIdsBySubOrder[subOrderDate].foodIds;
+
             const suitableFood = recommendFood(
               foodResponses,
-              groupFoodIdsBySubOrder[subOrderDate].foodIds,
+              subOrderFoodIds,
               allergies,
               isVegetarianOnly,
             );
 
             if (suitableFood) {
-              newMemberOrderResult[memberId] = {
+              const primaryFoodId = suitableFood?.id?.uuid;
+
+              const updatedMemberOrder = {
                 ...newMemberOrderResult[memberId],
-                foodId: suitableFood?.id?.uuid,
+                foodId: primaryFoodId,
                 status: EParticipantOrderStatus.joined,
+              };
+
+              let secondaryFoodId;
+
+              if (canAddSecondaryFood && !isSingleSelectionFood(suitableFood)) {
+                const secondaryCandidateFoodIds = subOrderFoodIds.filter(
+                  (foodId) => {
+                    if (foodId === primaryFoodId) {
+                      return false;
+                    }
+
+                    const foodListing = foodResponses.find(
+                      (food) => food.id?.uuid === foodId,
+                    );
+
+                    // Không pick món thứ 2 là món single selection
+                    return !isSingleSelectionFood(foodListing);
+                  },
+                );
+
+                if (secondaryCandidateFoodIds.length) {
+                  const secondaryFood = recommendFood(
+                    foodResponses,
+                    secondaryCandidateFoodIds,
+                    allergies,
+                    isVegetarianOnly,
+                  );
+
+                  if (secondaryFood) {
+                    secondaryFoodId = secondaryFood?.id?.uuid;
+                  }
+                }
+              }
+
+              newMemberOrderResult[memberId] = {
+                ...updatedMemberOrder,
+                ...(secondaryFoodId && { secondaryFoodId }),
               };
 
               console.log(
                 `LOG ~ Pick food for user`,
                 memberId,
-                suitableFood?.id?.uuid,
+                primaryFoodId,
+                secondaryFoodId ? `+ ${secondaryFoodId}` : '',
                 isVegetarianOnly ? '(vegetarian)' : '(non-vegetarian)',
                 'at',
                 new Date(+subOrderDate).toLocaleString('en-US', {

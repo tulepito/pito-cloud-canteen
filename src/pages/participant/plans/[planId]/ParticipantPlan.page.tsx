@@ -1,8 +1,11 @@
+/* eslint-disable prettier/prettier */
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
+import { toast } from 'react-toastify';
 import classNames from 'classnames';
 import isEmpty from 'lodash/isEmpty';
+import { ShoppingCartIcon } from 'lucide-react';
 import type { Duration } from 'luxon';
 import { DateTime } from 'luxon';
 import { useRouter } from 'next/router';
@@ -12,16 +15,21 @@ import IconArrow from '@components/Icons/IconArrow/IconArrow';
 import IconArrowFull from '@components/Icons/IconArrow/IconArrowFull';
 import ParticipantLayout from '@components/ParticipantLayout/ParticipantLayout';
 import { prepareOrderDeadline } from '@helpers/order/prepareDataHelper';
+import { getIsAllowAddSecondaryFood, isOrderOverDeadline } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
+import { useViewport } from '@hooks/useViewport';
+import { totalFoodPickedWithParticipant } from '@pages/participant/helpers';
 import { UIActions } from '@redux/slices/UI.slice';
 import type { RootState } from '@redux/store';
 import { participantPaths } from '@src/paths';
+import { formatTimestamp } from '@src/utils/dates';
 import { EOrderType } from '@src/utils/enums';
 import { Listing } from '@utils/data';
 
 import SectionCountdown from '../../components/SectionCountdown/SectionCountdown';
 import SectionOrderListing from '../../components/SectionOrderListing/SectionOrderListing';
+import TabActions from '../../components/SectionOrderListing/TabActions';
 import SectionOrderPanel from '../../components/SectionOrderPanel/SectionOrderPanel';
 import SectionRestaurantHero from '../../components/SectionRestaurantHero/SectionRestaurantHero';
 
@@ -40,6 +48,7 @@ const ParticipantPlan = () => {
   const router = useRouter();
   const isRouterReady = router.isReady;
   const { planId, from = 'orderList' } = router.query;
+  const { isMobileLayout } = useViewport();
 
   const { loadDataInProgress, order, plan } = useLoadData();
   const { orderDayState, selectedRestaurant, handleSelectRestaurant } =
@@ -54,16 +63,15 @@ const ParticipantPlan = () => {
   const orderId = order?.id?.uuid;
 
   const orderDays = Object.keys(plan);
-  const cartListKeys = Object.keys(cartList || []).filter(
-    (cartKey) => !!cartList[Number(cartKey)],
-  );
 
   const {
     deadlineDate = Date.now(),
     deadlineHour,
     orderType = EOrderType.group,
   } = Listing(order).getMetadata();
+  const isAllowAddSecondaryFood = getIsAllowAddSecondaryFood(order);
   const isGroupOrder = orderType === EOrderType.group;
+  const isOrderDeadlineOver = isOrderOverDeadline(order);
 
   const orderDeadline = prepareOrderDeadline(deadlineDate, deadlineHour);
 
@@ -158,13 +166,96 @@ const ParticipantPlan = () => {
     });
   };
 
+  const getNextSubOrderDay = (dayId: string) => {
+    const subOrderDates = Object.keys(plan);
+
+    const dayIndex = subOrderDates.findIndex((item) => item === dayId);
+    const firstDayIndexNotHaveDish = subOrderDates.findIndex(
+      (item) => !cartList?.[+item]?.foodId,
+    );
+    const nextDayIndex =
+      subOrderDates.length - 1 === dayIndex
+        ? firstDayIndexNotHaveDish !== -1
+          ? firstDayIndexNotHaveDish
+          : dayIndex
+        : dayIndex + 1;
+
+    return (
+      subOrderDates[nextDayIndex] || subOrderDates[firstDayIndexNotHaveDish]
+    );
+  };
+
+  const scrollTimeoutRef = useRef<any | null>(null);
+
+  const onAddedToCart = ({
+    foodName,
+    timestamp,
+  }: {
+    foodName?: string;
+    timestamp: string;
+  }) => {
+    toast.success(
+      foodName
+        ? `${intl.formatMessage({
+          id: 'da-them-mon',
+        })} ${foodName} ${intl.formatMessage({
+          id: 'cho-ngay',
+        })} ${formatTimestamp(+timestamp)}`
+        : `${intl.formatMessage({
+          id: 'khong-chon-mon-cho-ngay',
+        })} ${formatTimestamp(+timestamp)}`,
+      {
+        position: isMobileLayout ? 'top-center' : 'bottom-center',
+        toastId: 'add-to-cart',
+        updateId: 'add-to-cart',
+        pauseOnHover: false,
+        autoClose: 3000,
+      },
+    );
+
+    scrollTimeoutRef.current = setTimeout(() => {
+      const nextDate = getNextSubOrderDay(timestamp);
+      handleSelectRestaurant({ id: nextDate });
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      });
+    }, 1000);
+  };
+  const selectedDays = totalFoodPickedWithParticipant(
+    orderDays,
+    cartList,
+    plan,
+    isAllowAddSecondaryFood,
+  );
   const isAllDaysHaveDishInCart =
-    !!Object.keys(plan).length &&
-    Object.keys(plan).every((timestamp) => cartList?.[+timestamp]?.foodId);
+    selectedDays === orderDays.length;
+
+  const selectedDayDate =
+    orderDayState && Number(orderDayState)
+      ? DateTime.fromMillis(Number(orderDayState)).toJSDate()
+      : null;
+  const selectedDayLabel = selectedDayDate
+    ? `${intl.formatMessage({
+      id: `Calendar.week.dayHeader.${selectedDayDate.getDay()}`,
+    })}, ${selectedDayDate.getDate()}/${selectedDayDate.getMonth() + 1}`
+    : '';
 
   return (
     <ParticipantLayout>
       <div className={css.root}>
+        {isMobileLayout && (
+          <button
+            type="button"
+            className={css.cartCornerButton}
+            onClick={showMobileInfoSection}>
+            <ShoppingCartIcon className="w-4 h-4" />
+            <span className={css.cartCornerBadge}>
+              {selectedDays}
+              /{orderDays.length}
+            </span>
+          </button>
+        )}
         <div className={css.leftSection}>
           <div className={css.goBack} onClick={handleGoBack}>
             <IconArrow direction="left" />
@@ -183,6 +274,7 @@ const ParticipantPlan = () => {
             plan={plan}
             onSelectTab={handleSelectRestaurant}
             orderDay={`${orderDayState}`}
+            onAddedToCart={onAddedToCart}
           />
         </div>
         <div className={css.rightSection}>
@@ -204,25 +296,45 @@ const ParticipantPlan = () => {
                 },
               )}
             </div>
+            {selectedDayLabel && (
+              <div className={css.currentDayText}>
+                {intl.formatMessage({
+                  id: 'ParticipantPlan.summary.currentDayText',
+                })}
+                <span className={css.currentDayHighlight}>
+                  {selectedDayLabel}
+                </span>
+              </div>
+            )}
           </div>
-          <Button
-            className={classNames(css.viewCartMobile, {
-              [css.ctaBtn]: isAllDaysHaveDishInCart,
-            })}
-            onClick={showMobileInfoSection}>
-            <div>
-              {intl.formatMessage({ id: 'ParticipantPlan.summary.cart' })}
-            </div>
-            <div className={css.selections}>
-              {intl.formatMessage(
-                { id: 'ParticipantPlan.summary.selections' },
-                {
-                  selectedDays: cartListKeys.length,
-                  totalDays: orderDays.length,
-                },
-              )}
-            </div>
-          </Button>
+          {isAllDaysHaveDishInCart ? (
+            <Button
+              className={classNames(css.viewCartMobile, {
+                [css.ctaBtn]: isAllDaysHaveDishInCart,
+              })}
+              onClick={showMobileInfoSection}>
+              <div>
+                {intl.formatMessage({ id: 'ParticipantPlan.summary.cart' })}
+              </div>
+              <div className={css.selections}>
+                {intl.formatMessage(
+                  { id: 'ParticipantPlan.summary.selections' },
+                  {
+                    selectedDays,
+                    totalDays: orderDays.length,
+                  },
+                )}
+              </div>
+            </Button>
+          ) : (
+            <TabActions
+              planId={`${planId}`}
+              orderId={orderId}
+              orderDay={`${orderDayState}`}
+              isOrderDeadlineOver={isOrderDeadlineOver}
+              onAddedToCart={onAddedToCart}
+            />
+          )}
         </div>
 
         <div className={infoSectionClasses}>

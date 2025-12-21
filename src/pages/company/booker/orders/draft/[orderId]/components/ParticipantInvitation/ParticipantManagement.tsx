@@ -27,6 +27,7 @@ import type { TAddParticipantFormValues } from './AddParticipantForm';
 import AddParticipantForm from './AddParticipantForm';
 import ImportParticipantFromFile from './ImportParticipantFromFile';
 import ParticipantList from './ParticipantList';
+import RemovedParticipantList from './RemovedParticipantList';
 
 import css from './ParticipantManagement.module.scss';
 
@@ -131,44 +132,51 @@ const ParticipantManagement: React.FC<TParticipantManagementProps> = () => {
     await handleInviteMemberViaEmailList(parseEmailList);
   };
 
+  const handleRestoreParticipant = async (emails: string[]) => {
+    await handleSubmitAddParticipant({ emails: emails.join(',') });
+  };
+
   return (
-    <div className={css.root}>
-      <div className={css.titleContainer}>
-        <div className={css.title}>
-          {isMobileLayout
-            ? intl.formatMessage({ id: 'danh-sach-thanh-vien' })
-            : intl.formatMessage({ id: 'danh-sach-thanh-vien-hien-tai' })}
+    <div className="flex flex-col gap-2">
+      <div className={css.root}>
+        <div className={css.titleContainer}>
+          <div className={css.title}>
+            {isMobileLayout
+              ? intl.formatMessage({ id: 'danh-sach-thanh-vien' })
+              : intl.formatMessage({ id: 'danh-sach-thanh-vien-hien-tai' })}
+          </div>
+          <RenderWhen condition={!isParticipantListEmpty}>
+            <div className={css.count}>{participantData.length}</div>
+          </RenderWhen>
         </div>
-        <RenderWhen condition={!isParticipantListEmpty}>
-          <div className={css.count}>{participantData.length}</div>
+
+        <AddParticipantForm
+          onSubmit={handleSubmitAddParticipant}
+          restrictEmailList={restrictEmailList}
+        />
+        <RenderWhen condition={isMobileLayout}>
+          <RenderWhen.False>
+            <ImportParticipantFromFile
+              handleInviteMember={handleInviteMemberViaEmailList}
+            />
+          </RenderWhen.False>
         </RenderWhen>
+        <ParticipantList />
+
+        <Alert
+          className={css.mobileAlert}
+          position={EAlertPosition.bottom}
+          onClose={mobileAlertControl.setFalse}
+          autoClose
+          timeToClose={3000}
+          isOpen={mobileAlertControl.value}
+          hasCloseButton={false}
+          type={EAlertType.success}
+          message={message}
+          messageClassName={css.mobileAlertMessage}
+        />
       </div>
-
-      <AddParticipantForm
-        onSubmit={handleSubmitAddParticipant}
-        restrictEmailList={restrictEmailList}
-      />
-      <RenderWhen condition={isMobileLayout}>
-        <RenderWhen.False>
-          <ImportParticipantFromFile
-            handleInviteMember={handleInviteMemberViaEmailList}
-          />
-        </RenderWhen.False>
-      </RenderWhen>
-      <ParticipantList />
-
-      <Alert
-        className={css.mobileAlert}
-        position={EAlertPosition.bottom}
-        onClose={mobileAlertControl.setFalse}
-        autoClose
-        timeToClose={3000}
-        isOpen={mobileAlertControl.value}
-        hasCloseButton={false}
-        type={EAlertType.success}
-        message={message}
-        messageClassName={css.mobileAlertMessage}
-      />
+      <RemovedParticipantList onRestoreParticipant={handleRestoreParticipant} />
     </div>
   );
 };

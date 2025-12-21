@@ -31,7 +31,10 @@ import { Listing, User } from '@utils/data';
 import { getDaySessionFromDeliveryTime } from '@utils/dates';
 import type { TListing, TUser } from '@utils/types';
 
-import { BookerDraftOrderPageActions } from '../../BookerDraftOrderPage.slice';
+import {
+  BookerDraftOrderPageActions,
+  BookerDraftOrderPageThunks,
+} from '../../BookerDraftOrderPage.slice';
 import AccessForm from '../../forms/AccessForm/AccessForm';
 import DeliveryTimeForm from '../../forms/DeliveryTimeForm/DeliveryTimeForm';
 import ExpiredTimeForm from '../../forms/ExpiredTimeForm/ExpiredTimeForm';
@@ -329,7 +332,16 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
         getDaySessionFromDeliveryTime(finalDeliveryHour) ||
       packagePerMember !== +finalPackagePerMember ||
       memberAmount !== +memberAmountValue;
+    if (values?.selectedGroups?.length > 0) {
+      // fetch order participants again after changing selected groups
+      dispatch(BookerDraftOrderPageThunks.fetchOrderParticipants());
+    }
+    // quick return if selected groups or delivery address is changed because we don't need to recommend restaurants again
+    if (values?.selectedGroups?.length > 0 || values?.deliveryAddress) {
+      setIsOpenDetails(false);
 
+      return;
+    }
     const { payload: newOrderDetail } = await dispatch(
       orderAsyncActions.recommendRestaurants({}),
     );
@@ -348,9 +360,11 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
         }),
       );
 
-      const isAllDatesHaveNoRestaurants = Object.values(newOrderDetail).every(
-        ({ hasNoRestaurants = false }: any) => hasNoRestaurants,
-      );
+      const isAllDatesHaveNoRestaurants = newOrderDetail
+        ? Object.values(newOrderDetail).every(
+            ({ hasNoRestaurants = false }: any) => hasNoRestaurants,
+          )
+        : true;
 
       if (
         isAllDatesHaveNoRestaurantsCurrentOrder &&

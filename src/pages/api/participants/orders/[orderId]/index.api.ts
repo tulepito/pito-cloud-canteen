@@ -7,6 +7,7 @@ import cookies from '@services/cookie';
 import { fetchListing, fetchUser } from '@services/integrationHelper';
 import { addToProcessOrderQueue } from '@services/jobs/processOrder.job';
 import { getIntegrationSdk, getSdk, handleError } from '@services/sdk';
+import type { TUpdateParticipantOrderBody } from '@src/types/order';
 import { EListingType } from '@src/utils/enums';
 import type { TListing } from '@src/utils/types';
 import {
@@ -130,8 +131,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     case HttpMethod.POST: {
       const { orderId } = req.query;
-      const { planId, memberOrders, orderDay, orderDays, planData } = req.body;
-
+      const { planId, memberOrders, orderDay, orderDays, planData } =
+        req.body as TUpdateParticipantOrderBody & {
+          memberOrders: any;
+          orderDay: string;
+        };
       try {
         console.info('[TRACK] step=api_receive start', {
           orderId,
@@ -143,15 +147,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           await sdk.currentUser.show(),
         )[0];
         const currentUserId = CurrentUser(currentUser).getId();
-
-        // await pushOrderLog({
-        //   orderId: orderId as string,
-        //   planId,
-        //   authorId: currentUserId,
-        //   orderDays,
-        //   title: `Order logs ${orderId} user ${currentUserId}`,
-        //   entry: planData,
-        // });
 
         console.info('[TRACK] step=enqueue_job start', {
           orderId,

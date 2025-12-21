@@ -23,12 +23,67 @@ type Row = {
   'Món ăn': string;
   'Đơn giá': number;
   'Ghi chú': string;
+  'Phần ăn lỗi': string;
+  'Nguyên nhân bị lỗi': string;
   'Tên công ty'?: string;
   'Tên đối tác'?: string;
 };
 
 type PrivateField = {
   Email: string;
+};
+
+/**
+ * Group order data by user (email or name) in the same day
+ * @param orderData - Order data
+ * @returns Grouped data by user
+ */
+const groupOrderDataByUser = (orderData: Row[]): Row[] => {
+  const grouped: Record<string, Row> = {};
+
+  orderData.forEach((item) => {
+    const key = item.Email || item.Tên || '';
+    if (!key) {
+      const singleKey = `${item.Ngày}-${Math.random().toString(36).slice(2)}`;
+      grouped[singleKey] = item;
+
+      return;
+    }
+
+    if (!grouped[key]) {
+      grouped[key] = { ...item };
+
+      return;
+    }
+
+    const current = grouped[key];
+
+    if (item['Món ăn']) {
+      current['Món ăn'] = current['Món ăn']
+        ? `${current['Món ăn']} + ${item['Món ăn']}`
+        : item['Món ăn'];
+    }
+
+    current['Đơn giá'] = (current['Đơn giá'] || 0) + (item['Đơn giá'] || 0);
+
+    if (item['Ghi chú']) {
+      current['Ghi chú'] = current['Ghi chú']
+        ? `${current['Ghi chú']}\n${item['Ghi chú']}`
+        : item['Ghi chú'];
+    }
+
+    if (item['Phần ăn lỗi'] === 'Có') {
+      current['Phần ăn lỗi'] = 'Có';
+    }
+
+    if (item['Nguyên nhân bị lỗi']) {
+      current['Nguyên nhân bị lỗi'] = current['Nguyên nhân bị lỗi']
+        ? `${current['Nguyên nhân bị lỗi']}\n${item['Nguyên nhân bị lỗi']}`
+        : item['Nguyên nhân bị lỗi'];
+    }
+  });
+
+  return Object.values(grouped);
 };
 
 const prepareData = ({
@@ -56,63 +111,86 @@ const prepareData = ({
       const orderData = Object.entries<TObject>(memberOrders).reduce<TObject[]>(
         (memberOrderResult, currentMemberOrderEntry) => {
           const [memberId, memberOrderData] = currentMemberOrderEntry;
-          const { foodId, status, requirement } = memberOrderData;
+          const {
+            foodId,
+            secondaryFoodId,
+            status,
+            requirement = '',
+            secondaryRequirement = '',
+          } = memberOrderData;
 
-          const newItem: Row & Partial<PrivateField> = {
-            Ngày: formatTimestamp(Number(date)),
-            ...(participantData[memberId]?.groupName && {
-              Nhóm: participantData[memberId]?.groupName,
-            }),
-            Tên: participantData[memberId]?.name,
-            ...(privateFieldsIncludingIfAdmin
-              ? {
-                  Email: participantData[memberId]?.email,
-                }
-              : {}),
-            ...(participantData[memberId]?.email && {
-              Email: participantData[memberId]?.email,
-            }),
-            'Món ăn': foodListOfDate[foodId]?.foodName,
-            'Đơn giá': foodListOfDate[foodId]?.foodPrice,
-            'Ghi chú': requirement,
-            'Phần ăn lỗi': (mealItemsFailed?.[date] || []).some(
-              (item) => item.memberId === memberId && item.foodId === foodId,
-            )
-              ? 'Có'
-              : 'Không',
-            'Nguyên nhân bị lỗi':
-              (mealItemsFailed?.[date] || []).find(
-                (item) => item.memberId === memberId && item.foodId === foodId,
-              )?.reason || '',
+          const buildRowItem = (
+            fId: string,
+            req: string,
+          ): (Row & Partial<PrivateField>) | null => {
+            if (!fId || !isJoinedPlan(fId, status)) return null;
+            if (!foodListOfDate[fId]) return null;
+
+            const item: Row & Partial<PrivateField> = {
+              Ngày: formatTimestamp(Number(date)),
+              ...(participantData[memberId]?.groupName && {
+                Nhóm: participantData[memberId]?.groupName,
+              }),
+              Tên: participantData[memberId]?.name,
+              ...(privateFieldsIncludingIfAdmin
+                ? { Email: participantData[memberId]?.email }
+                : {}),
+              ...(participantData[memberId]?.email && {
+                Email: participantData[memberId]?.email,
+              }),
+              'Món ăn': foodListOfDate[fId]?.foodName,
+              'Đơn giá': foodListOfDate[fId]?.foodPrice || 0,
+              'Ghi chú': req,
+              'Phần ăn lỗi': (mealItemsFailed?.[date] || []).some(
+                (it) => it.memberId === memberId && it.foodId === fId,
+              )
+                ? 'Có'
+                : 'Không',
+              'Nguyên nhân bị lỗi':
+                (mealItemsFailed?.[date] || []).find(
+                  (it) => it.memberId === memberId && it.foodId === fId,
+                )?.reason || '',
+            };
+
+            extendedFields.forEach((field) => {
+              if (field === 'company-name') {
+                item['Tên công ty'] = participantData[memberId]?.companyName;
+              }
+              if (field === 'partner-name') {
+                item['Tên đối tác'] = restaurantName;
+              }
+            });
+
+            return item;
           };
 
-          extendedFields.forEach((field) => {
-            if (field === 'company-name') {
-              newItem['Tên công ty'] = participantData[memberId]?.companyName;
-            }
+          const primaryItem = buildRowItem(foodId, requirement);
+          const secondaryItem = buildRowItem(
+            secondaryFoodId,
+            secondaryRequirement,
+          );
 
-            if (field === 'partner-name') {
-              newItem['Tên đối tác'] = restaurantName;
-            }
-          });
+          let nextResult = memberOrderResult;
+          if (primaryItem) nextResult = nextResult.concat([primaryItem]);
+          if (secondaryItem) nextResult = nextResult.concat([secondaryItem]);
 
-          return isJoinedPlan(foodId, status)
-            ? memberOrderResult.concat([newItem])
-            : memberOrderResult;
+          return nextResult;
         },
         [],
       );
 
-      const sortedOrderData = orderData.sort((a, b) => {
+      const groupedData = groupOrderDataByUser(orderData as Row[]);
+
+      const sortedOrderData = groupedData.sort((a, b) => {
         const groupA = a['Nhóm'] ?? '';
         const groupB = b['Nhóm'] ?? '';
-        const dishA = a['Món ăn'] ?? '';
-        const dishB = b['Món ăn'] ?? '';
+        const nameA = a['Tên'] ?? '';
+        const nameB = b['Tên'] ?? '';
 
         const groupCompare = groupA.localeCompare(groupB, 'vi');
         if (groupCompare !== 0) return groupCompare;
 
-        return dishA.localeCompare(dishB, 'vi');
+        return nameA.localeCompare(nameB, 'vi');
       });
 
       return [...result, ...sortedOrderData];

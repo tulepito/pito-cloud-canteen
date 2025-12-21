@@ -324,22 +324,27 @@ const getFoodDataMap = ({
     return Object.entries(memberOrders).reduce(
       (foodFrequencyResult, currentMemberOrderEntry) => {
         const [, memberOrderData] = currentMemberOrderEntry;
-        const { foodId, status } = memberOrderData;
-        const { foodName, foodPrice } = foodListOfDate[foodId] || {};
+        const { foodId, status, secondaryFoodId } = memberOrderData;
 
-        if (isJoinedPlan(foodId, status)) {
-          const data = foodFrequencyResult[foodId];
+        const updateFoodFrequency = (result, id) => {
+          if (!isJoinedPlan(id, status) || !id) return result;
+
+          const { foodName, foodPrice } = foodListOfDate[id] || {};
+          const data = result[id];
           const { frequency } = data || {};
 
           return {
-            ...foodFrequencyResult,
-            [foodId]: data
+            ...result,
+            [id]: data
               ? { ...data, frequency: frequency + 1 }
-              : { foodId, foodName, foodPrice, frequency: 1 },
+              : { foodId: id, foodName, foodPrice, frequency: 1 },
           };
-        }
+        };
 
-        return foodFrequencyResult;
+        let updatedResult = updateFoodFrequency(foodFrequencyResult, foodId);
+        updatedResult = updateFoodFrequency(updatedResult, secondaryFoodId);
+
+        return updatedResult;
       },
       {},
     );

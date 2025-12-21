@@ -288,6 +288,12 @@ const OrderListPage = () => {
       const pickedFoodDetail = alreadyPickFood
         ? foodsInPlan?.foodListings[foodSelection?.foodId]
         : {};
+      const pickedSecondaryFoodDetail = foodSelection?.secondaryFoodId
+        ? foodsInPlan?.foodListings[foodSelection.secondaryFoodId]
+        : {};
+      const secondaryFoodName = dishes.find(
+        (_dish) => _dish.key === foodSelection?.secondaryFoodId,
+      )?.value;
 
       const event = {
         resource: {
@@ -315,14 +321,17 @@ const OrderListPage = () => {
           expiredTime: expiredTime.toMillis(),
           deliveryHour,
           dishSelection: { dishSelection: foodSelection?.foodId },
+          secondaryDishSelection: foodSelection?.secondaryFoodId,
           orderState,
           lastTransition,
           foodName: dishes.find((_dish) => _dish.key === foodSelection?.foodId)
             ?.value,
+          secondaryFoodName,
           barcode: foodSelection?.barcode,
           disableSelectFood:
             isOrderAlreadyInProgress && isSubOrderNotAbleToEdit,
           pickedFoodDetail,
+          pickedSecondaryFoodDetail,
         },
         title: orderTitle,
         start: DateTime.fromMillis(+planItemKey).toJSDate(),

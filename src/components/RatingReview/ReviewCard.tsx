@@ -146,7 +146,12 @@ const ReviewCard = ({
           </div>
           <span className="bg-white text-gray-500 pe-2 flex py-1 text-xs items-center gap-1">
             Đã đặt món:{' '}
-            <span className="font-bold">{reviewInformation.foodName}</span> vào{' '}
+            <span className="font-bold">
+              {reviewInformation.foodName}{' '}
+              {reviewInformation.secondaryFoodName &&
+                `+ ${reviewInformation.secondaryFoodName}`}
+            </span>{' '}
+            vào{' '}
             <span className="font-bold">
               {formatTimestamp(reviewInformation.timestamp, 'dd/MM/yyyy')}
             </span>

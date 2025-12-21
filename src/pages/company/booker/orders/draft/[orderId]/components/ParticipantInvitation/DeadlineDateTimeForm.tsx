@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import type { FormProps, FormRenderProps } from 'react-final-form';
 import { Form as FinalForm } from 'react-final-form';
 import { useIntl } from 'react-intl';
+import classNames from 'classnames';
 import isEmpty from 'lodash/isEmpty';
 import { DateTime } from 'luxon';
 
@@ -156,7 +157,9 @@ const DeadlineDateTimeFormComponent: React.FC<
       type="submit"
       onClick={handleSubmitOutSideForm}
       inProgress={submitInProgress}
-      className={css.sendNotificationButton}>
+      className={classNames(css.sendNotificationButton, {
+        [css.ctaBtn]: !submitDisabled,
+      })}>
       {intl.formatMessage({ id: 'gui-loi-moi-qua-email' })}
     </Button>
   );
@@ -255,7 +258,9 @@ const DeadlineDateTimeFormComponent: React.FC<
               minDate={minDeadlineDate}
               maxDate={maxDeadlineDate}
               dateFormat={'EEE, dd MMMM, yyyy'}
-              className={css.dateInput}
+              className={`${css.dateInput} ${
+                !selectedDeadlineDate ? css.empty : ''
+              }`}
               autoComplete="off"
               readOnly
               icon={<IconCalendar />}
@@ -286,6 +291,9 @@ const DeadlineDateTimeFormComponent: React.FC<
               leftIcon={<IconClock />}
               disabled={!selectedDeadlineDate}
               options={filteredTimeOptions}
+              fieldWrapperClassName={`${css.timeInput} ${
+                selectedDeadlineDate && isDeadlineHourEmpty ? css.empty : ''
+              }`}
             />
           </RenderWhen.False>
         </RenderWhen>

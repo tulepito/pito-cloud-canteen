@@ -19,7 +19,7 @@
   }
 
   & > div:nth-of-type(1) {
-    flex-basis: 30px;
+    flex-basis: 40px;
     flex-shrink: 0;
   }
   & > div:nth-of-type(2) {
@@ -207,6 +207,37 @@
           border: none;
         }
       }
+    }
+  }
+}
+
+.subGroupTitle {
+  background-color: $neutralGray1;
+  cursor: pointer;
+
+  .actionCell {
+    cursor: pointer;
+    display: flex;
+    justify-content: flex-end;
+    align-self: flex-start;
+
+    svg {
+      rotate: 0deg;
+      transition: rotate 0.2s linear;
+    }
+
+    .reversed {
+      rotate: x 180deg;
+    }
+  }
+}
+
+.subRows {
+  & > .row {
+    @include textTemplate(11px, 400, 14px);
+
+    @include viewportMedium {
+      @include textTemplate(14px, 400, 20px);
     }
   }
 }

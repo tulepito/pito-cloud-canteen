@@ -2,6 +2,9 @@ import isEmpty from 'lodash/isEmpty';
 import uniq from 'lodash/uniq';
 import { DateTime } from 'luxon';
 
+import type { FoodListing } from '@src/types';
+import type { TOrderDetail } from '@src/types/order';
+import { SECONDARY_FOOD_ALLOWED_COMPANIES } from '@src/utils/constants';
 import { ETransition } from '@src/utils/transaction';
 import { Listing } from '@utils/data';
 import { generateTimeRangeItems, isOver, renderDateRange } from '@utils/dates';
@@ -12,7 +15,12 @@ import {
   EOrderType,
 } from '@utils/enums';
 import type { TFoodList, TPlan } from '@utils/orderTypes';
-import type { TListing, TObject, TOrderStateHistoryItem } from '@utils/types';
+import type {
+  TFoodDataValue,
+  TListing,
+  TObject,
+  TOrderStateHistoryItem,
+} from '@utils/types';
 
 import { isJoinedPlan } from './order/orderPickingHelper';
 import {
@@ -230,13 +238,6 @@ export const isOrderDetailFullDatePickingFood = (orderDetail: TObject) => {
   });
 };
 
-type TFoodDataValue = {
-  foodId: string;
-  foodName: string;
-  foodPrice: number;
-  frequency: number;
-};
-
 type TFoodDataMap = TObject<string, TFoodDataValue>;
 
 export const getFoodDataMap = ({
@@ -247,24 +248,46 @@ export const getFoodDataMap = ({
 }: any) => {
   if (orderType === EOrderType.group) {
     return Object.entries(memberOrders).reduce<TFoodDataMap>(
-      (foodFrequencyResult, currentMemberOrderEntry) => {
-        const [, memberOrderData] = currentMemberOrderEntry;
-        const { foodId, status } = memberOrderData as TObject;
-        const { foodName, foodPrice } = foodListOfDate[foodId] || {};
+      (foodFrequencyResult, [, memberOrderData]) => {
+        const { foodId, status, secondaryFoodId } = memberOrderData as TObject;
 
-        if (isJoinedPlan(foodId, status)) {
-          const data = foodFrequencyResult[foodId] as TObject;
-          const { frequency } = data || {};
+        const updateFoodFrequency = (
+          result: TFoodDataMap,
+          id: string,
+        ): TFoodDataMap => {
+          if (!isJoinedPlan(id, status) || !id) return result;
+
+          const {
+            foodName,
+            foodPrice,
+            numberOfMainDishes,
+            requirement = '',
+          } = foodListOfDate[id] || {};
+          const current = result[id] as TObject;
+          const { notes = [] } = current || {};
+          const nextFrequency = (current?.frequency ?? 0) + 1;
+
+          if (!isEmpty(requirement)) {
+            notes.push(requirement);
+          }
 
           return {
-            ...foodFrequencyResult,
-            [foodId]: data
-              ? { ...data, frequency: frequency + 1 }
-              : { foodId, foodName, foodPrice, frequency: 1 },
+            ...result,
+            [id]: {
+              foodId: id,
+              foodName,
+              foodPrice,
+              numberOfMainDishes,
+              notes,
+              frequency: nextFrequency,
+            },
           };
-        }
+        };
 
-        return foodFrequencyResult;
+        let updatedResult = updateFoodFrequency(foodFrequencyResult, foodId);
+        updatedResult = updateFoodFrequency(updatedResult, secondaryFoodId);
+
+        return updatedResult;
       },
       {},
     );
@@ -446,6 +469,7 @@ export const getSelectedRestaurantAndFoodList = ({
     const { id, attributes } = item || {};
     const { title, price } = attributes;
     const foodUnit = attributes?.publicData?.unit || '';
+    const numberOfMainDishes = attributes?.publicData?.numberOfMainDishes;
 
     return id?.uuid
       ? {
@@ -454,6 +478,7 @@ export const getSelectedRestaurantAndFoodList = ({
             foodName: title,
             foodPrice: price?.amount || 0,
             foodUnit,
+            numberOfMainDishes,
           },
         }
       : result;
@@ -499,6 +524,51 @@ export const getUpdateLineItems = (foodList: any[], foodIds: string[]) => {
       acc[foodId] = {
         foodName: foodListingGetter.title,
         foodPrice: foodListingGetter.price?.amount || 0,
+        foodUnit: foodListingGetter.publicData?.unit || '',
+      };
+    }
+
+    return acc;
+  }, {});
+
+  const updateLineItems = Object.entries<{
+    foodName: string;
+    foodPrice: number;
+  }>(updateFoodList).map(([foodId, { foodName, foodPrice }]) => {
+    return {
+      id: foodId,
+      name: foodName,
+      unitPrice: foodPrice,
+      price: foodPrice,
+      quantity: 1,
+    };
+  });
+
+  return updateLineItems;
+};
+
+export const getUpdateLineItemsInDualSelectionOrder = (
+  foodList: FoodListing[],
+  foodIds: string[],
+) => {
+  const updateFoodList = foodIds.reduce((acc: any, foodId: string) => {
+    const food = foodList?.find(
+      (item: FoodListing) => item.id?.uuid === foodId,
+    );
+    if (food) {
+      const foodListingGetter = Listing(food as TListing).getAttributes();
+      const numberOfMainDishes =
+        foodListingGetter.publicData?.numberOfMainDishes;
+      const isSingleSelectionFood =
+        numberOfMainDishes !== undefined &&
+        numberOfMainDishes !== null &&
+        Number(numberOfMainDishes) === 1;
+      const foodPrice = isSingleSelectionFood
+        ? foodListingGetter.price?.amount || 0
+        : (foodListingGetter.price?.amount || 0) / 2;
+      acc[foodId] = {
+        foodName: foodListingGetter.title,
+        foodPrice,
         foodUnit: foodListingGetter.publicData?.unit || '',
       };
     }
@@ -647,4 +717,102 @@ export const confirmFirstTimeParticipant = (
   }
 
   return true;
+};
+
+/**
+ * Get whether to allow adding a second food
+ * @param orderListing - Order listing
+ * @returns True if the company is allowed to add a second food, false if not
+ */
+export const getIsAllowAddSecondaryFood = (orderListing: TListing) => {
+  if (!orderListing || !Listing(orderListing).getMetadata().companyId)
+    return false;
+
+  const { canAddSecondaryFood } = Listing(orderListing).getMetadata();
+
+  return canAddSecondaryFood || false;
+};
+
+/**
+ * Get whether to allow adding a second food in create order
+ * @param companyId - The company id
+ * @returns True if the company is allowed to add a second food, false if not
+ */
+export const getIsAllowAddSecondaryFoodInCreateOrder = (companyId: string) => {
+  if (!companyId) return false;
+
+  return SECONDARY_FOOD_ALLOWED_COMPANIES.includes(companyId) ?? false;
+};
+
+/**
+ * Adjust the food list price
+ * @param foodList - The food list
+ * @param order - The order
+ * @returns The adjusted food list
+ */
+export const adjustFoodListPrice = (
+  foodList: TFoodList,
+  order: TListing,
+): TFoodList => {
+  const isSecondaryFoodAllowedCompany = getIsAllowAddSecondaryFood(order);
+
+  return Object.entries(foodList).reduce(
+    (
+      acc: TObject,
+      [foodId, { foodName, foodPrice, foodUnit, numberOfMainDishes }],
+    ) => {
+      const isSingleSelectionFood =
+        numberOfMainDishes !== undefined &&
+        numberOfMainDishes !== null &&
+        Number(numberOfMainDishes) === 1;
+      if (isSecondaryFoodAllowedCompany && !isSingleSelectionFood) {
+        return {
+          ...acc,
+          [foodId]: {
+            foodName,
+            foodPrice: foodPrice / 2,
+            foodUnit,
+            numberOfMainDishes,
+          },
+        };
+      }
+
+      return {
+        ...acc,
+        [foodId]: {
+          foodName,
+          foodPrice,
+          foodUnit,
+          numberOfMainDishes,
+        },
+      };
+    },
+    {},
+  );
+};
+
+/**
+ * Adjust the food list price of the recommend order detail
+ * @param recommendOrderDetail - The recommend order detail
+ * @param order - The order
+ * @returns The adjusted recommend order detail
+ */
+export const adjustRecommendOrderDetailWithFoodListPrice = (
+  recommendOrderDetail: TOrderDetail,
+  order: TListing,
+): TOrderDetail => {
+  return Object.entries(recommendOrderDetail).reduce(
+    (acc: TOrderDetail, [dayId, curr]: [string, any]) => {
+      acc[dayId] = {
+        ...curr,
+        restaurant: {
+          ...curr.restaurant,
+          foodList: adjustFoodListPrice(curr?.restaurant?.foodList, order),
+        },
+      };
+
+      return acc;
+    },
+    {} as TOrderDetail,
+  );
 };

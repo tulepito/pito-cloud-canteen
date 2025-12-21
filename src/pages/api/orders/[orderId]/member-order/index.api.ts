@@ -107,16 +107,31 @@ const sendParticipantFoodChangeSlackNotification = async (
   ).reduce<Promise<DifferentOrderDetail>>(async (_acc, memberId) => {
     const acc = await _acc;
 
-    const { foodId, status } = newMembersOrderValues[memberId];
+    const { foodId, status, secondaryFoodId } = newMembersOrderValues[memberId];
 
     const member = await fetchUserListing(memberId);
     const integrationSdk = getIntegrationSdk();
-    const foodListing: WithFlexSDKData<FoodListing> =
-      await integrationSdk.listings.show({
-        id: foodId,
-      });
+
+    const getFoodName = async (id: string) => {
+      if (!id) return '';
+      const foodListing: WithFlexSDKData<FoodListing> =
+        await integrationSdk.listings.show({
+          id,
+        });
+
+      return foodListing.data.data.attributes?.title || '';
+    };
 
     if (status === 'joined') {
+      const foodName = await getFoodName(foodId);
+      const secondaryFoodName = secondaryFoodId
+        ? await getFoodName(secondaryFoodId)
+        : '';
+
+      const displayFoodName = secondaryFoodName
+        ? `${foodName} + ${secondaryFoodName}`
+        : foodName;
+
       return {
         ...acc,
         [currentDate]: {
@@ -124,7 +139,7 @@ const sendParticipantFoodChangeSlackNotification = async (
             ...acc[currentDate]?.memberOrders,
             [memberId]: {
               newFoodId: foodId,
-              newFoodName: foodListing.data.data.attributes?.title,
+              newFoodName: displayFoodName,
               restaurantName,
               memberName: buildFullName(
                 member?.attributes?.profile?.firstName,
@@ -191,6 +206,8 @@ type NewMembersOrderValues = {
     foodId: string;
     requirement: string;
     status: 'joined';
+    secondaryFoodId?: string;
+    secondaryRequirement?: string;
   };
 };
 

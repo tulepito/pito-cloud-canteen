@@ -6,6 +6,7 @@ export type TFoodList = {
     foodName: string;
     foodPrice: number;
     foodUnit?: string;
+    numberOfMainDishes: number | string;
   };
 };
 
@@ -29,6 +30,8 @@ export type TPlan = {
           foodId: string;
           status: EParticipantOrderStatus;
           requirement?: string;
+          secondaryFoodId?: string;
+          secondaryRequirement?: string;
         };
       };
 

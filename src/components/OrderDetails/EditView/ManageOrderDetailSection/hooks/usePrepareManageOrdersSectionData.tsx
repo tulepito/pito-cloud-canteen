@@ -62,6 +62,7 @@ export const usePrepareManageOrdersSectionData = (
       return {
         foodId,
         foodName: foodData?.foodName || '',
+        numberOfMainDishes: foodData?.numberOfMainDishes || 2,
       };
     },
   );

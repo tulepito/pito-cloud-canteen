@@ -114,20 +114,50 @@ const prepareData = ({
       const orderData = Object.entries<TObject>(memberOrders).reduce<TObject[]>(
         (memberOrderResult, currentMemberOrderEntry) => {
           const [memberId, memberOrderData] = currentMemberOrderEntry;
-          const { foodId, status, requirement } = memberOrderData;
-          const newItem = {
-            memberData: participantData[memberId],
-            foodData: {
-              requirement,
-              foodId,
-              ...foodListOfDate[foodId],
-            },
-            restaurant,
+          const {
+            foodId,
+            secondaryFoodId,
+            status,
+            requirement = '',
+            secondaryRequirement = '',
+          } = memberOrderData;
+
+          const appendFoodToResult = (
+            items: TObject[],
+            id?: string,
+            requirementValue: string = '',
+          ) => {
+            if (!id || !isJoinedPlan(id, status)) {
+              return items;
+            }
+            const foodDataOfDate = foodListOfDate[id];
+            if (!foodDataOfDate) {
+              return items;
+            }
+
+            return items.concat({
+              memberData: participantData[memberId],
+              foodData: {
+                requirement: requirementValue,
+                foodId: id,
+                ...foodDataOfDate,
+              },
+              restaurant,
+            });
           };
 
-          return isJoinedPlan(foodId, status)
-            ? memberOrderResult.concat([newItem])
-            : memberOrderResult;
+          let nextResult = appendFoodToResult(
+            memberOrderResult,
+            foodId,
+            requirement,
+          );
+          nextResult = appendFoodToResult(
+            nextResult,
+            secondaryFoodId,
+            secondaryRequirement,
+          );
+
+          return nextResult;
         },
         [],
       );
@@ -167,24 +197,44 @@ const prepareDataGroups = ({
 
           const memberIds = members.map((m: TObject) => m.id);
           const orderData = memberIds
-            .map((memberId: string) => {
+            .flatMap((memberId: string) => {
               const memberOrder = memberOrders[memberId];
-              if (!memberOrder) return null;
+              if (!memberOrder) return [];
 
-              const { foodId, status, requirement } = memberOrder;
-              if (!isJoinedPlan(foodId, status)) return null;
+              const {
+                foodId,
+                secondaryFoodId,
+                status,
+                requirement = '',
+                secondaryRequirement = '',
+              } = memberOrder;
 
-              return {
-                memberData: participantMap[memberId],
-                foodData: {
-                  requirement,
-                  foodId,
-                  ...foodListOfDate[foodId],
-                },
-                restaurant,
+              const buildFoodData = (
+                id?: string,
+                requirementValue: string = '',
+              ) => {
+                if (!id || !isJoinedPlan(id, status)) return [];
+                const foodDataOfDate = foodListOfDate[id];
+                if (!foodDataOfDate) return [];
+
+                return [
+                  {
+                    memberData: participantMap[memberId],
+                    foodData: {
+                      requirement: requirementValue,
+                      foodId: id,
+                      ...foodDataOfDate,
+                    },
+                    restaurant,
+                  },
+                ];
               };
+
+              return [
+                ...buildFoodData(foodId, requirement),
+                ...buildFoodData(secondaryFoodId, secondaryRequirement),
+              ];
             })
-            .filter(Boolean)
             .sort((a: TObject, b: TObject) => {
               const foodNameA = a.foodData?.foodName || '';
               const foodNameB = b.foodData?.foodName || '';
@@ -212,21 +262,41 @@ const prepareDataGroups = ({
 
       const orderDataForOthers = Object.entries<TObject>(memberOrders)
         .filter(([memberId]) => !allGroupMemberIds.has(memberId))
-        .map(([memberId, memberOrderData]) => {
-          const { foodId, status, requirement } = memberOrderData;
-          if (!isJoinedPlan(foodId, status)) return null;
+        .flatMap(([memberId, memberOrderData]) => {
+          const {
+            foodId,
+            secondaryFoodId,
+            status,
+            requirement = '',
+            secondaryRequirement = '',
+          } = memberOrderData;
 
-          return {
-            memberData: participantMap[memberId],
-            foodData: {
-              requirement,
-              foodId,
-              ...foodListOfDate[foodId],
-            },
-            restaurant,
+          const buildFoodData = (
+            id?: string,
+            requirementValue: string = '',
+          ) => {
+            if (!id || !isJoinedPlan(id, status)) return [];
+            const foodDataOfDate = foodListOfDate[id];
+            if (!foodDataOfDate) return [];
+
+            return [
+              {
+                memberData: participantMap[memberId],
+                foodData: {
+                  requirement: requirementValue,
+                  foodId: id,
+                  ...foodDataOfDate,
+                },
+                restaurant,
+              },
+            ];
           };
-        })
-        .filter(Boolean);
+
+          return [
+            ...buildFoodData(foodId, requirement),
+            ...buildFoodData(secondaryFoodId, secondaryRequirement),
+          ];
+        });
 
       return [
         ...result,
@@ -239,6 +309,68 @@ const prepareDataGroups = ({
     },
     [],
   );
+};
+
+type TGroupedOrderData = {
+  memberName: string;
+  memberId: string;
+  email?: string;
+  totalPrice: number;
+  foodNames: string[];
+  requirements: string[];
+  foodIds: string[];
+};
+
+const groupOrderDataByUser = (orderData: TObject[]): TGroupedOrderData[] => {
+  const grouped: Record<string, TGroupedOrderData> = (orderData || []).reduce(
+    (acc: Record<string, TGroupedOrderData>, row: TObject) => {
+      const {
+        memberData,
+        foodData: { foodId, foodName, foodPrice = 0, requirement } = {},
+      } = row || {};
+
+      const {
+        name: memberName,
+        id: memberId,
+        email,
+      }: { name?: string; id?: string; email?: string } = memberData || {};
+
+      const key = email || memberId;
+
+      if (!key || !memberId) return acc;
+
+      if (!acc[key]) {
+        acc[key] = {
+          memberName: memberName || '',
+          memberId,
+          email,
+          totalPrice: 0,
+          foodNames: [],
+          requirements: [],
+          foodIds: [],
+        };
+      }
+
+      if (foodName) {
+        acc[key].foodNames.push(foodName);
+      }
+
+      if (requirement) {
+        acc[key].requirements.push(requirement);
+      }
+
+      if (foodId) {
+        acc[key].foodIds.push(foodId);
+      }
+
+      acc[key].totalPrice += Number(foodPrice) || 0;
+
+      return acc;
+    },
+    {},
+  );
+
+  return Object.values(grouped);
 };
 
 type TReviewOrdersResultModalProps = {
@@ -1103,92 +1235,107 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
                             </div>
                             <RenderWhen condition={isExpanding}>
                               <div className="w-full">
-                                {group?.orderData?.map((row: TObject) => {
-                                  const {
-                                    memberData,
-                                    foodData: {
-                                      foodId,
-                                      foodName,
-                                      foodPrice = 0,
-                                      requirement,
-                                    },
-                                  } = row;
-                                  const {
-                                    name: memberName,
-                                    id: memberId,
+                                {groupOrderDataByUser(
+                                  group?.orderData || [],
+                                ).map(
+                                  ({
+                                    memberName,
+                                    memberId,
                                     email,
-                                  } = memberData || {};
+                                    totalPrice,
+                                    foodNames,
+                                    requirements,
+                                    foodIds,
+                                  }) => {
+                                    const isMealItemFailed = (
+                                      mealItemsFailed[date] || []
+                                    ).some(
+                                      (item) => item.memberId === memberId,
+                                    );
 
-                                  const isMealItemFailed = (
-                                    mealItemsFailed[date] || []
-                                  ).some((item) => item.memberId === memberId);
+                                    const initialReason =
+                                      (mealItemsFailed[date] || []).find(
+                                        (i) => i.memberId === memberId,
+                                      )?.reason ?? '';
 
-                                  return (
-                                    <div
-                                      key={memberId}
-                                      className="flex items-center w-full">
-                                      <div className="flex items-center flex-1 text-xs p-2 gap-2">
-                                        <div className="flex-1 basis-[80px] font-semibold">
-                                          {memberName}
-                                          <br />
-                                          <span className="text-gray-500">
-                                            {email}
-                                          </span>
-                                        </div>
+                                    const foodNameDisplay =
+                                      foodNames.join(' + ');
+                                    const requirementDisplay =
+                                      requirements.join('\n');
 
-                                        <div className="text-xs flex-1 font-semibold">
-                                          {foodName}
-                                        </div>
-                                        <div className="text-xs flex-1">{`${parseThousandNumber(
-                                          foodPrice,
-                                        )}đ`}</div>
-                                        {requirement ? (
-                                          <Tooltip
-                                            overlayClassName={
-                                              css.requirementTooltip
-                                            }
-                                            tooltipContent={requirement}
-                                            placement="bottomLeft">
-                                            <div className="flex-1">
-                                              {requirement}
-                                            </div>
-                                          </Tooltip>
-                                        ) : (
-                                          <div className="flex-1">-</div>
-                                        )}
-                                        <div className="text-xs flex-1">
-                                          <ReasonFieldMealItemFailed
-                                            readOnly={!isAdmin}
-                                            checked={isMealItemFailed}
-                                            initialReason={
-                                              (
-                                                mealItemsFailed[date] || []
-                                              ).find(
-                                                (i) => i.memberId === memberId,
-                                              )?.reason ?? ''
-                                            }
-                                            onChange={(checked, reason) =>
-                                              onCheckMealItemFailed({
-                                                timestamp: date,
-                                                foodId,
-                                                memberId,
-                                                reason: checked ? reason : '',
-                                              })
-                                            }
-                                            onChangeReasonInput={(reason) =>
-                                              onChangeReasonInput({
-                                                timestamp: date,
-                                                foodId,
-                                                memberId,
-                                                reason,
-                                              })
-                                            }
-                                          />
+                                    return (
+                                      <div
+                                        key={memberId}
+                                        className="flex items-center w-full">
+                                        <div className="flex items-center flex-1 text-xs p-2 gap-2">
+                                          <div className="flex-1 basis-[80px] font-semibold">
+                                            {memberName}
+                                            <br />
+                                            <span className="text-gray-500">
+                                              {email}
+                                            </span>
+                                          </div>
+
+                                          <div className="text-xs flex-1 font-semibold">
+                                            {foodNameDisplay}
+                                          </div>
+                                          <div className="text-xs flex-1">{`${parseThousandNumber(
+                                            totalPrice,
+                                          )}đ`}</div>
+                                          {requirementDisplay ? (
+                                            <Tooltip
+                                              overlayClassName={
+                                                css.requirementTooltip
+                                              }
+                                              tooltipContent={
+                                                requirementDisplay
+                                              }
+                                              placement="bottomLeft">
+                                              <div className="flex-1 whitespace-pre-line">
+                                                {requirementDisplay}
+                                              </div>
+                                            </Tooltip>
+                                          ) : (
+                                            <div className="flex-1">-</div>
+                                          )}
+                                          <div className="text-xs flex-1">
+                                            <ReasonFieldMealItemFailed
+                                              readOnly={!isAdmin}
+                                              checked={isMealItemFailed}
+                                              initialReason={initialReason}
+                                              onChange={(checked, reason) => {
+                                                foodIds.forEach(
+                                                  (foodId: string) => {
+                                                    onCheckMealItemFailed({
+                                                      timestamp: date,
+                                                      foodId,
+                                                      memberId,
+                                                      reason: checked
+                                                        ? reason
+                                                        : '',
+                                                    });
+                                                  },
+                                                );
+                                              }}
+                                              onChangeReasonInput={(reason) => {
+                                                foodIds.forEach(
+                                                  (foodId: string) => {
+                                                    onChangeReasonInput({
+                                                      timestamp: date,
+                                                      foodId,
+                                                      memberId,
+                                                      reason,
+                                                    });
+                                                  },
+                                                );
+                                              }}
+                                            />
+                                          </div>
                                         </div>
                                       </div>
-                                    </div>
-                                  );
-                                })}
+                                    );
+                                  },
+                                )}
                               </div>
                             </RenderWhen>
                           </React.Fragment>
@@ -1216,85 +1363,102 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
                             </div>
                             <RenderWhen condition={isExpanding}>
                               <div className="w-full">
-                                {orderDataForOthers?.map((row: TObject) => {
-                                  const {
-                                    memberData,
-                                    foodData: {
-                                      foodId,
-                                      foodName,
-                                      foodPrice = 0,
-                                      requirement,
-                                    },
-                                  } = row;
-                                  const { name: memberName, id: memberId } =
-                                    memberData || {};
+                                {groupOrderDataByUser(
+                                  orderDataForOthers || [],
+                                ).map(
+                                  ({
+                                    memberName,
+                                    memberId,
+                                    totalPrice,
+                                    foodNames,
+                                    requirements,
+                                    foodIds,
+                                  }) => {
+                                    const isMealItemFailed = (
+                                      mealItemsFailed[date] || []
+                                    ).some(
+                                      (item) => item.memberId === memberId,
+                                    );
 
-                                  const isMealItemFailed = (
-                                    mealItemsFailed[date] || []
-                                  ).some((item) => item.memberId === memberId);
+                                    const initialReason =
+                                      (mealItemsFailed[date] || []).find(
+                                        (i) => i.memberId === memberId,
+                                      )?.reason ?? '';
 
-                                  return (
-                                    <div
-                                      key={memberId}
-                                      className="flex items-center w-full">
-                                      <div className="flex items-center flex-1 text-xs p-2 gap-2">
-                                        <div className="flex-1 basis-[80px] font-semibold">
-                                          {memberName}
-                                        </div>
+                                    const foodNameDisplay =
+                                      foodNames.join(' + ');
+                                    const requirementDisplay =
+                                      requirements.join('\n');
 
-                                        <div className="text-xs flex-1 font-semibold">
-                                          {foodName}
-                                        </div>
-                                        <div className="text-xs flex-1">{`${parseThousandNumber(
-                                          foodPrice,
-                                        )}đ`}</div>
-                                        {requirement ? (
-                                          <Tooltip
-                                            overlayClassName={
-                                              css.requirementTooltip
-                                            }
-                                            tooltipContent={requirement}
-                                            placement="bottomLeft">
-                                            <div className="flex-1">
-                                              {requirement}
-                                            </div>
-                                          </Tooltip>
-                                        ) : (
-                                          <div className="flex-1">-</div>
-                                        )}
-                                        <div className="text-xs flex-1">
-                                          <ReasonFieldMealItemFailed
-                                            readOnly={!isAdmin}
-                                            checked={isMealItemFailed}
-                                            initialReason={
-                                              (
-                                                mealItemsFailed[date] || []
-                                              ).find(
-                                                (i) => i.memberId === memberId,
-                                              )?.reason ?? ''
-                                            }
-                                            onChange={(checked, reason) =>
-                                              onCheckMealItemFailed({
-                                                timestamp: date,
-                                                foodId,
-                                                memberId,
-                                                reason: checked ? reason : '',
-                                              })
-                                            }
-                                            onChangeReasonInput={(reason) =>
-                                              onChangeReasonInput({
-                                                timestamp: date,
-                                                foodId,
-                                                memberId,
-                                                reason,
-                                              })
-                                            }
-                                          />
+                                    return (
+                                      <div
+                                        key={memberId}
+                                        className="flex items-center w-full">
+                                        <div className="flex items-center flex-1 text-xs p-2 gap-2">
+                                          <div className="flex-1 basis-[80px] font-semibold">
+                                            {memberName}
+                                          </div>
+
+                                          <div className="text-xs flex-1 font-semibold">
+                                            {foodNameDisplay}
+                                          </div>
+                                          <div className="text-xs flex-1">{`${parseThousandNumber(
+                                            totalPrice,
+                                          )}đ`}</div>
+                                          {requirementDisplay ? (
+                                            <Tooltip
+                                              overlayClassName={
+                                                css.requirementTooltip
+                                              }
+                                              tooltipContent={
+                                                requirementDisplay
+                                              }
+                                              placement="bottomLeft">
+                                              <div className="flex-1">
+                                                {requirementDisplay}
+                                              </div>
+                                            </Tooltip>
+                                          ) : (
+                                            <div className="flex-1">-</div>
+                                          )}
+                                          <div className="text-xs flex-1">
+                                            <ReasonFieldMealItemFailed
+                                              readOnly={!isAdmin}
+                                              checked={isMealItemFailed}
+                                              initialReason={initialReason}
+                                              onChange={(checked, reason) => {
+                                                foodIds.forEach(
+                                                  (foodId: string) => {
+                                                    onCheckMealItemFailed({
+                                                      timestamp: date,
+                                                      foodId,
+                                                      memberId,
+                                                      reason: checked
+                                                        ? reason
+                                                        : '',
+                                                    });
+                                                  },
+                                                );
+                                              }}
+                                              onChangeReasonInput={(reason) => {
+                                                foodIds.forEach(
+                                                  (foodId: string) => {
+                                                    onChangeReasonInput({
+                                                      timestamp: date,
+                                                      foodId,
+                                                      memberId,
+                                                      reason,
+                                                    });
+                                                  },
+                                                );
+                                              }}
+                                            />
+                                          </div>
                                         </div>
                                       </div>
-                                    </div>
-                                  );
-                                })}
+                                    );
+                                  },
+                                )}
                               </div>
                             </RenderWhen>
                           </React.Fragment>
@@ -1411,79 +1575,85 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
                     </div>
                     <RenderWhen condition={isExpanding}>
                       <div className="w-full">
-                        {orderData.map((row: TObject) => {
-                          const {
-                            memberData,
-                            foodData: {
-                              foodName,
-                              foodPrice = 0,
-                              requirement,
-                              foodId,
-                            },
-                          } = row;
-                          const { name: memberName, id: memberId } =
-                            memberData || {};
+                        {groupOrderDataByUser(orderData || []).map(
+                          ({
+                            memberName,
+                            memberId,
+                            totalPrice,
+                            foodNames,
+                            requirements,
+                            foodIds,
+                          }) => {
+                            const isMealItemFailed = (
+                              mealItemsFailed[date] || []
+                            ).some((item) => item.memberId === memberId);
 
-                          const isMealItemFailed = (
-                            mealItemsFailed[date] || []
-                          ).some((item) => item === memberId);
+                            const initialReason =
+                              (mealItemsFailed[date] || []).find(
+                                (i) => i.memberId === memberId,
+                              )?.reason ?? '';
 
-                          const initialReason =
-                            (mealItemsFailed[date] || []).find(
-                              (i) => i.memberId === memberId,
-                            )?.reason ?? '';
+                            const foodNameDisplay = foodNames.join(' + ');
+                            const requirementDisplay = requirements.join('\n');
 
-                          return (
-                            <div
-                              key={memberId}
-                              className="flex items-center w-full">
-                              <div className="flex items-center flex-1 text-xs p-2 gap-2">
-                                <div className="flex-1 basis-[80px] font-semibold">
-                                  {memberName}
-                                </div>
-                                <div className="text-xs flex-1 font-semibold">
-                                  {foodName}
-                                </div>
-                                <div className="text-xs flex-1">{`${parseThousandNumber(
-                                  foodPrice,
-                                )}đ`}</div>
-                                {requirement ? (
-                                  <Tooltip
-                                    overlayClassName={css.requirementTooltip}
-                                    tooltipContent={requirement}
-                                    placement="bottomLeft">
-                                    <div className="flex-1">{requirement}</div>
-                                  </Tooltip>
-                                ) : (
-                                  <div className="flex-1">-</div>
-                                )}
-                                <div className="text-xs flex-1">
-                                  <ReasonFieldMealItemFailed
-                                    readOnly={!isAdmin}
-                                    checked={isMealItemFailed}
-                                    initialReason={initialReason}
-                                    onChange={(checked, reason) =>
-                                      onCheckMealItemFailed({
-                                        timestamp: date,
-                                        foodId,
-                                        memberId,
-                                        reason: checked ? reason : '',
-                                      })
-                                    }
-                                    onChangeReasonInput={(reason) =>
-                                      onChangeReasonInput({
-                                        timestamp: date,
-                                        foodId,
-                                        memberId,
-                                        reason,
-                                      })
-                                    }
-                                  />
+                            return (
+                              <div
+                                key={memberId}
+                                className="flex items-center w-full">
+                                <div className="flex items-center flex-1 text-xs p-2 gap-2">
+                                  <div className="flex-1 basis-[80px] font-semibold">
+                                    {memberName}
+                                  </div>
+                                  <div className="text-xs flex-1 font-semibold">
+                                    {foodNameDisplay}
+                                  </div>
+                                  <div className="text-xs flex-1">{`${parseThousandNumber(
+                                    totalPrice,
+                                  )}đ`}</div>
+                                  {requirementDisplay ? (
+                                    <Tooltip
+                                      overlayClassName={css.requirementTooltip}
+                                      tooltipContent={requirementDisplay}
+                                      placement="bottomLeft">
+                                      <div className="flex-1 whitespace-pre-line">
+                                        {requirementDisplay}
+                                      </div>
+                                    </Tooltip>
+                                  ) : (
+                                    <div className="flex-1">-</div>
+                                  )}
+                                  <div className="text-xs flex-1">
+                                    <ReasonFieldMealItemFailed
+                                      readOnly={!isAdmin}
+                                      checked={isMealItemFailed}
+                                      initialReason={initialReason}
+                                      onChange={(checked, reason) => {
+                                        foodIds.forEach((foodId: string) => {
+                                          onCheckMealItemFailed({
+                                            timestamp: date,
+                                            foodId,
+                                            memberId,
+                                            reason: checked ? reason : '',
+                                          });
+                                        });
+                                      }}
+                                      onChangeReasonInput={(reason) => {
+                                        foodIds.forEach((foodId: string) => {
+                                          onChangeReasonInput({
+                                            timestamp: date,
+                                            foodId,
+                                            memberId,
+                                            reason,
+                                          });
+                                        });
+                                      }}
+                                    />
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          );
-                        })}
+                            );
+                          },
+                        )}
                       </div>
                     </RenderWhen>
                   </div>

@@ -275,12 +275,14 @@ export const calculatePriceQuotationInfoFromOrder = ({
   const PITOFee = actualPCCFee;
   const totalWithoutVAT =
     totalPrice - serviceFee + transportFee + PITOFee - promotion;
+
   // * VAT
   const vatPercentage = vatPercentageBaseOnVatSetting({
     vatSetting,
     vatPercentage: orderVATPercentage,
     isPartner,
   });
+
   const VATFee = calculateVATFee({
     vatPercentage,
     orderProvisionalPrice: totalWithoutVAT,

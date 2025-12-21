@@ -9,7 +9,10 @@ import { Listing, User } from '@src/utils/data';
 import { buildFullName } from '@src/utils/emailTemplate/participantOrderPicking';
 import type { TObject, TUser } from '@src/utils/types';
 
-import { BookerDraftOrderPageThunks } from '../../BookerDraftOrderPage.slice';
+import {
+  BookerDraftOrderPageActions,
+  BookerDraftOrderPageThunks,
+} from '../../BookerDraftOrderPage.slice';
 
 import css from './ParticipantList.module.scss';
 
@@ -48,6 +51,16 @@ const ParticipantList: React.FC<TParticipantListProps> = () => {
           participants: difference(participantIds, [currentParticipantId]),
         }),
       );
+      const deletedParticipant = participantData.find(
+        (p) => p.id.uuid === currentParticipantId,
+      );
+      if (deletedParticipant) {
+        dispatch(
+          BookerDraftOrderPageActions.setRemovedParticipantData(
+            deletedParticipant,
+          ),
+        );
+      }
     }
     deleteParticipantControl.setFalse();
   };

@@ -46,6 +46,7 @@ const getOrder = async ({ orderId }: { orderId: string }) => {
     participants = [],
     anonymous = [],
     bookerId = '',
+    removedParticipants = [],
   } = Listing(orderListing).getMetadata();
 
   const companyResponse = await integrationSdk.users.show({
@@ -82,7 +83,26 @@ const getOrder = async ({ orderId }: { orderId: string }) => {
     ),
   ).map((item) => cleanPrivateData(item));
 
-  data = { ...data, participantData, anonymousParticipantData };
+  const removedParticipantData = flatten(
+    await Promise.all(
+      chunk(removedParticipants, 100).map(async (ids) => {
+        return denormalisedResponseEntities(
+          await integrationSdk.users.query({
+            meta_id: ids,
+            include: ['profileImage'],
+            'fields.image': [`variants.${EImageVariants.squareSmall2x}`],
+          }),
+        );
+      }),
+    ),
+  ).map((item) => cleanPrivateData(item));
+
+  data = {
+    ...data,
+    participantData,
+    anonymousParticipantData,
+    removedParticipantData,
+  };
 
   if (plans?.length > 0) {
     const planId = plans[0];

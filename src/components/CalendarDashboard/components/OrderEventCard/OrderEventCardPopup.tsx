@@ -88,7 +88,7 @@ const OrderEventCardPopup: React.FC<TOrderEventCardPopupProps> = ({
         planId,
         memberOrders: {
           [currentUserId]: {
-            status: 'notJoined',
+            status: EParticipantOrderStatus.notJoined,
             foodId: '',
           },
         },

@@ -270,8 +270,6 @@ const reviewsSlice = createSlice({
       })
       .addCase(fetchReviewsSilent.fulfilled, (state, action) => {
         const newReviews = action.payload.reviews;
-        console.log('newReviews', newReviews);
-
         newReviews.forEach((serverReview) => {
           const existingReviewIndex = state.reviews.findIndex(
             (r) => r.id?.uuid === serverReview.id?.uuid,

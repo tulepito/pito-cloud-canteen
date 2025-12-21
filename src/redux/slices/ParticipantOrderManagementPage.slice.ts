@@ -6,10 +6,11 @@ import { updateParticipantOrderApi } from '@apis/index';
 import { updateFirstTimeViewOrderApi } from '@apis/participantApi';
 import { fetchTxApi } from '@apis/txApi';
 import { createAsyncThunk } from '@redux/redux.helper';
+import type { TUpdateParticipantOrderBody } from '@src/types/order';
 import { denormalisedResponseEntities, Listing } from '@src/utils/data';
 import { EImageVariants, EParticipantOrderStatus } from '@src/utils/enums';
 import { storableError } from '@utils/errors';
-import type { TListing, TObject, TTransaction, TUser } from '@utils/types';
+import type { TListing, TTransaction, TUser } from '@utils/types';
 
 const LOAD_DATA = 'app/OrderManagementPage/LOAD_DATA';
 const UPDATE_ORDER = 'app/OrderManagementPage/UPDATE_ORDER';
@@ -89,10 +90,13 @@ const loadData = createAsyncThunk(
       const subOrderDate = subOrders[key];
       const memberOrder = subOrderDate?.memberOrders[currentUserId];
       if (memberOrder) {
-        const { foodId, status } = memberOrder;
+        const { foodId, status, secondaryFoodId } = memberOrder;
 
         if (foodId && status === EParticipantOrderStatus.joined) {
           pickedFoodIds.push(foodId);
+        }
+        if (secondaryFoodId && status === EParticipantOrderStatus.joined) {
+          pickedFoodIds.push(secondaryFoodId);
         }
       }
     });
@@ -163,7 +167,10 @@ const loadData = createAsyncThunk(
 
 const updateOrder = createAsyncThunk(
   UPDATE_ORDER,
-  async (data: { orderId: string; updateValues: TObject }, { getState }) => {
+  async (
+    data: { orderId: string; updateValues: TUpdateParticipantOrderBody },
+    { getState },
+  ) => {
     const { plans } = getState().ParticipantOrderManagementPage;
     const { orderId, updateValues } = data;
     const { data: response } = await updateParticipantOrderApi(

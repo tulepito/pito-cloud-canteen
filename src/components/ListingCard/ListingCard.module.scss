@@ -7,17 +7,17 @@
   overflow: hidden;
   border: 1px solid $neutralGray3;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+
+  width: 100%;
 
   @include viewportMedium {
-    min-width: 280px;
+    flex-direction: column;
   }
 
   @include viewportLarge {
     min-width: unset;
   }
-
-  width: 100%;
   .listingCardContent {
     padding: 12px;
     display: flex;
@@ -29,8 +29,8 @@
 
 .listingImage {
   cursor: pointer;
-  height: 146px;
-  width: 100%;
+  width: 100px;
+  height: 100%;
   overflow: hidden;
   position: relative;
 
@@ -39,18 +39,30 @@
     height: 100%;
     object-fit: cover;
   }
+
+  @include viewportMedium {
+    width: 100%;
+    height: 146px;
+  }
 }
 
 .listingCardInfo {
   cursor: pointer;
   flex: 1;
-  margin-bottom: 12px;
-  padding-bottom: 8px;
+
+  .headerRow {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+  }
 
   .title {
     @include textTemplate(14px, 600, 18px, '');
     color: $neutralGray7;
     margin: 0 0 4px 0;
+    justify-self: start;
+    flex: 1;
   }
 
   .categories {
@@ -65,11 +77,39 @@
     }
   }
   .description {
-    @include textTemplate(14px, 400, 24px);
+    @include textTemplate(12px, 400, 24px);
     color: $neutralGray6;
     margin: 0;
     @include lineClamp(2, 24px);
     letter-spacing: 0.028px;
+  }
+
+  .addDish {
+    cursor: pointer;
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    max-width: 24px;
+    border-radius: 50%;
+    border: 1px solid $primaryPri2;
+    @include flexCenter;
+  }
+
+  .selectDisabled {
+    border: 1px solid $neutralGray6;
+    cursor: not-allowed;
+    flex-shrink: 0;
+
+    & svg path {
+      fill: $neutralGray6;
+    }
+  }
+
+  .removeDish {
+    margin-bottom: 5px;
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
   }
 }
 
@@ -84,34 +124,6 @@
     color: $neutralGray6;
     @include textTemplate(12px, 500, 16px, '');
     margin: 0;
-  }
-
-  .addDish {
-    cursor: pointer;
-    display: inline-block;
-    width: 24px;
-    height: 24px;
-    max-width: 24px;
-    border-radius: 50%;
-    border: 1px solid $primaryPri2;
-    @include flexCenter;
-    flex-shrink: 0;
-  }
-
-  .selectDisabled {
-    border: 1px solid $neutralGray6;
-    cursor: not-allowed;
-    flex-shrink: 0;
-
-    & svg path {
-      fill: $neutralGray6;
-    }
-  }
-
-  .removeDish {
-    cursor: pointer;
-    width: 24px;
-    height: 24px;
   }
 }
 

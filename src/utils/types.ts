@@ -2,6 +2,7 @@ import type { ReactElement } from 'react';
 import type Decimal from 'decimal.js';
 import type { NextPage } from 'next';
 
+import type { RestoreDraftDisAllowedMemberPayload } from '@redux/slices/OrderManagement.slice';
 import { types as sdkLoader } from '@sharetribe/sdk';
 import type { adminRoutes, partnerRoutes } from '@src/paths';
 
@@ -700,6 +701,17 @@ export type TOrderChangeHistoryItem = {
   type?: EEditOrderHistoryType;
 };
 
+export type TSubOrderChangeHistoryValue = {
+  foodId?: string;
+  foodName?: string;
+  foodPrice?: number;
+  secondaryFoodId?: string;
+  secondaryFoodName?: string;
+  secondaryFoodPrice?: number;
+  quantity?: number;
+  members?: RestoreDraftDisAllowedMemberPayload['members'];
+};
+
 export type TSubOrderChangeHistoryItem = {
   id?: string | number;
   authorId?: string;
@@ -709,8 +721,8 @@ export type TSubOrderChangeHistoryItem = {
   member?: {
     email?: string;
   };
-  newValue?: any;
-  oldValue?: any;
+  newValue?: TSubOrderChangeHistoryValue | null;
+  oldValue?: TSubOrderChangeHistoryValue;
   planId?: string;
   planOrderDate?: Date;
   type?: EEditSubOrderHistoryType;
@@ -759,4 +771,13 @@ export type TMenuStateHistory = {
   state: EListingStates;
   reason: string;
   updatedAt: number;
+};
+
+export type TFoodDataValue = {
+  foodId: string;
+  foodName: string;
+  foodPrice: number;
+  frequency: number;
+  numberOfMainDishes: number;
+  notes?: string[];
 };

@@ -54,3 +54,24 @@ export const LOCAL_STORAGE_KEYS = {
 export const QUERY_REFS = {
   INVITATION_LINK: 'invitation-link' as const,
 };
+
+export const SECONDARY_FOOD_ALLOWED_COMPANIES = (() => {
+  const envValue = process.env.NEXT_PUBLIC_SECONDARY_FOOD_ALLOWED_COMPANIES;
+  if (!envValue) return [];
+
+  try {
+    const parsed = JSON.parse(envValue);
+    if (Array.isArray(parsed)) {
+      return parsed;
+    }
+  } catch (error) {
+    console.error(
+      'Error parsing NEXT_PUBLIC_SECONDARY_FOOD_ALLOWED_COMPANIES',
+      error,
+    );
+
+    return [];
+  }
+
+  return [];
+})();

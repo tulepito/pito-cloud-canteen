@@ -25,6 +25,8 @@ import { addCommas } from '@helpers/format';
 import { getItem } from '@helpers/localStorageHelpers';
 import { findSuitableAnchorDate } from '@helpers/order/prepareDataHelper';
 import {
+  adjustFoodListPrice,
+  getIsAllowAddSecondaryFood,
   getRestaurantListFromOrderDetail,
   getSelectedRestaurantAndFoodList,
   getUpdateLineItems,
@@ -309,13 +311,17 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
     const { restaurant, selectedFoodList } = values;
     const foodIds = Object.keys(selectedFoodList);
     const subOrderDate = (selectedDate as Date).getTime();
+    const adjustedFoodList = adjustFoodListPrice(
+      selectedFoodList,
+      order as TListing,
+    );
     const restaurantData = {
       restaurant: {
         id: restaurant.id,
         restaurantName: restaurant.restaurantName,
         menuId: restaurant.menuId,
         phoneNumber: restaurant.phoneNumber,
-        foodList: selectedFoodList,
+        foodList: adjustedFoodList,
         minQuantity: restaurant.minQuantity || 1,
         maxQuantity: restaurant.maxQuantity || 100,
       },
@@ -392,13 +398,30 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
       );
     } else {
       dispatch(setCanNotGoAfterOderDetail(true));
+      const isOrderAllowAddSecondaryFood = getIsAllowAddSecondaryFood(
+        order as TListing,
+      );
+      const lineItems = isOrderAllowAddSecondaryFood
+        ? Object.entries(adjustedFoodList).map(
+            ([foodId, { foodName, foodPrice }]: [string, any]) => {
+              return {
+                id: foodId,
+                name: foodName,
+                unitPrice: foodPrice,
+                price: foodPrice,
+                quantity: 1,
+              };
+            },
+          )
+        : getUpdateLineItems(foodList, foodIds);
+
       await dispatch(
         orderAsyncActions.updatePlanDetail({
           orderId,
           orderDetail: {
             [subOrderDate]: {
               ...restaurantData,
-              lineItems: getUpdateLineItems(foodList, foodIds),
+              lineItems,
             },
           },
           planId,
@@ -667,7 +690,6 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
         foodIds,
         currentRestaurant,
       });
-
     await handleSubmitRestaurant({
       restaurant: { ...submitRestaurantData, menuId: currentSelectedMenuId },
       selectedFoodList: submitFoodListData,
@@ -845,6 +867,10 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
           ),
         );
 
+        const isOrderAllowAddSecondaryFood = getIsAllowAddSecondaryFood(
+          order as TListing,
+        );
+
         const newOrderDetail = totalDates.reduce((result, curr) => {
           const currWeekday = convertWeekDay(
             DateTime.fromMillis(curr).weekday,
@@ -889,6 +915,11 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
                 {},
               );
 
+              // Adjust the food list price if the company is allowed to add a second food
+              const adjustedFoodList = isOrderAllowAddSecondaryFood
+                ? adjustFoodListPrice(newFoodList, order as TListing)
+                : newFoodList;
+
               return {
                 ...result,
                 [curr]: {
@@ -896,7 +927,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
                   lineItems: orderDetailToHandle![date]?.lineItems || [],
                   restaurant: {
                     ...orderDetailToHandle?.[date]?.restaurant,
-                    foodList: newFoodList,
+                    foodList: adjustedFoodList,
                   },
                 },
               };
