@@ -36,9 +36,8 @@ const CartItemList: React.FC<TCartItemList> = ({
     const planDate = DateTime.fromMillis(Number(key)).toJSDate();
     const itemLabel = `${intl.formatMessage({
       id: `Calendar.week.dayHeader.${planDate.getDay()}`,
-    })}, ${planDate.getDate()}/${
-      planDate.getMonth() + 1
-    }/${planDate.getFullYear()}`;
+    })}, ${planDate.getDate()}/${planDate.getMonth() + 1
+      }/${planDate.getFullYear()}`;
 
     const { foodId = '', secondaryFoodId = '' } = item;
 

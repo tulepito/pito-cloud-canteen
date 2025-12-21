@@ -3,6 +3,7 @@ import difference from 'lodash/difference';
 
 import { participantSubOrderAddDocumentApi } from '@apis/firebaseApi';
 import { loadPlanDataApi, updateParticipantOrderApi } from '@apis/index';
+import { placeOrderApi } from '@apis/participantApi';
 import {
   pickRandomFood,
   pickRandomFoodExcludingIds,
@@ -32,6 +33,7 @@ const RECOMMEND_FOOD_SUB_ORDER =
   'app/ParticipantPlanPage/RECOMMEND_FOOD_SUB_ORDER';
 const RECOMMEND_FOOD_SUB_ORDERS =
   'app/ParticipantPlanPage/RECOMMEND_FOOD_SUB_ORDERS';
+const PLACE_ORDER = 'app/ParticipantPlanPage/PLACE_ORDER';
 
 const recommendFoodForShoppingCart = ({
   plan,
@@ -408,6 +410,114 @@ const updateOrder = createAsyncThunk(
   },
 );
 
+/**
+ * Place order for participant
+ * @param data - { orderId: string; planId: string }
+ * @param getState - getState function
+ * @returns boolean
+ */
+const placeOrder = createAsyncThunk(
+  PLACE_ORDER,
+  async (
+    data: { orderId: string; planId: string },
+    { getState, rejectWithValue, dispatch },
+  ) => {
+    const { orderId, planId } = data;
+    const { currentUser } = getState().user;
+    const currentUserId = currentUser?.id?.uuid;
+    const { orders } = getState().shoppingCart;
+    const planData = orders?.[currentUserId]?.[planId] || {};
+    const orderDays = Object.keys(planData);
+
+    const buildCartItem = (
+      foodId: string,
+      requirement: string,
+      secondaryFoodId?: string,
+      secondaryRequirement?: string,
+    ) => {
+      const isNotJoined = foodId === EParticipantOrderStatus.notJoined;
+      const status = isNotJoined
+        ? EParticipantOrderStatus.notJoined
+        : foodId?.length > 0
+        ? EParticipantOrderStatus.joined
+        : EParticipantOrderStatus.empty;
+
+      const baseItem: TCartItem = {
+        status,
+        foodId: isNotJoined ? '' : foodId,
+        requirement,
+        ...(secondaryFoodId && {
+          secondaryFoodId,
+          secondaryRequirement,
+        }),
+      };
+
+      return baseItem;
+    };
+
+    const updatedPlan = orderDays.reduce<TShoppingCartMemberPlan>(
+      (acc, curr) => {
+        const {
+          foodId = '',
+          requirement = '',
+          secondaryFoodId,
+          secondaryRequirement,
+        } = planData[+curr] || {};
+
+        return {
+          ...acc,
+          [curr]: {
+            [currentUserId]: buildCartItem(
+              foodId,
+              requirement,
+              secondaryFoodId,
+              secondaryRequirement,
+            ),
+          },
+        };
+      },
+      {},
+    );
+
+    const updateValues: TUpdateParticipantOrderBody = {
+      orderId,
+      orderDays,
+      planId,
+      planData: updatedPlan,
+    };
+
+    console.log(`PLACE_ORDER@orderID:${orderId}`, {
+      updateValues,
+    });
+    try {
+      const res = await placeOrderApi(orderId, updateValues);
+      console.log('PLACE_ORDER@res:', res);
+      const { orderMemberDocumentId } = res?.data?.data || {};
+      if (!orderMemberDocumentId) {
+        return rejectWithValue(new Error('Failed to place order'));
+      }
+      await dispatch(reloadData(planId));
+      // firebase documents for history sub-orders and rating feature
+      await Promise.all(
+        orderDays.map((timestamp: string) =>
+          participantSubOrderAddDocumentApi({
+            participantId: currentUserId,
+            planId,
+            timestamp: parseInt(timestamp, 10),
+          }),
+        ),
+      );
+
+      return { status: true, orderMemberDocumentId };
+    } catch (error) {
+      return rejectWithValue(error as Error);
+    }
+  },
+  {
+    serializeError: storableError,
+  },
+);
+
 export const recommendFoodSubOrder = createAsyncThunk(
   RECOMMEND_FOOD_SUB_ORDER,
   async (subOrderDate: string, { getState, dispatch }) => {
@@ -515,6 +625,7 @@ export const ParticipantPlanThunks = {
   updateOrder,
   recommendFoodSubOrder,
   recommendFoodSubOrders,
+  placeOrder,
 };
 
 const participantPlanSlice = createSlice({
@@ -569,6 +680,17 @@ const participantPlanSlice = createSlice({
         state.submitDataInprogress = false;
       })
       .addCase(updateOrder.rejected, (state, { error }) => {
+        state.submitDataInprogress = false;
+        state.submitDataError = error.message;
+      })
+      .addCase(placeOrder.pending, (state) => {
+        state.submitDataInprogress = true;
+        state.submitDataError = null;
+      })
+      .addCase(placeOrder.fulfilled, (state) => {
+        state.submitDataInprogress = false;
+      })
+      .addCase(placeOrder.rejected, (state, { error }) => {
         state.submitDataInprogress = false;
         state.submitDataError = error.message;
       });

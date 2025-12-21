@@ -132,10 +132,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     case HttpMethod.POST: {
       const { orderId } = req.query;
       const { planId, memberOrders, orderDay, orderDays, planData } =
-        req.body as TUpdateParticipantOrderBody & {
-          memberOrders: any;
-          orderDay: string;
-        };
+        req.body as TUpdateParticipantOrderBody;
       try {
         console.info('[TRACK] step=api_receive start', {
           orderId,

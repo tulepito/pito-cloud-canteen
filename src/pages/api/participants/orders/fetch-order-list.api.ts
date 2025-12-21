@@ -22,6 +22,10 @@ import {
 import { EImageVariants } from '@src/utils/enums';
 import type { TListing } from '@src/utils/types';
 
+import { getSubOrderFromFirestore } from '../plans/[planId]/index.api';
+
+// import { getSubOrderFromFirestore } from '../plans/[planId]/index.api';
+
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
     const apiMethod = req.method;
@@ -36,10 +40,18 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         )[0];
 
         const { startDate, endDate } = JSON.parse(JSONParams as string);
+        const startDateMs = new Date(startDate).getTime();
+        const endDateMsRaw =
+          endDate !== undefined ? new Date(endDate).getTime() : undefined;
+        const endDateMs =
+          endDateMsRaw !== undefined && endDateMsRaw < startDateMs
+            ? startDateMs
+            : endDateMsRaw;
+
         const ordersQueries = getParticipantOrdersQueries({
           userId: currentUser.id.uuid,
-          startDate: new Date(startDate).getTime(),
-          endDate: new Date(endDate).getTime(),
+          startDate: startDateMs,
+          endDate: endDateMs,
         });
         const orderPaticipants = integrationSdk.listings.query(
           ordersQueries.queryParticipants,
@@ -183,9 +195,57 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
           }),
         );
 
+        // Sync data from firestore to order detail
+        const newAllPlans = await Promise.all(
+          allPlans.map(async (plan: TListing) => {
+            const planListing = Listing(plan);
+            const planId = planListing.getId();
+            const subOrderFromFirestore = await getSubOrderFromFirestore({
+              planId,
+              participantId: currentUser.id.uuid,
+            });
+
+            if (!subOrderFromFirestore) {
+              return plan;
+            }
+
+            const orderDetail = planListing.getMetadata().orderDetail;
+            const newOrderDetail = Object.keys(orderDetail || {}).reduce(
+              (acc, dayId) => {
+                const { memberOrders } = orderDetail[dayId];
+                const firestoreOrder = subOrderFromFirestore[dayId] || {};
+
+                return {
+                  ...acc,
+                  [dayId]: {
+                    ...orderDetail[dayId],
+                    memberOrders: {
+                      [currentUser.id.uuid]:
+                        firestoreOrder[currentUser.id.uuid] ||
+                        memberOrders?.[currentUser.id.uuid],
+                    },
+                  },
+                };
+              },
+              {},
+            );
+
+            return {
+              ...plan,
+              attributes: {
+                ...plan.attributes,
+                metadata: {
+                  ...plan.attributes?.metadata,
+                  orderDetail: newOrderDetail,
+                },
+              },
+            };
+          }),
+        );
+
         return res.status(200).json({
           orders,
-          allPlans,
+          allPlans: newAllPlans,
           restaurants: allRelatedRestaurants,
           mappingSubOrderToOrder,
           company,

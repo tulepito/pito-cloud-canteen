@@ -772,6 +772,7 @@ export type TMenuStateHistory = {
   reason: string;
   updatedAt: number;
 };
+export type TOrderMemberProcessStatus = 'pending' | 'completed' | 'failed';
 
 export type TFoodDataValue = {
   foodId: string;
