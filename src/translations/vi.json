@@ -2003,6 +2003,7 @@
   "UserPermission.participant": "Thành viên",
   "HomeRoute.description": "Trang chủ",
   "HomeRoute.title": "Trang chủ",
+  "BookerDraftOrderPage.reachMaxNumberOfParticipants": "Số lượng người tham gia đơn hàng vượt quá số lượng tối đa. Xin vui lòng tách đơn.",
   "bang-cach-tham-gia-ban-da-doc-va-dong-y": "Bằng cách tham gia, bạn đã đọc và đồng ý",
   "dieu-khoan-dich-vu-va-dieu-kien-su-dung": "Điều khoản dịch vụ và điều kiện sử dụng",
   "cua-pito": "của PITO.",
