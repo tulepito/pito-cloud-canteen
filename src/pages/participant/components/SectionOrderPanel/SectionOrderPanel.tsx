@@ -100,7 +100,6 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
       if (res.status) {
         setIsSubmitSuccess(true);
       }
-      console.log('SectionOrderPanel@handleSubmit@res:', res);
     } catch (error) {
       toast.error('Đã có lỗi xảy ra trong chọn món. Vui lòng thử lại sau');
     }

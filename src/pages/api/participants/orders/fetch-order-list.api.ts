@@ -24,8 +24,6 @@ import type { TListing } from '@src/utils/types';
 
 import { getSubOrderFromFirestore } from '../plans/[planId]/index.api';
 
-// import { getSubOrderFromFirestore } from '../plans/[planId]/index.api';
-
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
     const apiMethod = req.method;
