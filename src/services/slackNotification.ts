@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 import logger from '@helpers/logger';
+import type { TMemberPlan } from '@redux/slices/shoppingCart.slice';
 import { Listing, User } from '@src/utils/data';
 import { formatTimestamp } from '@src/utils/dates';
 import { ESlackNotificationType } from '@src/utils/enums';
@@ -165,6 +166,13 @@ type SlackNotificationParams = {
     menuName: string;
     restaurantName: string;
     menuLink: string;
+  };
+  participantPlaceOrderFailedData?: {
+    orderId: string;
+    planId: string;
+    userOrder: TMemberPlan;
+    error: string;
+    userEmail: string;
   };
 };
 
@@ -1136,6 +1144,54 @@ export const createSlackNotification = async (
           },
         );
 
+        break;
+      }
+
+      case ESlackNotificationType.PARTICIPANT_PLACE_ORDER_FAILED: {
+        if (!notificationParams.participantPlaceOrderFailedData) return;
+
+        const { orderId, planId, userOrder, error, userEmail } =
+          notificationParams.participantPlaceOrderFailedData;
+        await axios.post(
+          process.env.SLACK_WEBHOOK_FOR_MISSING_ORDERS_URL,
+          {
+            blocks: [
+              {
+                type: 'section',
+                text: {
+                  type: 'mrkdwn',
+                  text: `:warning: Đơn hàng *#${orderId}* của plan *${planId}* bị lỗi khi đặt món`,
+                },
+              },
+              {
+                type: 'section',
+                text: {
+                  type: 'mrkdwn',
+                  text: `*Người dùng:*\n${userEmail}`,
+                },
+              },
+              {
+                type: 'section',
+                text: {
+                  type: 'mrkdwn',
+                  text: `*Lỗi:*\n${JSON.stringify(error)}`,
+                },
+              },
+              {
+                type: 'section',
+                text: {
+                  type: 'mrkdwn',
+                  text: `*User Order:*\n${JSON.stringify(userOrder)}`,
+                },
+              },
+            ],
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          },
+        );
         break;
       }
       default:

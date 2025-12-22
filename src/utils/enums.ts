@@ -485,6 +485,7 @@ export enum ESlackNotificationType {
   PARTNER_MENU_PUBLISHED_DRAFT_TO_PENDING = 'partnerMenuPublishedDraftToPending',
   ADMIN_APPROVE_PARTNER_MENU = 'adminApprovePartnerMenu',
   ADMIN_REJECT_PARTNER_MENU = 'adminRejectPartnerMenu',
+  PARTICIPANT_PLACE_ORDER_FAILED = 'participantPlaceOrderFailed',
 }
 
 export enum QuizStep {
