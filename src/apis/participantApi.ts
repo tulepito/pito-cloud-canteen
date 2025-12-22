@@ -1,5 +1,6 @@
 import type { VoucherInfo } from '@pages/api/participants/events/voucher/receive.api';
 import type { POSTParticipantRating } from '@pages/api/participants/ratings/index.api';
+import type { TMemberPlan } from '@redux/slices/shoppingCart.slice';
 import type { TUpdateParticipantOrderBody } from '@src/types/order';
 import type { ApiResponse } from '@src/utils/response';
 
@@ -55,5 +56,24 @@ export const placeOrderApi = (
 ) =>
   postApi<ApiResponse<{ orderMemberDocumentId: string }>>(
     `/participants/orders/${orderId}/place-order`,
+    body,
+  );
+
+/**
+ * Place order failed for participant
+ * @param orderId - order id
+ * @param body - body
+ */
+export const placeOrderFailedApi = (
+  orderId: string,
+  body: {
+    planId: string;
+    userOrder: TMemberPlan;
+    userEmail: string;
+    error: string;
+  },
+) =>
+  postApi<ApiResponse<{ message: string }>>(
+    `/participants/orders/${orderId}/place-order-failed`,
     body,
   );
