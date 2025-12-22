@@ -320,7 +320,9 @@ const loadData = createAsyncThunk(
   'app/OrderManagement/LOAD_DATA',
   async (payload: { orderId: string; isAdminFlow?: boolean }, { dispatch }) => {
     const { orderId, isAdminFlow = false } = payload;
+    console.log('loadData@@payload:', { payload });
     const response: any = await getBookerOrderDataApi(orderId);
+    console.log('loadData@@response:', { response });
     dispatch(SystemAttributesThunks.fetchVATPercentageByOrderId(orderId));
     // Check if company is allowing add second food
     const isAllowAddSecondaryFood = getIsAllowAddSecondaryFood(

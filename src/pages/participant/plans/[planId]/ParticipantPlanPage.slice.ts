@@ -3,7 +3,7 @@ import difference from 'lodash/difference';
 
 import { participantSubOrderAddDocumentApi } from '@apis/firebaseApi';
 import { loadPlanDataApi, updateParticipantOrderApi } from '@apis/index';
-import { placeOrderApi } from '@apis/participantApi';
+import { placeOrderApi, placeOrderFailedApi } from '@apis/participantApi';
 import {
   pickRandomFood,
   pickRandomFoodExcludingIds,
@@ -11,6 +11,7 @@ import {
 import { sleep } from '@helpers/index';
 import { getIsAllowAddSecondaryFood } from '@helpers/orderHelper';
 import { createAsyncThunk } from '@redux/redux.helper';
+import type { TMemberPlan } from '@redux/slices/shoppingCart.slice';
 import {
   shoppingCartActions,
   shoppingCartThunks,
@@ -419,79 +420,75 @@ const updateOrder = createAsyncThunk(
 const placeOrder = createAsyncThunk(
   PLACE_ORDER,
   async (
-    data: { orderId: string; planId: string },
+    data: { orderId: string; planId: string; userOrder?: TMemberPlan },
     { getState, rejectWithValue, dispatch },
   ) => {
-    const { orderId, planId } = data;
-    const { currentUser } = getState().user;
-    const currentUserId = currentUser?.id?.uuid;
-    const { orders } = getState().shoppingCart;
-    const planData = orders?.[currentUserId]?.[planId] || {};
-    const orderDays = Object.keys(planData);
+    try {
+      const { orderId, planId } = data;
+      const { currentUser } = getState().user;
+      const currentUserId = currentUser?.id?.uuid;
+      const { orders } = getState().shoppingCart;
+      const planData = orders?.[currentUserId]?.[planId] || {};
+      const orderDays = Object.keys(planData);
 
-    const buildCartItem = (
-      foodId: string,
-      requirement: string,
-      secondaryFoodId?: string,
-      secondaryRequirement?: string,
-    ) => {
-      const isNotJoined = foodId === EParticipantOrderStatus.notJoined;
-      const status = isNotJoined
-        ? EParticipantOrderStatus.notJoined
-        : foodId?.length > 0
-        ? EParticipantOrderStatus.joined
-        : EParticipantOrderStatus.empty;
+      const buildCartItem = (
+        foodId: string,
+        requirement: string,
+        secondaryFoodId?: string,
+        secondaryRequirement?: string,
+      ) => {
+        const isNotJoined = foodId === EParticipantOrderStatus.notJoined;
+        const status = isNotJoined
+          ? EParticipantOrderStatus.notJoined
+          : foodId?.length > 0
+          ? EParticipantOrderStatus.joined
+          : EParticipantOrderStatus.empty;
 
-      const baseItem: TCartItem = {
-        status,
-        foodId: isNotJoined ? '' : foodId,
-        requirement,
-        ...(secondaryFoodId && {
-          secondaryFoodId,
-          secondaryRequirement,
-        }),
+        const baseItem: TCartItem = {
+          status,
+          foodId: isNotJoined ? '' : foodId,
+          requirement,
+          ...(secondaryFoodId && {
+            secondaryFoodId,
+            secondaryRequirement,
+          }),
+        };
+
+        return baseItem;
       };
 
-      return baseItem;
-    };
+      const updatedPlan = orderDays.reduce<TShoppingCartMemberPlan>(
+        (acc, curr) => {
+          const {
+            foodId = '',
+            requirement = '',
+            secondaryFoodId,
+            secondaryRequirement,
+          } = planData[+curr] || {};
 
-    const updatedPlan = orderDays.reduce<TShoppingCartMemberPlan>(
-      (acc, curr) => {
-        const {
-          foodId = '',
-          requirement = '',
-          secondaryFoodId,
-          secondaryRequirement,
-        } = planData[+curr] || {};
+          return {
+            ...acc,
+            [curr]: {
+              [currentUserId]: buildCartItem(
+                foodId,
+                requirement,
+                secondaryFoodId,
+                secondaryRequirement,
+              ),
+            },
+          };
+        },
+        {},
+      );
 
-        return {
-          ...acc,
-          [curr]: {
-            [currentUserId]: buildCartItem(
-              foodId,
-              requirement,
-              secondaryFoodId,
-              secondaryRequirement,
-            ),
-          },
-        };
-      },
-      {},
-    );
+      const updateValues: TUpdateParticipantOrderBody = {
+        orderId,
+        orderDays,
+        planId,
+        planData: updatedPlan,
+      };
 
-    const updateValues: TUpdateParticipantOrderBody = {
-      orderId,
-      orderDays,
-      planId,
-      planData: updatedPlan,
-    };
-
-    console.log(`PLACE_ORDER@orderID:${orderId}`, {
-      updateValues,
-    });
-    try {
       const res = await placeOrderApi(orderId, updateValues);
-      console.log('PLACE_ORDER@res:', res);
       const { orderMemberDocumentId } = res?.data?.data || {};
       if (!orderMemberDocumentId) {
         return rejectWithValue(new Error('Failed to place order'));
@@ -510,6 +507,18 @@ const placeOrder = createAsyncThunk(
 
       return { status: true, orderMemberDocumentId };
     } catch (error) {
+      const { orderId, planId, userOrder = {} } = data;
+      const { currentUser } = getState().user;
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+
+      await placeOrderFailedApi(orderId, {
+        planId,
+        userOrder,
+        userEmail: currentUser?.attributes?.email || '',
+        error: errorMessage,
+      });
+
       return rejectWithValue(error as Error);
     }
   },

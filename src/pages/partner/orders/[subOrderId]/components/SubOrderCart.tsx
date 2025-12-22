@@ -63,6 +63,7 @@ const SubOrderCart: React.FC<TSubOrderCartProps> = (props) => {
     serviceFeePercentageMap[restaurantListingId] || 0;
   const vatSetting = ensureVATSetting(vatSettings[restaurantListingId]);
 
+  console.log('orderVATPercentage', orderVATPercentage);
   const {
     promotion = 0,
     serviceFee = 0,

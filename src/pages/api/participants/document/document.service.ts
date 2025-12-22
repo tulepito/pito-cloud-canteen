@@ -104,6 +104,85 @@ export const addFirebaseDocument = async ({
       ...(extraParams || {}),
     };
   }
+  if (status !== EParticipantOrderStatus.notJoined && secondaryFoodId) {
+    const { foodName } = foodList[secondaryFoodId] || {};
+    const foodResponse = await fetchListing(
+      secondaryFoodId,
+      ['images'],
+      [`variants.${EImageVariants.squareSmall2x}`],
+    );
+    const foodListing = Listing(foodResponse);
+    const foodImages = foodListing.getImages();
+
+    const newSecondFoodImage =
+      foodImages.length > 0
+        ? {
+            ...foodImages[0],
+            id: {
+              uuid: foodImages[0].id.uuid,
+            },
+          }
+        : null;
+    subOrderDocument = {
+      ...subOrderDocument,
+      secondaryFoodName: foodName,
+      ...(newSecondFoodImage && { secondaryFoodImage: newSecondFoodImage }),
+    };
+  }
+
+  if (status !== EParticipantOrderStatus.notJoined && secondaryFoodId) {
+    const { foodName } = foodList[secondaryFoodId] || {};
+    const foodResponse = await fetchListing(
+      secondaryFoodId,
+      ['images'],
+      [`variants.${EImageVariants.squareSmall2x}`],
+    );
+    const foodListing = Listing(foodResponse);
+    const foodImages = foodListing.getImages();
+
+    const newSecondFoodImage =
+      foodImages.length > 0
+        ? {
+            ...foodImages[0],
+            id: {
+              uuid: foodImages[0].id.uuid,
+            },
+          }
+        : null;
+    subOrderDocument = {
+      ...subOrderDocument,
+      secondaryFoodId,
+      secondaryFoodName: foodName,
+      ...(newSecondFoodImage && { secondaryFoodImage: newSecondFoodImage }),
+    };
+  }
+
+  if (status !== EParticipantOrderStatus.notJoined && secondaryFoodId) {
+    const { foodName } = foodList[secondaryFoodId] || {};
+    const foodResponse = await fetchListing(
+      secondaryFoodId,
+      ['images'],
+      [`variants.${EImageVariants.squareSmall2x}`],
+    );
+    const foodListing = Listing(foodResponse);
+    const foodImages = foodListing.getImages();
+
+    const newSecondFoodImage =
+      foodImages.length > 0
+        ? {
+            ...foodImages[0],
+            id: {
+              uuid: foodImages[0].id.uuid,
+            },
+          }
+        : null;
+    subOrderDocument = {
+      ...subOrderDocument,
+      secondaryFoodId,
+      secondaryFoodName: foodName,
+      ...(newSecondFoodImage && { secondaryFoodImage: newSecondFoodImage }),
+    };
+  }
 
   if (status !== EParticipantOrderStatus.notJoined && secondaryFoodId) {
     const { foodName } = foodList[secondaryFoodId] || {};

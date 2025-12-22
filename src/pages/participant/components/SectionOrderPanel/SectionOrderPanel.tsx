@@ -89,19 +89,19 @@ const SectionOrderPanel: React.FC<TSectionOrderPanelProps> = ({
     Tracker.track('participant:order:place', {
       orderId,
     });
-    console.log(`SectionOrderPanel@handleSubmit@orderID:${orderId}`, {
-      cartList,
-    });
     try {
       const res = await dispatch(
-        ParticipantPlanThunks.placeOrder({ orderId, planId }),
+        ParticipantPlanThunks.placeOrder({
+          orderId,
+          planId,
+          userOrder: cartList,
+        }),
       ).unwrap();
       if (res.status) {
         setIsSubmitSuccess(true);
       }
       console.log('SectionOrderPanel@handleSubmit@res:', res);
     } catch (error) {
-      console.error('SectionOrderPanel@handleSubmit@error:', error);
       toast.error('Đã có lỗi xảy ra trong chọn món. Vui lòng thử lại sau');
     }
   };
