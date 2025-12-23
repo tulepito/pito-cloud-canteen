@@ -142,6 +142,7 @@ export const useGetCalendarExtraResources = ({
                       foodName: string;
                       foodPrice: number;
                       foodUnit: string;
+                      numberOfMainDishes: number;
                     };
                   },
                   food: TFoodInRestaurant,
@@ -150,6 +151,7 @@ export const useGetCalendarExtraResources = ({
                     foodName: food.foodName,
                     foodPrice: food.price,
                     foodUnit: food.foodUnit,
+                    numberOfMainDishes: food?.numberOfMainDishes || 2,
                   };
 
                   return foodResult;

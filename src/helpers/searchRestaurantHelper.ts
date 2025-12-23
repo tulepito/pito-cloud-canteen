@@ -97,6 +97,7 @@ export function parseFoodsFromMenu(
         minQuantity: foodListing.getPublicData().minQuantity ?? 0,
         price: price.amount,
         foodUnit: publicData?.unit ?? '',
+        numberOfMainDishes: publicData?.numberOfMainDishes ?? 2,
       });
     }
   });

@@ -900,6 +900,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
                       foodName: string;
                       foodPrice: number;
                       foodUnit: string;
+                      numberOfMainDishes: number;
                     };
                   },
                   food: TFoodInRestaurant,
@@ -908,6 +909,7 @@ const SetupOrderDetail: React.FC<TSetupOrderDetailProps> = ({
                     foodName: food.foodName,
                     foodPrice: food.price,
                     foodUnit: food.foodUnit,
+                    numberOfMainDishes: food?.numberOfMainDishes ?? 2,
                   };
 
                   return foodResult;
