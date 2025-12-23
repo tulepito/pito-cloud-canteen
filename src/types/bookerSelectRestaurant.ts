@@ -14,4 +14,5 @@ export type TFoodInRestaurant = {
   minQuantity: number;
   foodName: string;
   foodUnit: string;
+  numberOfMainDishes?: number;
 };
