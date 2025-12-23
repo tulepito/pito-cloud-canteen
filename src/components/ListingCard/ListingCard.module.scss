@@ -3,13 +3,31 @@
 @use '/src/styles/customMediaQueries.scss' as *;
 
 .root {
-  border-radius: 10px;
+  width: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+.cardWrapper {
+  flex: 1;
+  width: 100%;
+  box-sizing: border-box;
+  border-radius: 16px;
   overflow: hidden;
   border: 1px solid $neutralGray3;
   display: flex;
   flex-direction: row;
+  background-color: #ffffff;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s ease;
 
-  width: 100%;
+  &:hover {
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+    transform: translateY(-4px);
+  }
 
   @include viewportMedium {
     flex-direction: column;
@@ -18,51 +36,106 @@
   @include viewportLarge {
     min-width: unset;
   }
+
   .listingCardContent {
     padding: 12px;
     display: flex;
     flex: 1;
     flex-direction: column;
     position: relative;
+    justify-content: center;
+    min-width: 0;
+
+    @include viewportMedium {
+      padding: 16px;
+      justify-content: flex-start;
+    }
   }
 }
 
 .listingImage {
   cursor: pointer;
   width: 100px;
-  height: 100%;
+  flex-shrink: 0;
   overflow: hidden;
   position: relative;
+  background-color: $neutralGray1;
 
   & > img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+
+  &:hover > img {
+    transform: scale(1.1);
   }
 
   @include viewportMedium {
     width: 100%;
-    height: 146px;
+    height: auto;
+    aspect-ratio: 4 / 3;
+  }
+}
+
+.decoratorWrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: $neutralGray3;
+}
+
+.decoratorImage {
+  width: 80px;
+  height: 100%;
+  object-fit: contain;
+
+  @include viewportMedium {
+    width: 120px;
+    height: 120px;
   }
 }
 
 .listingCardInfo {
   cursor: pointer;
   flex: 1;
+  min-width: 0;
 
   .headerRow {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    gap: 8px;
+    gap: 12px;
+    width: 100%;
+  }
+
+  .actionButtons {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
   }
 
   .title {
-    @include textTemplate(14px, 600, 18px, '');
+    @include textTemplate(14px, 700, 20px, '');
     color: $neutralGray7;
-    margin: 0 0 4px 0;
+    margin: 0;
     justify-self: start;
     flex: 1;
+    min-width: 0;
+    word-break: break-word;
+    transition: color 0.3s ease;
+
+    @include viewportMedium {
+      @include textTemplate(18px, 700, 24px, '');
+      margin-bottom: 4px;
+    }
+
+    .cardWrapper:hover & {
+      color: $primaryPri2;
+    }
   }
 
   .categories {
@@ -72,44 +145,88 @@
 
     gap: 6px;
     margin-bottom: 8px;
+
+    @include viewportMedium {
+      margin-bottom: 12px;
+    }
+
     .badge {
       border-radius: 20px;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      font-size: 10px;
     }
   }
   .description {
-    @include textTemplate(12px, 400, 24px);
+    @include textTemplate(12px, 400, 18px);
     color: $neutralGray6;
     margin: 0;
-    @include lineClamp(2, 24px);
+    @include lineClamp(2, 18px);
     letter-spacing: 0.028px;
+
+    @include viewportMedium {
+      @include textTemplate(13px, 400, 20px);
+      @include lineClamp(2, 20px);
+    }
   }
 
   .addDish {
     cursor: pointer;
-    display: inline-block;
-    width: 24px;
-    height: 24px;
-    max-width: 24px;
+    display: inline-flex;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
-    border: 1px solid $primaryPri2;
+    background-color: $neutralGray7;
     @include flexCenter;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    color: #ffffff;
+
+    @include viewportMedium {
+      width: 36px;
+      height: 36px;
+    }
+
+    &:hover {
+      background-color: $sematicGreen2;
+      transform: scale(1.1);
+      box-shadow: 0 6px 16px rgba(101, 219, 99, 0.4);
+    }
   }
 
   .selectDisabled {
-    border: 1px solid $neutralGray6;
+    background-color: $neutralGray3;
+    box-shadow: none;
     cursor: not-allowed;
-    flex-shrink: 0;
+    color: $neutralGray6;
 
-    & svg path {
-      fill: $neutralGray6;
+    &:hover {
+      background-color: $neutralGray3;
+      transform: none;
     }
   }
 
   .removeDish {
-    margin-bottom: 5px;
     cursor: pointer;
-    width: 24px;
-    height: 24px;
+    display: inline-flex;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: $sematicGreen2;
+    @include flexCenter;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(101, 219, 99, 0.4);
+    color: #ffffff;
+
+    @include viewportMedium {
+      width: 36px;
+      height: 36px;
+    }
+
+    &:hover {
+      transform: scale(1.1);
+    }
   }
 }
 
@@ -117,13 +234,15 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 0;
+  padding: 8px 0;
   border-top: 1px solid $neutralGray3;
+  margin-top: auto;
 
   .allergiesLabel {
     color: $neutralGray6;
-    @include textTemplate(12px, 500, 16px, '');
+    @include textTemplate(11px, 500, 14px, '');
     margin: 0;
+    font-style: italic;
   }
 }
 
