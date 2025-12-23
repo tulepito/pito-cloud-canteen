@@ -109,7 +109,6 @@
     align-items: flex-start;
     justify-content: space-between;
     gap: 12px;
-    margin-bottom: 8px;
     width: 100%;
   }
 
@@ -131,7 +130,7 @@
 
     @include viewportMedium {
       @include textTemplate(18px, 700, 24px, '');
-      margin-bottom: 8px;
+      margin-bottom: 4px;
     }
 
     .cardWrapper:hover & {

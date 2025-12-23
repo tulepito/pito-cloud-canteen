@@ -278,15 +278,15 @@ const ListingCard: React.FC<TListCardProps> = ({
                 </div>
               </div>
             </div>
-            <div className={css.categories}>
-              {numberOfMainDishes === 1 && isAllowAddSecondaryFood && (
+            {numberOfMainDishes === 1 && isAllowAddSecondaryFood && (
+              <div className={css.categories}>
                 <Badge
                   className={css.badge}
                   label="Chọn 1 món"
                   type={EBadgeType.success}
                 />
-              )}
-            </div>
+              </div>
+            )}
             <div className="flex items-center gap-2">
               {isAllowAddSecondaryFood &&
                 dualFoodSelection.isFirstFoodSelected && (
