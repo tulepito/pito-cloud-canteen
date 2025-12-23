@@ -224,6 +224,7 @@ const ResultDetailModal: React.FC<TResultDetailModalProps> = ({
           foodName,
           foodPrice: finalPrice,
           foodUnit: foodListingGetter.publicData?.unit || '',
+          numberOfMainDishes,
         };
       }
 
