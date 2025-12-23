@@ -50,13 +50,12 @@ const validateCartItem = (
           numberOfMainDishes !== undefined &&
           numberOfMainDishes !== null &&
           Number(numberOfMainDishes) === 1;
-
         if (isSingleSelectionFood) {
           if (secondaryFoodId) {
-            return 'Cannot choose secondary food for single selection food';
+            return `Cannot choose secondary food for single selection food for ${dayId}`;
           }
         } else if (!secondaryFoodId) {
-          return 'Please choose secondary food';
+          return `Please choose secondary food for ${dayId}`;
         }
       }
     }
@@ -84,23 +83,25 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           }).send(res);
         }
         const order = await sdk.listings.show({ id: orderId as string });
-        if (!order) {
+        const [orderListing] = denormalisedResponseEntities(order);
+        if (!orderListing) {
           return new FailedResponse({
             status: HttpStatus.NOT_FOUND,
             message: 'Order not found',
           }).send(res);
         }
         const plan = await sdk.listings.show({ id: planId });
-        if (!plan) {
+        const [planListing] = denormalisedResponseEntities(plan);
+        if (!planListing) {
           return new FailedResponse({
             status: HttpStatus.NOT_FOUND,
             message: 'Plan not found',
           }).send(res);
         }
         // check if order is valid with case allowed secondary food
-        const isAllowedSecondaryFood = getIsAllowAddSecondaryFood(order);
+        const isAllowedSecondaryFood = getIsAllowAddSecondaryFood(orderListing);
 
-        const planMetadata = Listing(plan).getMetadata();
+        const planMetadata = Listing(planListing).getMetadata();
         const orderDetail = planMetadata.orderDetail || {};
 
         if (planData) {
