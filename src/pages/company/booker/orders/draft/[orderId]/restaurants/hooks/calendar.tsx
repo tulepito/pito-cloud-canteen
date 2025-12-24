@@ -350,7 +350,7 @@ export const useGetCalendarComponentProps = ({
       );
 
       const isAllDatesHaveNoRestaurants = Object.values(
-        recommendOrderDetail,
+        recommendOrderDetail || {},
       ).every(({ hasNoRestaurants = false }: any) => hasNoRestaurants);
 
       const isShowToastAfterSuccessfullyCreatingOrder =

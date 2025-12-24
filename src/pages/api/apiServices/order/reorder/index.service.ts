@@ -102,6 +102,9 @@ export const reorder = async ({
   const timestampWeekDays = getDayInWeekFromPeriod(startDate, endDate).map(
     (day) => convertWeekDay(day).key,
   );
+
+  const canAddSecondaryFood = oldOrderMetadata.canAddSecondaryFood;
+
   const newOrderResponse = await integrationSdk.listings.create(
     {
       authorId: subAccountId,
@@ -121,6 +124,7 @@ export const reorder = async ({
         endDate,
         deadlineDate: initialDeadlineDate,
         dayInWeek: timestampWeekDays,
+        ...(canAddSecondaryFood ? { canAddSecondaryFood } : {}),
       },
     },
     { expand: true },
