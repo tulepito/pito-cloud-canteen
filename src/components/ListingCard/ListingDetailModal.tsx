@@ -34,6 +34,20 @@ type TListingDetailModalProps = {
   onChangeRequirement: (value: string) => void;
 };
 
+const DECORATORS: string[] = [
+  '/static/loading-asset-1.png',
+  '/static/loading-asset-2.png',
+  '/static/loading-asset-3.png',
+  '/static/loading-asset-4.png',
+];
+
+const getDecorator = (id: string): string => {
+  if (!id) return DECORATORS[0];
+  const hash = id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+
+  return DECORATORS[hash % DECORATORS.length];
+};
+
 const ListingDetailModal: React.FC<TListingDetailModalProps> = (props) => {
   const {
     isOpen,
@@ -150,8 +164,12 @@ const ListingDetailModal: React.FC<TListingDetailModalProps> = (props) => {
             </Slider>
 
             <RenderWhen.False>
-              <div className={css.imageWrapper}>
-                <ResponsiveImage image={null} emptyType="food" alt={title} />
+              <div className={css.decoratorWrapper}>
+                <img
+                  src={getDecorator(listing.id?.uuid)}
+                  alt={title}
+                  className={css.decoratorImage}
+                />
               </div>
             </RenderWhen.False>
           </RenderWhen>

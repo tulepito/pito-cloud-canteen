@@ -16,7 +16,6 @@ import ListingDetailModal from './ListingDetailModal';
 
 import css from './ListingCard.module.scss';
 
-// Decorator images paths (for placeholder when image is null)
 const DECORATORS: string[] = [
   '/static/loading-asset-1.png',
   '/static/loading-asset-2.png',
@@ -160,10 +159,25 @@ const ListingCard: React.FC<TListCardProps> = ({
             'transition-all duration-200',
           )}>
           <div className={css.listingCardInfo} onClick={viewListingDetail}>
-            <div className="font-bold text-xs text-orange-600 mb-1 uppercase">
-              {getLabelByKey(FOOD_TYPE_OPTIONS, foodType)}
-            </div>
+            <div className="flex md:flex-row flex-col items-start md:items-center md:gap-2 font-bold text-xs">
+              <div className={css.categories}>
+                <Badge
+                  className={css.badge}
+                  label={getLabelByKey(FOOD_TYPE_OPTIONS, foodType)}
+                  type={EBadgeType.success}
+                />
+              </div>
 
+              {numberOfMainDishes === 1 && isAllowAddSecondaryFood && (
+                <div className={css.categories}>
+                  <Badge
+                    className={css.badge}
+                    label="Chọn 1 món"
+                    type={EBadgeType.success}
+                  />
+                </div>
+              )}
+            </div>
             <div className={css.headerRow}>
               <h6 className={css.title}>{title}</h6>
               <div className={css.actionButtons}>
@@ -278,15 +292,6 @@ const ListingCard: React.FC<TListCardProps> = ({
                 </div>
               </div>
             </div>
-            {numberOfMainDishes === 1 && isAllowAddSecondaryFood && (
-              <div className={css.categories}>
-                <Badge
-                  className={css.badge}
-                  label="Chọn 1 món"
-                  type={EBadgeType.success}
-                />
-              </div>
-            )}
             <div className="flex items-center gap-2">
               {isAllowAddSecondaryFood &&
                 dualFoodSelection.isFirstFoodSelected && (

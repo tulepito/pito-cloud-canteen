@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { AxiosError } from 'axios';
 import difference from 'lodash/difference';
 
 import { participantSubOrderAddDocumentApi } from '@apis/firebaseApi';
@@ -23,6 +24,7 @@ import type {
   TUpdateParticipantOrderBody,
 } from '@src/types/order';
 import { CurrentUser, Listing } from '@src/utils/data';
+import type { ApiResponse } from '@src/utils/response';
 import type { TListing } from '@src/utils/types';
 import { EParticipantOrderStatus } from '@utils/enums';
 import { storableError } from '@utils/errors';
@@ -506,17 +508,22 @@ const placeOrder = createAsyncThunk(
       );
 
       return { status: true, orderMemberDocumentId };
-    } catch (error) {
+    } catch (error: unknown) {
       const { orderId, planId, userOrder = {} } = data;
       const { currentUser } = getState().user;
       const errorMessage =
-        error instanceof Error ? error.message : String(error);
+        error instanceof AxiosError
+          ? (error as AxiosError<ApiResponse<{ message: string }>>).response
+              ?.data?.message
+          : error instanceof Error
+          ? error.message
+          : String(error);
 
       await placeOrderFailedApi(orderId, {
         planId,
         userOrder,
         userEmail: currentUser?.attributes?.email || '',
-        error: errorMessage,
+        error: errorMessage || 'Unknown error',
       });
 
       return rejectWithValue(error as Error);

@@ -74,7 +74,7 @@
 
   @include viewportMedium {
     width: 100%;
-    height: auto;
+    height: 120px;
     aspect-ratio: 4 / 3;
   }
 }
@@ -132,10 +132,6 @@
       @include textTemplate(18px, 700, 24px, '');
       margin-bottom: 4px;
     }
-
-    .cardWrapper:hover & {
-      color: $primaryPri2;
-    }
   }
 
   .categories {
@@ -152,7 +148,6 @@
 
     .badge {
       border-radius: 20px;
-      text-transform: uppercase;
       font-weight: 700;
       letter-spacing: 0.05em;
       font-size: 10px;

@@ -43,8 +43,7 @@ const ParticipantInvitation: React.FC<TParticipantInvitationProps> = ({
     (state) => state.BookerDraftOrderPage.participantData,
   );
 
-  const { startDate, deadlineHour, deliveryHour } =
-    Listing(order).getMetadata();
+  const { startDate, deliveryHour } = Listing(order).getMetadata();
   const intl = useIntl();
 
   // * calculate start delivery time
@@ -54,11 +53,14 @@ const ParticipantInvitation: React.FC<TParticipantInvitationProps> = ({
     .plus({ days: 7 })
     .toMillis();
   const deliveryTime = new Date(startDate || nextStartWeek);
+  const deadlineDate =
+    Number(order?.attributes.metadata.deadlineDate) || undefined;
+  const deadlineHour = order?.attributes.metadata.deadlineHour || undefined;
 
   // * prepare deadline date time form initial
   const deadlineDateTimeInitialValues = {
-    deadlineDate: undefined,
-    deadlineHour: undefined,
+    deadlineDate,
+    deadlineHour,
     draftDeadlineHour: deadlineHour,
   };
 
