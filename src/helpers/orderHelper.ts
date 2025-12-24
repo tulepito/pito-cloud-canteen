@@ -755,6 +755,7 @@ export const adjustFoodListPrice = (
   order: TListing,
 ): TFoodList => {
   const isSecondaryFoodAllowedCompany = getIsAllowAddSecondaryFood(order);
+  if (!foodList) return {} as TFoodList;
 
   return Object.entries(foodList).reduce(
     (
@@ -801,14 +802,18 @@ export const adjustRecommendOrderDetailWithFoodListPrice = (
   recommendOrderDetail: TOrderDetail,
   order: TListing,
 ): TOrderDetail => {
+  if (!recommendOrderDetail) return {} as TOrderDetail;
+
   return Object.entries(recommendOrderDetail).reduce(
     (acc: TOrderDetail, [dayId, curr]: [string, any]) => {
       acc[dayId] = {
         ...curr,
-        restaurant: {
-          ...curr.restaurant,
-          foodList: adjustFoodListPrice(curr?.restaurant?.foodList, order),
-        },
+        restaurant: curr?.restaurant
+          ? {
+              ...curr.restaurant,
+              foodList: adjustFoodListPrice(curr?.restaurant?.foodList, order),
+            }
+          : curr?.restaurant,
       };
 
       return acc;
