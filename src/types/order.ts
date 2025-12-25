@@ -51,6 +51,7 @@ export type TFood = {
   foodName: string;
   foodPrice: number;
   foodUnit: string;
+  numberOfMainDishes?: number;
 };
 
 export type TOrderDetailRestaurant = {

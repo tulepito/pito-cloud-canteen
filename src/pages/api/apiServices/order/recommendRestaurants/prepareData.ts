@@ -7,7 +7,10 @@ import {
 } from '@helpers/listingSearchQuery';
 import { calculateDistance } from '@helpers/mapHelpers';
 import { mealTypeAdapter } from '@helpers/order/adapterHelper';
-import { getSelectedRestaurantAndFoodList } from '@helpers/orderHelper';
+import {
+  adjustFoodListPrice,
+  getSelectedRestaurantAndFoodList,
+} from '@helpers/orderHelper';
 import { fetchListing, fetchUser } from '@services/integrationHelper';
 import config from '@src/configs';
 import { Listing, User } from '@src/utils/data';
@@ -86,7 +89,16 @@ export const prepareMenuFoodList = async ({
   mealType: foodTypes = [],
   nutritions = [],
   packagePerMember = 0,
-}: TObject) => {
+  order,
+}: {
+  restaurant: TListing;
+  menu: TListing;
+  timestamp: number;
+  mealType: string[];
+  nutritions: string[];
+  packagePerMember: number;
+  order: TListing | null;
+}) => {
   // * prepare params
   const dateTime = DateTime.fromMillis(+timestamp).setZone(VNTimezone);
   const dayOfWeek = convertWeekDay(dateTime.weekday).key;
@@ -131,7 +143,12 @@ export const prepareMenuFoodList = async ({
       currentRestaurant: restaurant,
     });
 
-  return normalizedFoodList;
+  // Adjust food list price if the company is allowed to add a second food
+  const foodList = order
+    ? adjustFoodListPrice(normalizedFoodList, order)
+    : normalizedFoodList;
+
+  return foodList;
 };
 
 export const prepareParamsFromOrderForSpecificDay = async ({

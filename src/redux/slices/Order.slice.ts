@@ -38,11 +38,7 @@ import { queryRestaurantListingsApi } from '@apis/restaurant';
 import { queryAllPages } from '@helpers/apiHelpers';
 import { convertHHmmStringToTimeParts } from '@helpers/dateHelpers';
 import { getMenuQueryInSpecificDay } from '@helpers/listingSearchQuery';
-import {
-  adjustRecommendOrderDetailWithFoodListPrice,
-  getIsAllowAddSecondaryFood,
-  mergeRecommendOrderDetailWithCurrentOrderDetail,
-} from '@helpers/orderHelper';
+import { mergeRecommendOrderDetailWithCurrentOrderDetail } from '@helpers/orderHelper';
 import { createAsyncThunk } from '@redux/redux.helper';
 import config from '@src/configs';
 import { CompanyPermissions } from '@src/types/UserPermission';
@@ -479,20 +475,6 @@ const recommendRestaurants = createAsyncThunk(
       recommendParams,
     });
 
-    // // Adjust the food list price if the company is allowed to add a second food
-    const isCompanyAllowDualSelection = getIsAllowAddSecondaryFood(
-      order as TListing,
-    );
-    if (isCompanyAllowDualSelection) {
-      const adjustedRecommendOrderDetail =
-        adjustRecommendOrderDetailWithFoodListPrice(
-          orderDetail,
-          order as TListing,
-        );
-
-      return adjustedRecommendOrderDetail;
-    }
-
     return orderDetail;
   },
 );
@@ -510,9 +492,6 @@ const recommendRestaurantForSpecificDay = createAsyncThunk(
     const { order, draftEditOrderData } = getState().Order;
 
     const orderId = Listing(order).getId();
-    const isCompanyAllowDualSelection = getIsAllowAddSecondaryFood(
-      order as TListing,
-    );
 
     const { plans = [] } = Listing(order).getMetadata();
 
@@ -524,24 +503,16 @@ const recommendRestaurantForSpecificDay = createAsyncThunk(
       recommendParams,
     });
 
-    // Adjust the food list price if the company is allowed to add a second food
-    const adjustedOrderDetail = isCompanyAllowDualSelection
-      ? adjustRecommendOrderDetailWithFoodListPrice(
-          newOrderDetail,
-          order as TListing,
-        )
-      : newOrderDetail;
-
     if (shouldUpdatePlanOrderOrderDetail) {
-      updateOrderDetail = adjustedOrderDetail;
+      updateOrderDetail = newOrderDetail;
       updatePlanDetailsApi(orderId, {
-        orderDetail: adjustedOrderDetail,
+        orderDetail: newOrderDetail,
         planId: plans[0],
       });
     } else {
       updateOrderDetail = mergeRecommendOrderDetailWithCurrentOrderDetail(
         draftEditOrderData?.orderDetail!,
-        adjustedOrderDetail,
+        newOrderDetail,
         dateTime,
       );
 
