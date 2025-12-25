@@ -140,9 +140,7 @@ export const recommendRestaurantForSpecificDay = async ({
   }
 
   if (restaurantsFiltered.length > 0) {
-    const randomNumber = Math.floor(
-      Math.random() * restaurantsFiltered.length - 1,
-    );
+    const randomNumber = Math.floor(Math.random() * restaurantsFiltered.length);
 
     const otherRandomNumber = Math.abs(
       randomNumber - restaurantsFiltered.length + 1,
@@ -165,6 +163,7 @@ export const recommendRestaurantForSpecificDay = async ({
       nutritions,
       packagePerMember,
       mealType,
+      order,
     });
 
     return {
@@ -329,6 +328,7 @@ export const recommendRestaurants = async ({
             nutritions,
             mealType,
             packagePerMember,
+            order,
           });
 
           orderDetail[timestamp] = {

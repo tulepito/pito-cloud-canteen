@@ -1,3 +1,4 @@
+import { difference, isEqual } from 'lodash';
 import isEmpty from 'lodash/isEmpty';
 import uniq from 'lodash/uniq';
 import { DateTime } from 'luxon';
@@ -7,7 +8,12 @@ import type { TOrderDetail } from '@src/types/order';
 import { SECONDARY_FOOD_ALLOWED_COMPANIES } from '@src/utils/constants';
 import { ETransition } from '@src/utils/transaction';
 import { Listing } from '@utils/data';
-import { generateTimeRangeItems, isOver, renderDateRange } from '@utils/dates';
+import {
+  generateTimeRangeItems,
+  getDaySessionFromDeliveryTime,
+  isOver,
+  renderDateRange,
+} from '@utils/dates';
 import {
   EBookerOrderDraftStates,
   EOrderDraftStates,
@@ -793,31 +799,60 @@ export const adjustFoodListPrice = (
 };
 
 /**
- * Adjust the food list price of the recommend order detail
- * @param recommendOrderDetail - The recommend order detail
- * @param order - The order
- * @returns The adjusted recommend order detail
+ * Check if the restaurant is still suitable
+ * @param dayData - The day data
+ * @param finalPackagePerMember - The final package per member
+ * @param finalMemberAmount - The final member amount
+ * @param nutritions - The nutritions
+ * @param finalNutritions - The final nutritions
+ * @param mealType - The meal type
+ * @param mealTypeValue - The meal type value
+ * @param deliveryHour - The delivery hour
+ * @param finalDeliveryHour - The final delivery hour
+ * @returns True if the restaurant is still suitable, false if not
  */
-export const adjustRecommendOrderDetailWithFoodListPrice = (
-  recommendOrderDetail: TOrderDetail,
-  order: TListing,
-): TOrderDetail => {
-  if (!recommendOrderDetail) return {} as TOrderDetail;
+export const isRestaurantStillSuitable = ({
+  dayData,
+  finalPackagePerMember,
+  finalMemberAmount,
+  nutritions,
+  finalNutritions,
+  mealType,
+  mealTypeValue,
+  deliveryHour,
+  finalDeliveryHour,
+}: {
+  dayData: TOrderDetail[string];
+  finalPackagePerMember: number;
+  finalMemberAmount: number;
+  nutritions: string[];
+  finalNutritions: string[];
+  mealType: string[];
+  mealTypeValue: string[];
+  deliveryHour: string;
+  finalDeliveryHour: string;
+}) => {
+  const { restaurant } = dayData || {};
+  if (!restaurant) return false;
 
-  return Object.entries(recommendOrderDetail).reduce(
-    (acc: TOrderDetail, [dayId, curr]: [string, any]) => {
-      acc[dayId] = {
-        ...curr,
-        restaurant: curr?.restaurant
-          ? {
-              ...curr.restaurant,
-              foodList: adjustFoodListPrice(curr?.restaurant?.foodList, order),
-            }
-          : curr?.restaurant,
-      };
-
-      return acc;
-    },
-    {} as TOrderDetail,
+  const hasFoodAtPrice = Object.values(restaurant.foodList || {}).some(
+    (f) => f.foodPrice === +finalPackagePerMember,
   );
+  if (!hasFoodAtPrice) return false;
+  if (
+    +finalMemberAmount < (restaurant.minQuantity || 0) ||
+    +finalMemberAmount > (restaurant.maxQuantity || Infinity)
+  ) {
+    return false;
+  }
+  if (
+    difference(nutritions, finalNutritions).length > 0 ||
+    !isEqual(mealType, mealTypeValue || []) ||
+    getDaySessionFromDeliveryTime(deliveryHour.split('-')[0]) !==
+      getDaySessionFromDeliveryTime(finalDeliveryHour)
+  ) {
+    return false;
+  }
+
+  return true;
 };

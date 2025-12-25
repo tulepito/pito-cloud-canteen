@@ -240,6 +240,7 @@ export const createNewPlanFromOldPlans = async ({
                   menu: menuListing,
                   timestamp,
                   ...oldOrderMetadata,
+                  order: newOrder,
                 });
 
                 newOrderDetail[timestamp].restaurant = {

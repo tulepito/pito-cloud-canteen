@@ -17,6 +17,8 @@ const VNDIcon = () => {
   return <div className={css.vndIcon}>đ</div>;
 };
 
+const NEXON_PACKAGE_PER_MEMBER = 92500;
+
 function createOptions({
   min = 40000,
   max = 80000,
@@ -30,6 +32,7 @@ function createOptions({
   for (let i = min; i <= max; i += gap) {
     options.push(i);
   }
+  options.push(NEXON_PACKAGE_PER_MEMBER);
 
   return options;
 }
