@@ -22,8 +22,10 @@ import {
   findDeliveryDate,
   findMinStartDate,
 } from '@helpers/order/prepareDataHelper';
+import { isRestaurantStillSuitable } from '@helpers/orderHelper';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import { orderAsyncActions } from '@redux/slices/Order.slice';
+import type { TOrderDetail } from '@src/types/order';
 import { EOrderType } from '@src/utils/enums';
 import { FOOD_TYPE_OPTIONS, getLabelByKey } from '@src/utils/options';
 import { upperCaseFirstLetter } from '@src/utils/validators';
@@ -319,11 +321,13 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
         },
       }),
     );
-    const { plans = [] } = Listing(order as TListing).getMetadata();
-    const finalPackagePerMember = packagePerMemberValue || packagePerMember;
-
     const finalDeliveryHour = deliveryHourValue || deliveryHour;
     const finalNutritions = nutritionsValue || nutritions;
+    const finalPackagePerMember = packagePerMemberValue || packagePerMember;
+    const finalMemberAmount = memberAmountValue || memberAmount;
+
+    const { plans = [] } = Listing(order as TListing).getMetadata();
+
     const changedOrderDetailFactor =
       startDate !== finalStartDate ||
       endDate !== finalEndDate ||
@@ -331,22 +335,52 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
       getDaySessionFromDeliveryTime(deliveryHour.split('-')[0]) !==
         getDaySessionFromDeliveryTime(finalDeliveryHour) ||
       packagePerMember !== +finalPackagePerMember ||
-      memberAmount !== +memberAmountValue;
+      memberAmount !== +finalMemberAmount;
+
     if (values?.selectedGroups?.length > 0) {
-      // fetch order participants again after changing selected groups
       dispatch(BookerDraftOrderPageThunks.fetchOrderParticipants());
     }
-    // quick return if selected groups or delivery address is changed because we don't need to recommend restaurants again
-    if (values?.selectedGroups?.length > 0 || values?.deliveryAddress) {
+
+    const isAllCurrentRestaurantsStillSuitable =
+      Object.keys(orderDetail).length > 0 &&
+      Object.values(orderDetail).every((dayData) =>
+        isRestaurantStillSuitable({
+          dayData: dayData as TOrderDetail[string],
+          finalPackagePerMember,
+          finalMemberAmount,
+          nutritions,
+          finalNutritions,
+          mealType,
+          mealTypeValue,
+          deliveryHour,
+          finalDeliveryHour,
+        }),
+      );
+    console.log(
+      'isAllCurrentRestaurantsStillSuitable',
+      isAllCurrentRestaurantsStillSuitable,
+    );
+    if (isAllCurrentRestaurantsStillSuitable) {
       setIsOpenDetails(false);
 
       return;
     }
+
     const { payload: newOrderDetail } = await dispatch(
       orderAsyncActions.recommendRestaurants({}),
     );
 
-    if (!isEqual(orderDetail, newOrderDetail) && changedOrderDetailFactor) {
+    const mergedOrderDetail = { ...newOrderDetail };
+    Object.keys(orderDetail).forEach((timestamp) => {
+      if (
+        newOrderDetail[timestamp] &&
+        isRestaurantStillSuitable(orderDetail[timestamp])
+      ) {
+        mergedOrderDetail[timestamp] = orderDetail[timestamp];
+      }
+    });
+
+    if (!isEqual(orderDetail, mergedOrderDetail) && changedOrderDetailFactor) {
       const isAllDatesHaveNoRestaurantsCurrentOrder = Object.values(
         orderDetail,
       ).every(({ hasNoRestaurants = false }: any) => hasNoRestaurants);
@@ -355,13 +389,13 @@ const SidebarContent: React.FC<TSidebarContentProps> = ({
       await dispatch(
         orderAsyncActions.updatePlanDetail({
           orderId: Listing(order as TListing).getId(),
-          orderDetail: newOrderDetail,
+          orderDetail: mergedOrderDetail,
           planId,
         }),
       );
 
-      const isAllDatesHaveNoRestaurants = newOrderDetail
-        ? Object.values(newOrderDetail).every(
+      const isAllDatesHaveNoRestaurants = mergedOrderDetail
+        ? Object.values(mergedOrderDetail).every(
             ({ hasNoRestaurants = false }: any) => hasNoRestaurants,
           )
         : true;
