@@ -2,6 +2,7 @@ import isEmpty from 'lodash/isEmpty';
 
 import { getFoodDataMap } from '@helpers/orderHelper';
 import { generateScannerBarCode } from '@pages/api/admin/scanner/[planId]/toggle-mode.api';
+import type { TCartItem } from '@src/types/order';
 import { Listing, User } from '@src/utils/data';
 import { buildFullName } from '@src/utils/emailTemplate/participantOrderPicking';
 import { TRANSITIONS_TO_STATE_CANCELED } from '@src/utils/transaction';
@@ -483,6 +484,11 @@ export const groupPickingOrderByFoodLevels = ({
           },
           {} as TObject,
         );
+        const totalParticipantOrdered = validMemberOrders.filter(
+          ([_, memberOrderData]) =>
+            (memberOrderData as TCartItem).status ===
+            EParticipantOrderStatus.joined,
+        ).length;
 
         return [
           ...groupResult,
@@ -490,10 +496,11 @@ export const groupPickingOrderByFoodLevels = ({
             id: groupId,
             name: groupName,
             foodDataList: Object.values(foodDataList), // Chuyển foodDataList thành array
+            totalParticipantOrdered,
           },
         ];
       }, []);
-
+      let totalParticipantOrdered = 0;
       // Xử lý các member không có trong nhóm
       const foodDataListForOthers = Object.entries(memberOrders).reduce(
         (foodDataResult, [memberId, memberOrderData]) => {
@@ -593,6 +600,7 @@ export const groupPickingOrderByFoodLevels = ({
 
               return updatedMap;
             }
+            totalParticipantOrdered += 1;
           }
 
           return foodDataResult;
@@ -608,6 +616,7 @@ export const groupPickingOrderByFoodLevels = ({
           foodDataList: Object.values(foodDataListForOthers),
           dataOfGroups,
           restaurantId: id,
+          totalParticipantOrdered,
         },
       ];
     },
