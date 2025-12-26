@@ -214,7 +214,7 @@ const TrackingOrderDetailInfo: React.FC<TTrackingOrderDetailInfoProps> = ({
         <TableHeader>
           <TableRow>
             <TableHead colSpan={4} className="font-bold text-[16px] text-black">
-              Tổng số lượng: {totalFood}
+              Tổng số lượng món: {totalFood}
             </TableHead>
           </TableRow>
           <TableRow>
@@ -260,7 +260,7 @@ const TrackingOrderDetailInfo: React.FC<TTrackingOrderDetailInfoProps> = ({
       <TableHeader>
         <TableRow>
           <TableHead colSpan={4} className="font-bold text-[16px] text-black">
-            Tổng số lượng: {totalFood}
+            Tổng số lượng món: {totalFood}
           </TableHead>
         </TableRow>
         <TableRow>
@@ -277,6 +277,7 @@ const TrackingOrderDetailInfo: React.FC<TTrackingOrderDetailInfoProps> = ({
               const {
                 foodDataList: foodDataListGroup = [],
                 name: groupName = '',
+                totalParticipantOrdered,
               } = group || {};
 
               const totalFoodInGroup = foodDataListGroup.reduce(
@@ -297,15 +298,21 @@ const TrackingOrderDetailInfo: React.FC<TTrackingOrderDetailInfoProps> = ({
                   <TableRow className="bg-neutral-700 hover:bg-neutral-700">
                     <TableCell className="text-white">
                       {groupName || `Group ${groupIndex + 1}`}
+                      <br />
                     </TableCell>
-                    <TableCell></TableCell>
+                    <TableCell className="text-white">
+                      Tổng số người đặt: {totalParticipantOrdered}
+                    </TableCell>
                     <TableCell className="text-white">
                       {totalFoodInGroup}
                     </TableCell>
                     <TableCell></TableCell>
                   </TableRow>
-                  {foodDataListGroup.map(
-                    (foodData: TObject, foodIndex: number) => {
+                  {foodDataListGroup
+                    .sort((a: TObject, b: TObject) => {
+                      return a.foodName.localeCompare(b.foodName);
+                    })
+                    .map((foodData: TObject, foodIndex: number) => {
                       const result = renderFoodRow(
                         foodData,
                         foodIndex,
@@ -313,8 +320,7 @@ const TrackingOrderDetailInfo: React.FC<TTrackingOrderDetailInfoProps> = ({
                       );
 
                       return result;
-                    },
-                  )}
+                    })}
                 </Fragment>
               );
             })}
