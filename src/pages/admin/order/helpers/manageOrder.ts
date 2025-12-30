@@ -41,7 +41,7 @@ export const parseEntitiesToExportCsv = (
       companyName,
       bookerPhoneNumber,
       companyLocation,
-      totalDishes,
+      // totalDishes,
       startDate,
       endDate,
       children = [],
@@ -56,6 +56,7 @@ export const parseEntitiesToExportCsv = (
       price,
       bookerName,
       id,
+      totalParticipantOrdered = 0,
     } = order.data || {};
 
     console.log('order.data', order.data);
@@ -78,7 +79,7 @@ export const parseEntitiesToExportCsv = (
         'Giờ giao hàng': deliveryHour,
         'Ngày giao hàng': `${startDate}-${endDate}`,
       }),
-      ...(hasTotalDishes && { 'Số phần ăn': totalDishes }),
+      ...(hasTotalDishes && { 'Số phần ăn': totalParticipantOrdered }),
       ...(hasFoodList && {
         'Danh sách món': foodList.map((item: any) => item?.foodName).join('\n'),
       }),
@@ -105,13 +106,12 @@ export const parseEntitiesToExportCsv = (
         'Địa chỉ đối tác': partnerLocation.join('\n'),
       }),
     };
-
     const subOrdersData = hasSubOrders
       ? children.map((child: any) => {
           const {
             price,
             title,
-            totalDishes,
+            // totalDishes,
             foodList = [],
             partnerPhoneNumber,
             partnerLocation,
@@ -119,6 +119,7 @@ export const parseEntitiesToExportCsv = (
             restaurantId,
             subOrderDate,
             timestamp,
+            totalParticipantOrdered,
           } = child?.data || {};
 
           return {
@@ -139,7 +140,7 @@ export const parseEntitiesToExportCsv = (
               'Giờ giao hàng': deliveryHour,
               'Ngày giao hàng': subOrderDate,
             }),
-            ...(hasTotalDishes && { 'Số phần ăn': totalDishes }),
+            ...(hasTotalDishes && { 'Số phần ăn': totalParticipantOrdered }),
             ...(hasFoodList && {
               'Danh sách món': foodList
                 .map((item: any) => item?.foodName)

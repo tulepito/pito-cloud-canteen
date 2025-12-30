@@ -304,10 +304,11 @@ const parseEntitiesToTableData = (
       return orderDetail[key]?.restaurant;
     });
     const isGroupOrder = orderType === EOrderType.group;
-    const { totalDishes } = calculateTotalPriceAndDishes({
-      orderDetail,
-      isGroupOrder,
-    });
+    const { totalDishes, totalParticipantOrdered } =
+      calculateTotalPriceAndDishes({
+        orderDetail,
+        isGroupOrder,
+      });
 
     const orderVATPercentageToUse = [
       EOrderDraftStates.draft,
@@ -322,6 +323,7 @@ const parseEntitiesToTableData = (
         const {
           totalDishes: childTotalDishes,
           totalPrice: childTotalPrice,
+          totalParticipantOrdered: childTotalParticipantOrdered,
           ...rest
         } = calculateTotalPriceAndDishes({
           orderDetail,
@@ -364,6 +366,7 @@ const parseEntitiesToTableData = (
             tx: orderDetail[key]?.transaction,
             partnerPhoneNumber: orderDetail[key]?.restaurant?.phoneNumber,
             totalDishes: childTotalDishes,
+            totalParticipantOrdered: childTotalParticipantOrdered,
             timestamp: +key,
             partnerLocation: allRestaurants.find(
               (_restaurant) =>
@@ -415,6 +418,7 @@ const parseEntitiesToTableData = (
         bookerPhoneNumber:
           company?.attributes?.profile?.publicData?.phoneNumber,
         totalDishes,
+        totalParticipantOrdered,
         orderNotes: entity.attributes.metadata?.notes,
         orderNote: entity.attributes.metadata?.orderNote,
         fullRestaurantsData,
