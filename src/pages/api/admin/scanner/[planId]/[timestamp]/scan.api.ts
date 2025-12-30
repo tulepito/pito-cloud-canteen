@@ -87,11 +87,11 @@ export default async function handler(
       }
 
       const foodId = matchedBarcodeMemberOrder.foodId;
+      const secondaryFoodId = matchedBarcodeMemberOrder.secondaryFoodId;
 
       if (!foodId) {
         return res.status(404).json({ error: 'Người dùng chưa chọn món' });
       }
-
       const foodListingResponse: FoodListing = denormalisedResponseEntities(
         await integrationSdk.listings.show({
           id: foodId,
@@ -109,6 +109,23 @@ export default async function handler(
       const memberListing = memberListingResponse;
 
       const foodListing = foodListingResponse;
+
+      let foodName: string = foodListing.attributes?.title!;
+      if (secondaryFoodId) {
+        const secondaryFoodListingResponse: FoodListing =
+          denormalisedResponseEntities(
+            await integrationSdk.listings.show({
+              id: secondaryFoodId,
+              include: ['images'],
+              'fields.image': [`variants.${EImageVariants.squareSmall}`],
+            }),
+          )[0];
+        if (foodId === secondaryFoodId) {
+          foodName += ` x2 định lượng`;
+        } else {
+          foodName += ` + ${secondaryFoodListingResponse.attributes?.title!}`;
+        }
+      }
 
       const recordId = `${planId}_${memberId}_${+timestamp}`;
 
@@ -159,7 +176,7 @@ export default async function handler(
                 memberListing.attributes?.profile?.displayName,
             },
           ),
-          foodName: foodListing.attributes?.title!,
+          foodName,
           foodThumbnailUrl:
             foodListingResponse.images?.[0]?.attributes?.variants?.[
               'square-small'
