@@ -129,7 +129,7 @@ export const prepareOrderDetail = ({
       newMemberOrderValues = {
         ...newMemberOrderValues,
         foodId,
-        ...(secondaryFoodId && { secondaryFoodId }),
+        secondaryFoodId,
       };
       break;
     case EParticipantOrderStatus.empty:
@@ -137,7 +137,7 @@ export const prepareOrderDetail = ({
       newMemberOrderValues = {
         ...newMemberOrderValues,
         foodId,
-        ...(secondaryFoodId && { secondaryFoodId }),
+        secondaryFoodId,
         status: EParticipantOrderStatus.joined,
       };
       break;
@@ -545,7 +545,6 @@ const addOrUpdateMemberOrder = createAsyncThunk(
         requirement,
         ...(secondaryRequirement ? { secondaryRequirement } : {}),
       };
-
       const updateParams = {
         currentViewDate,
         participantId,

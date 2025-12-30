@@ -4,6 +4,7 @@ import Modal from '@components/Modal/Modal';
 import RenderWhen from '@components/RenderWhen/RenderWhen';
 import SlideModal from '@components/SlideModal/SlideModal';
 import { parseThousandNumber } from '@helpers/format';
+import { useAppSelector } from '@hooks/reduxHooks';
 import { useViewport } from '@hooks/useViewport';
 import type { TObject } from '@utils/types';
 
@@ -34,12 +35,39 @@ const EditOrderRowModal: React.FC<TEditOrderRowModalProps> = (props) => {
   const { isMobileLayout } = useViewport();
 
   const { memberData = {}, foodData = {} } = currentMemberOrderData;
+
+  const isAllowAddSecondaryFood = useAppSelector(
+    (state) => state.OrderManagement.isAllowAddSecondaryFood,
+  );
+
+  const primaryFoodId = foodData.foodId || '';
+  const primaryFoodData = foodOptions.find(
+    (food) => food.foodId === primaryFoodId,
+  );
+  const isSingleSelectionFood = primaryFoodData?.numberOfMainDishes === 1;
+
   const initialValues = {
-    foodId: foodData.foodId || '',
+    foodId: primaryFoodId,
     requirement: foodData.requirement || '',
     memberName: memberData.name || '',
-    secondaryFoodId: foodData.secondaryFoodId,
-    secondaryRequirement: foodData.secondaryRequirement,
+    secondaryFoodId: isSingleSelectionFood
+      ? undefined
+      : foodData.secondaryFoodId,
+    secondaryRequirement: isSingleSelectionFood
+      ? undefined
+      : foodData.secondaryRequirement,
+  };
+
+  const handleSubmit = (values: TEditOrderRowFormValues) => {
+    const selectedFoodId = values.foodId;
+    const selectedFoodData = foodOptions.find(
+      (food) => food.foodId === selectedFoodId,
+    );
+    if (isAllowAddSecondaryFood && selectedFoodData?.numberOfMainDishes === 1) {
+      values.secondaryFoodId = '';
+      values.secondaryRequirement = '';
+    }
+    onSubmit(values);
   };
 
   const modalTitle = intl.formatMessage({
@@ -58,7 +86,7 @@ const EditOrderRowModal: React.FC<TEditOrderRowModalProps> = (props) => {
         )}
       </div>
       <EditOrderRowForm
-        onSubmit={onSubmit}
+        onSubmit={handleSubmit}
         foodOptions={foodOptions}
         initialValues={initialValues}
       />
