@@ -4,7 +4,7 @@ import uniq from 'lodash/uniq';
 import { DateTime } from 'luxon';
 
 import type { FoodListing } from '@src/types';
-import type { TOrderDetail } from '@src/types/order';
+import type { TMemberOrders, TOrderDetail } from '@src/types/order';
 import { SECONDARY_FOOD_ALLOWED_COMPANIES } from '@src/utils/constants';
 import { ETransition } from '@src/utils/transaction';
 import { Listing } from '@utils/data';
@@ -14,6 +14,7 @@ import {
   isOver,
   renderDateRange,
 } from '@utils/dates';
+import type { EParticipantOrderStatus } from '@utils/enums';
 import {
   EBookerOrderDraftStates,
   EOrderDraftStates,
@@ -855,4 +856,21 @@ export const isRestaurantStillSuitable = ({
   }
 
   return true;
+};
+
+/**
+ * Get the number of participants in the order
+ * @param memberOrders - The member orders
+ * @returns The number of participants in the order
+ */
+export const getOrderParticipantNumber = (memberOrders: TMemberOrders) => {
+  if (isEmpty(memberOrders)) return 0;
+
+  return Object.values(memberOrders).reduce((result: number, current) => {
+    const { status } = current;
+
+    return (
+      result + +isJoinedPlan(current.foodId, status as EParticipantOrderStatus)
+    );
+  }, 0);
 };
