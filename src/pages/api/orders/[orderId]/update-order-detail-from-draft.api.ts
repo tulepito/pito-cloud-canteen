@@ -30,9 +30,13 @@ import { normalizeOrderDetail } from '../utils';
 
 type DifferentOrderDetailMember = {
   oldFoodId?: string;
+  oldSecondaryFoodId?: string;
   oldFoodName?: string;
+  oldSecondaryFoodName?: string;
   newFoodId?: string;
+  newSecondaryFoodId?: string;
   newFoodName?: string;
+  newSecondaryFoodName?: string;
   memberName: string;
   restaurantName: string;
 };
@@ -86,7 +90,11 @@ const notifyParticipantChangedGroupOrderFoods = async (
               ...memberAcc,
               [memberId]: {
                 oldFoodId: oldMemberOrders?.[memberId]?.foodId,
+                oldSecondaryFoodId:
+                  oldMemberOrders?.[memberId]?.secondaryFoodId,
                 newFoodId: newMemberOrders?.[memberId]?.foodId,
+                newSecondaryFoodId:
+                  newMemberOrders?.[memberId]?.secondaryFoodId,
                 restaurantName,
                 memberName: buildFullName(
                   member?.attributes?.profile?.firstName,
@@ -108,7 +116,10 @@ const notifyParticipantChangedGroupOrderFoods = async (
               ...memberAcc,
               [memberId]: {
                 oldFoodId: oldMemberOrders?.[memberId]?.foodId,
+                oldSecondaryFoodId:
+                  oldMemberOrders?.[memberId]?.secondaryFoodId,
                 newFoodId: undefined,
+                newSecondaryFoodId: undefined,
                 restaurantName,
                 memberName: buildFullName(
                   member?.attributes?.profile?.firstName,
@@ -130,7 +141,10 @@ const notifyParticipantChangedGroupOrderFoods = async (
               ...memberAcc,
               [memberId]: {
                 oldFoodId: undefined,
+                oldSecondaryFoodId: undefined,
                 newFoodId: newMemberOrders?.[memberId]?.foodId,
+                newSecondaryFoodId:
+                  newMemberOrders?.[memberId]?.secondaryFoodId,
                 restaurantName,
                 memberName: buildFullName(
                   member?.attributes?.profile?.firstName,
@@ -153,13 +167,22 @@ const notifyParticipantChangedGroupOrderFoods = async (
 
       if (Object.keys(differentMemberOrders).length) {
         const distinctFoodIds = Object.values(differentMemberOrders).reduce(
-          (foodIds, { oldFoodId, newFoodId }) => {
+          (
+            foodIds,
+            { oldFoodId, newFoodId, oldSecondaryFoodId, newSecondaryFoodId },
+          ) => {
             if (oldFoodId && !foodIds.includes(oldFoodId)) {
               foodIds = [...foodIds, oldFoodId];
+            }
+            if (oldSecondaryFoodId && !foodIds.includes(oldSecondaryFoodId)) {
+              foodIds = [...foodIds, oldSecondaryFoodId];
             }
 
             if (newFoodId && !foodIds.includes(newFoodId)) {
               foodIds = [...foodIds, newFoodId];
+            }
+            if (newSecondaryFoodId && !foodIds.includes(newSecondaryFoodId)) {
+              foodIds = [...foodIds, newSecondaryFoodId];
             }
 
             return foodIds;
@@ -188,16 +211,29 @@ const notifyParticipantChangedGroupOrderFoods = async (
 
         const memberOrders = Object.keys(differentMemberOrders).reduce(
           (memberAcc, memberId) => {
-            const { oldFoodId, newFoodId, memberName } =
-              differentMemberOrders[memberId];
+            const {
+              oldFoodId,
+              newFoodId,
+              oldSecondaryFoodId,
+              newSecondaryFoodId,
+              memberName,
+            } = differentMemberOrders[memberId];
 
             return {
               ...memberAcc,
               [memberId]: {
                 oldFoodId,
+                oldSecondaryFoodId,
                 oldFoodName: oldFoodId ? foodNameMap[oldFoodId] : undefined,
+                oldSecondaryFoodName: oldSecondaryFoodId
+                  ? foodNameMap[oldSecondaryFoodId]
+                  : undefined,
                 newFoodId,
+                newSecondaryFoodId,
                 newFoodName: newFoodId ? foodNameMap[newFoodId] : undefined,
+                newSecondaryFoodName: newSecondaryFoodId
+                  ? foodNameMap[newSecondaryFoodId]
+                  : undefined,
                 memberName,
                 restaurantName,
               },
@@ -238,8 +274,13 @@ const notifyParticipantChangedGroupOrderFoods = async (
         }
 
         return Object.keys(memberOrders).map((memberId) => {
-          const { oldFoodName, newFoodName, memberName } =
-            memberOrders[memberId];
+          const {
+            oldFoodName,
+            newFoodName,
+            oldSecondaryFoodName,
+            newSecondaryFoodName,
+            memberName,
+          } = memberOrders[memberId];
           const type =
             (!oldFoodName && newFoodName && ('add' as const)) ||
             (!newFoodName && oldFoodName && ('remove' as const)) ||
@@ -257,7 +298,9 @@ const notifyParticipantChangedGroupOrderFoods = async (
               },
               newData: {
                 title: weekDay,
-                content: `${memberName}: Thêm món "${newFoodName}"`,
+                content: `${memberName}: Thêm món "${newFoodName}${
+                  newSecondaryFoodName ? ` + ${newSecondaryFoodName}` : ''
+                }"`,
               },
             };
           }
@@ -277,11 +320,15 @@ const notifyParticipantChangedGroupOrderFoods = async (
             return {
               oldData: {
                 title: weekDay,
-                content: `${memberName}: "${oldFoodName}"`,
+                content: `${memberName}: "${oldFoodName}${
+                  oldSecondaryFoodName ? ` + ${oldSecondaryFoodName}` : ''
+                }"`,
               },
               newData: {
                 title: weekDay,
-                content: `${memberName}: đổi món "${newFoodName}"`,
+                content: `${memberName}: đổi món "${newFoodName}${
+                  newSecondaryFoodName ? ` + ${newSecondaryFoodName}` : ''
+                }"`,
               },
             };
           }
@@ -317,8 +364,14 @@ const notifyParticipantChangedGroupOrderFoods = async (
             }
 
             return Object.keys(memberOrders).map((memberId) => {
-              const { oldFoodName, newFoodName, memberName, restaurantName } =
-                memberOrders[memberId];
+              const {
+                oldFoodName,
+                newFoodName,
+                oldSecondaryFoodName,
+                newSecondaryFoodName,
+                memberName,
+                restaurantName,
+              } = memberOrders[memberId];
               const type =
                 (!oldFoodName && newFoodName && ('add' as const)) ||
                 (!newFoodName && oldFoodName && ('remove' as const)) ||
@@ -328,10 +381,18 @@ const notifyParticipantChangedGroupOrderFoods = async (
                 participantName: memberName,
                 date: convertDateToVNTimezone(new Date(+date)).split('T')[0],
                 type,
-                fromFoodName: oldFoodName,
-                toFoodName: newFoodName,
-                addFoodName: newFoodName,
-                removeFoodName: oldFoodName,
+                fromFoodName: `${oldFoodName}${
+                  oldSecondaryFoodName ? ` + ${oldSecondaryFoodName}` : ''
+                }`,
+                toFoodName: `${newFoodName}${
+                  newSecondaryFoodName ? ` + ${newSecondaryFoodName}` : ''
+                }`,
+                addFoodName: `${newFoodName}${
+                  newSecondaryFoodName ? ` + ${newSecondaryFoodName}` : ''
+                }`,
+                removeFoodName: `${oldFoodName}${
+                  oldSecondaryFoodName ? ` + ${oldSecondaryFoodName}` : ''
+                }`,
                 restaurantName,
               };
             });
