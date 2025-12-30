@@ -15,6 +15,22 @@ import { EImageVariants, EParticipantOrderStatus } from '@src/utils/enums';
 
 import OrderEventCardContentItem from './OrderEventCardContentItem';
 
+import css from './OrderEventCard.module.scss';
+
+const DECORATORS: string[] = [
+  '/static/loading-asset-1.png',
+  '/static/loading-asset-2.png',
+  '/static/loading-asset-3.png',
+  '/static/loading-asset-4.png',
+];
+
+const getDecorator = (id: string): string => {
+  if (!id) return DECORATORS[0];
+  const hash = id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+
+  return DECORATORS[hash % DECORATORS.length];
+};
+
 export type TEventCardContentProps = {
   event: Event;
   isFirstHighlight?: boolean;
@@ -65,17 +81,27 @@ const EventCardContent: React.FC<TEventCardContentProps> = ({
     <>
       <RenderWhen condition={showCoverImage}>
         <div className={classNameCoverImage}>
-          <ResponsiveImage
-            alt="foodPicked"
-            image={image}
-            variants={[EImageVariants.default]}
-            emptyType="food"
-          />
+          {pickedFoodListing?.getImages().length > 0 ? (
+            <ResponsiveImage
+              image={image}
+              alt="foodPicked"
+              variants={[EImageVariants.default]}
+              emptyType="food"
+            />
+          ) : (
+            <div className={css.decoratorWrapper}>
+              <img
+                src={getDecorator(pickedFoodListing?.getId())}
+                alt=""
+                className={css.decoratorImage}
+              />
+            </div>
+          )}
         </div>
       </RenderWhen>
 
       <RenderWhen condition={status === EParticipantOrderStatus.joined}>
-        <OrderEventCardContentItem icon={<IconDish />}>
+        <OrderEventCardContentItem icon={<IconDish />} noEllipsis>
           <span>{foodTitle}</span>
         </OrderEventCardContentItem>
       </RenderWhen>

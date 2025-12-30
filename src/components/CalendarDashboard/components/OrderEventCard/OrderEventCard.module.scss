@@ -154,6 +154,34 @@
   width: calc(100% - 17px);
 }
 
+.eventContentItemTextFull {
+  @include textTemplate(12px, $fontWeightRegular, 20px, '');
+  color: $neutralGray7;
+  width: calc(100% - 17px);
+  white-space: normal;
+  word-wrap: break-word;
+}
+
+.decoratorWrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: $neutralGray3;
+}
+
+.decoratorImage {
+  width: 120px;
+  height: 100%;
+  object-fit: contain;
+
+  @include viewportMedium {
+    width: 100px;
+    height: 80px;
+  }
+}
+
 .eventContentItemIcon {
   width: 12px;
   height: 12px;
