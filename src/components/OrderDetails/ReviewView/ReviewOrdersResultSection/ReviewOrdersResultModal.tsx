@@ -196,6 +196,12 @@ const prepareDataGroups = ({
           const { id: groupId, name: groupName, members = [] } = group;
 
           const memberIds = members.map((m: TObject) => m.id);
+          const joinedParticipantCount = memberIds.filter((memberId: string) =>
+            isJoinedPlan(
+              memberOrders[memberId]?.foodId,
+              memberOrders[memberId]?.status,
+            ),
+          ).length;
           const orderData = memberIds
             .flatMap((memberId: string) => {
               const memberOrder = memberOrders[memberId];
@@ -246,6 +252,7 @@ const prepareDataGroups = ({
             groupId,
             groupName,
             orderData,
+            joinedParticipantCount,
           };
         })
         .sort((a, b) => {
@@ -259,10 +266,14 @@ const prepareDataGroups = ({
       const allGroupMemberIds = new Set(
         groups.flatMap((g) => g.members.map((m: TObject) => m.id)),
       );
+      let otherJoinedParticipantCount = 0;
 
       const orderDataForOthers = Object.entries<TObject>(memberOrders)
         .filter(([memberId]) => !allGroupMemberIds.has(memberId))
         .flatMap(([memberId, memberOrderData]) => {
+          if (isJoinedPlan(memberOrderData?.foodId, memberOrderData?.status)) {
+            otherJoinedParticipantCount += 1;
+          }
           const {
             foodId,
             secondaryFoodId,
@@ -304,6 +315,7 @@ const prepareDataGroups = ({
           date,
           groupOrderData,
           orderDataForOthers,
+          joinedParticipantCount: otherJoinedParticipantCount,
         },
       ];
     },
@@ -1218,7 +1230,7 @@ const ReviewOrdersResultModal: React.FC<TReviewOrdersResultModalProps> = (
                               <div className="flex-1 flex items-center">
                                 {group?.groupName}
                                 {group?.orderData?.length > 0 &&
-                                  `(Số lượng: ${group.orderData.length})`}
+                                  `(Số lượng: ${group.joinedParticipantCount})`}
                               </div>
                               <RenderWhen condition={!isEmptyOrderData}>
                                 <div className="flex flex-wrap justify-end items-center">

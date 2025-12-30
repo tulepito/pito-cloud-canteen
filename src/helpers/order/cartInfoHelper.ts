@@ -3,6 +3,7 @@ import pick from 'lodash/pick';
 
 import {
   getFoodDataMap,
+  getOrderParticipantNumber,
   getPCCFeeByMemberAmount,
   getTotalInfo,
 } from '@helpers/orderHelper';
@@ -87,17 +88,22 @@ export const calculateTotalPriceAndDishes = ({
           const foodDataMap = getFoodDataMap({ foodListOfDate, memberOrders });
           const foodDataList = Object.values(foodDataMap);
           const totalInfo = getTotalInfo(foodDataList);
+          const totalParticipantOrdered =
+            getOrderParticipantNumber(memberOrders);
 
           return {
             ...result,
             totalPrice: result.totalPrice + totalInfo.totalPrice,
             totalDishes: result.totalDishes + totalInfo.totalDishes,
+            totalParticipantOrdered:
+              result.totalParticipantOrdered + totalParticipantOrdered,
             [dateKey]: foodDataList,
           };
         },
         {
           totalDishes: 0,
           totalPrice: 0,
+          totalParticipantOrdered: 0,
         },
       )
     : Object.entries<TObject>(orderDetail).reduce<TObject>(
@@ -129,6 +135,7 @@ export const calculateTotalPriceAndDishes = ({
               return {
                 totalPrice: res.totalPrice + price,
                 totalDishes: res.totalDishes + quantity,
+                totalParticipantOrdered: res.totalDishes + quantity,
               };
             },
             { totalPrice: 0, totalDishes: 0 },
