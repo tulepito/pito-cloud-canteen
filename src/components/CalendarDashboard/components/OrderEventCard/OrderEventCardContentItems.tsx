@@ -73,10 +73,6 @@ const EventCardContent: React.FC<TEventCardContentProps> = ({
   const hasSecondaryFood =
     status === EParticipantOrderStatus.joined && !!secondaryFoodName;
 
-  const foodTitle = hasSecondaryFood
-    ? `${foodName} + ${secondaryFoodName}`
-    : foodName;
-
   return (
     <>
       <RenderWhen condition={showCoverImage}>
@@ -101,9 +97,15 @@ const EventCardContent: React.FC<TEventCardContentProps> = ({
       </RenderWhen>
 
       <RenderWhen condition={status === EParticipantOrderStatus.joined}>
-        <OrderEventCardContentItem icon={<IconDish />} noEllipsis>
-          <span>{foodTitle}</span>
+        <OrderEventCardContentItem icon={<IconDish />}>
+          <span className="font-semibold">{foodName}</span>
         </OrderEventCardContentItem>
+
+        <RenderWhen condition={hasSecondaryFood}>
+          <OrderEventCardContentItem icon={<IconDish />}>
+            <span className="font-semibold">{secondaryFoodName}</span>
+          </OrderEventCardContentItem>
+        </RenderWhen>
       </RenderWhen>
 
       <RenderWhen condition={shouldShowRejectButton}>
