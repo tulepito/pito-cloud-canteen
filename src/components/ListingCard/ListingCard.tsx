@@ -159,25 +159,6 @@ const ListingCard: React.FC<TListCardProps> = ({
             'transition-all duration-200',
           )}>
           <div className={css.listingCardInfo} onClick={viewListingDetail}>
-            <div className="flex md:flex-row flex-col items-start md:items-center md:gap-2 font-bold text-xs">
-              <div className={css.categories}>
-                <Badge
-                  className={css.badge}
-                  label={getLabelByKey(FOOD_TYPE_OPTIONS, foodType)}
-                  type={EBadgeType.success}
-                />
-              </div>
-
-              {numberOfMainDishes === 1 && isAllowAddSecondaryFood && (
-                <div className={css.categories}>
-                  <Badge
-                    className={css.badge}
-                    label="Chọn 1 món"
-                    type={EBadgeType.success}
-                  />
-                </div>
-              )}
-            </div>
             <div className={css.headerRow}>
               <h6 className={css.title}>{title}</h6>
               <div className={css.actionButtons}>
@@ -292,7 +273,27 @@ const ListingCard: React.FC<TListCardProps> = ({
                 </div>
               </div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center md:gap-2 font-bold text-xs">
+              <div className={css.categories}>
+                <Badge
+                  className="rounded-full"
+                  label={getLabelByKey(FOOD_TYPE_OPTIONS, foodType)}
+                  type={EBadgeType.success}
+                />
+              </div>
+
+              {numberOfMainDishes === 1 && isAllowAddSecondaryFood && (
+                <div className={css.categories}>
+                  <Badge
+                    className="rounded-full"
+                    label="Chọn 1 món"
+                    type={EBadgeType.success}
+                  />
+                </div>
+              )}
+            </div>
+            <p className={css.description}>{description}</p>
+            <div className="flex items-center gap-2 mt-1">
               {isAllowAddSecondaryFood &&
                 dualFoodSelection.isFirstFoodSelected && (
                   <Badge
@@ -310,7 +311,6 @@ const ListingCard: React.FC<TListCardProps> = ({
                   />
                 )}
             </div>
-            <p className={css.description}>{description}</p>
           </div>
           <RenderWhen condition={allergicIngredients.length > 0}>
             <div className={css.listingCardFooter}>
