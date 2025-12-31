@@ -198,6 +198,9 @@ const EditOrderRowFormComponent: React.FC<TEditOrderRowFormComponentProps> = (
       }),
 
     [JSON.stringify(foodOptions)],
+  )?.sort(
+    (a: { disabled: boolean }, b: { disabled: boolean }) =>
+      Number(a.disabled) - Number(b.disabled),
   );
 
   const handleToggleShowHideRequirementField = () => {
