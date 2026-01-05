@@ -1,3 +1,4 @@
+import chunk from 'lodash/chunk';
 import isEmpty from 'lodash/isEmpty';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
@@ -7,6 +8,26 @@ import { fetchListing, fetchUser } from '@services/integrationHelper';
 import { getIntegrationSdk, handleError } from '@services/sdk';
 import { denormalisedResponseEntities, Listing } from '@src/utils/data';
 import { EOrderType } from '@src/utils/enums';
+
+const CHUNK_SIZE = 200;
+
+/**
+ * Fetch users by chunked IDs
+ * @param sdk - SDK instance
+ * @param ids - User IDs
+ * @returns User data
+ */
+const fetchUsersByIds = async (sdk: any, ids: string[]) => {
+  const chunks = chunk(ids, CHUNK_SIZE);
+
+  const results = await Promise.all(
+    chunks.map((idsChunk) =>
+      sdk.users.query({ meta_id: idsChunk }).then(denormalisedResponseEntities),
+    ),
+  );
+
+  return results.flat();
+};
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
@@ -38,22 +59,19 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
         if (isGroupOrder) {
           if (!isEmpty(participants)) {
-            const participantData = denormalisedResponseEntities(
-              await integrationSdk.users.query({
-                meta_id: participants,
-              }),
+            const participantData = await fetchUsersByIds(
+              integrationSdk,
+              participants,
             );
-
             orderWithPlanDataMaybe = {
               ...orderWithPlanDataMaybe,
               participants: participantData,
             };
           }
           if (!isEmpty(anonymous)) {
-            const anonymousParticipantData = denormalisedResponseEntities(
-              await integrationSdk.users.query({
-                meta_id: anonymous,
-              }),
+            const anonymousParticipantData = await fetchUsersByIds(
+              integrationSdk,
+              anonymous,
             );
 
             orderWithPlanDataMaybe = {
