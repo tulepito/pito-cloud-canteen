@@ -77,6 +77,15 @@ const ApologiesPage = () => {
         </div>
       )}
       <div className={css.content}>
+        <div className={css.coverWrapper}>
+          <Image
+            src="/static/cover-sorry.png"
+            width={800}
+            height={400}
+            alt="apologies"
+            className={css.coverImage}
+          />
+        </div>
         <div className={css.greeting}>Thân gửi bạn {employeeName},</div>
 
         <div className={css.paragraph}>

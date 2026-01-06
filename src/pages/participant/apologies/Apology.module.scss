@@ -184,10 +184,28 @@
   width: auto;
 }
 
+.coverWrapper {
+  max-width: 800px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.coverImage {
+  width: 100%;
+  height: auto;
+  margin-bottom: 24px;
+  border-radius: 8px;
+  display: block;
+  @include viewportMedium {
+    height: 200px;
+  }
+}
+
 .content {
   max-width: 800px;
   margin: 0 auto;
-  margin-top: 50px;
+  margin-top: 40px;
   background-color: white;
   padding: 32px 24px;
   border-radius: 8px;
