@@ -1,0 +1,307 @@
+@use '/src/styles/vars.scss' as *;
+@use '/src/styles/mixins.scss' as *;
+@use '/src/styles/customMediaQueries.scss' as *;
+
+.container {
+  padding: 24px 16px;
+  padding-top: 0;
+  min-height: 100vh;
+  background-color: #fafafa;
+  padding-bottom: 104px;
+  position: relative;
+  overflow: hidden;
+
+  @include viewportMedium {
+    padding: 48px 24px;
+    padding-bottom: 104px;
+  }
+
+  @include viewportLarge {
+    padding: 60px;
+    padding-bottom: 60px;
+    display: flex;
+    justify-content: center;
+  }
+}
+
+.decorators {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.decoratorGreen {
+  position: absolute;
+  opacity: 0.25;
+  top: -80px;
+  right: -60px;
+  width: 300px;
+  height: 300px;
+  object-fit: contain;
+  transform: rotate(60deg);
+
+  @include viewportMedium {
+    width: 400px;
+    height: 400px;
+    top: -100px;
+    right: -80px;
+  }
+
+  @include viewportLarge {
+    width: 500px;
+    height: 500px;
+    top: -120px;
+    right: -100px;
+  }
+}
+
+.decoratorPink {
+  position: absolute;
+  opacity: 0.25;
+  top: 200px;
+  left: -80px;
+  width: 400px;
+  height: 400px;
+  object-fit: contain;
+  transform: rotate(12deg);
+
+  @include viewportMedium {
+    width: 500px;
+    height: 500px;
+    top: 250px;
+    left: -100px;
+  }
+
+  @include viewportLarge {
+    width: 600px;
+    height: 600px;
+    top: 300px;
+    left: -120px;
+  }
+}
+
+.decoratorBlue {
+  position: absolute;
+  opacity: 0.25;
+  top: 500px;
+  right: -100px;
+  width: 400px;
+  height: 400px;
+  object-fit: contain;
+  transform: rotate(290deg);
+
+  @include viewportMedium {
+    width: 500px;
+    height: 500px;
+    top: 600px;
+    right: -120px;
+  }
+
+  @include viewportLarge {
+    width: 600px;
+    height: 600px;
+    top: 700px;
+    right: -150px;
+  }
+}
+
+.decoratorYellow {
+  position: absolute;
+  opacity: 0.25;
+  top: 900px;
+  right: -80px;
+  width: 350px;
+  height: 350px;
+  object-fit: contain;
+  transform: rotate(12deg);
+
+  @include viewportMedium {
+    width: 450px;
+    height: 450px;
+    top: 1000px;
+    right: -100px;
+  }
+
+  @include viewportLarge {
+    width: 550px;
+    height: 550px;
+    top: 1100px;
+    right: -120px;
+  }
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: white;
+  padding: 12px 16px;
+  margin: -24px -16px 24px -16px;
+  border-bottom: 1px solid $neutralGray3;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+
+  @include viewportMedium {
+    display: none;
+  }
+}
+
+.backButton {
+  position: absolute;
+  left: 16px;
+  @include flexAlign(center);
+  gap: 8px;
+  cursor: pointer;
+  @include textTemplate(16px, $fontWeightSemiBold, 24px);
+  color: $neutralGray7;
+
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+.backText {
+  @include textTemplate(16px, $fontWeightSemiBold, 24px);
+  color: $neutralGray7;
+}
+
+.headerLogo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.logoIcon {
+  height: 32px;
+  width: auto;
+}
+
+.coverWrapper {
+  max-width: 800px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.coverImage {
+  width: 100%;
+  height: auto;
+  margin-bottom: 24px;
+  border-radius: 8px;
+  display: block;
+  @include viewportMedium {
+    height: 200px;
+  }
+}
+
+.content {
+  max-width: 800px;
+  margin: 0 auto;
+  margin-top: 40px;
+  background-color: white;
+  padding: 32px 24px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  position: relative;
+  z-index: 1;
+
+  @include viewportMedium {
+    padding: 48px 40px;
+    margin-top: 0px;
+  }
+
+  @include viewportLarge {
+    padding: 40px 60px;
+    margin-top: 0px;
+  }
+}
+
+.greeting {
+  @include textTemplate(16px, $fontWeightSemiBold, 24px);
+  margin-bottom: 24px;
+  color: $neutralGray7;
+
+  @include viewportMedium {
+    font-size: 18px;
+    line-height: 28px;
+  }
+}
+
+.paragraph {
+  @include textTemplate(14px, $fontWeightRegular, 22px);
+  margin-bottom: 20px;
+  color: $neutralGray6;
+  text-align: justify;
+
+  @include viewportMedium {
+    font-size: 15px;
+    line-height: 24px;
+    margin-bottom: 24px;
+  }
+
+  @include viewportLarge {
+    font-size: 16px;
+    line-height: 26px;
+  }
+}
+
+.signature {
+  margin-top: 40px;
+  padding-top: 24px;
+
+  @include viewportMedium {
+    margin-top: 48px;
+    padding-top: 32px;
+  }
+}
+
+.signatureText {
+  @include textTemplate(14px, $fontWeightRegular, 22px);
+  margin-bottom: 16px;
+  color: $neutralGray6;
+
+  @include viewportMedium {
+    font-size: 15px;
+    line-height: 24px;
+  }
+}
+
+.signatureName {
+  @include textTemplate(15px, $fontWeightSemiBold, 24px);
+  margin-bottom: 8px;
+  color: $neutralGray7;
+
+  @include viewportMedium {
+    font-size: 16px;
+    line-height: 26px;
+  }
+}
+
+.signatureTitle {
+  @include textTemplate(14px, $fontWeightRegular, 22px);
+  margin-bottom: 4px;
+  color: $neutralGray6;
+
+  @include viewportMedium {
+    font-size: 15px;
+    line-height: 24px;
+  }
+}
+
+.signatureCompany {
+  @include textTemplate(14px, $fontWeightRegular, 22px);
+  color: $neutralGray6;
+
+  @include viewportMedium {
+    font-size: 15px;
+    line-height: 24px;
+  }
+}

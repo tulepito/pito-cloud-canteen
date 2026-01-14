@@ -37,13 +37,6 @@ export const fetchOrdersApi = (params: TFetchOrdersApiParams) =>
 export const receiveVoucherApi = () =>
   putApi<ApiResponse<VoucherInfo>>('/participants/events/voucher/receive', {});
 
-export const getEmailsApi = (options: { signal?: AbortSignal }) =>
-  getApi<ApiResponse<string[]>>(
-    '/participants/events/voucher/get-emails',
-    {},
-    { signal: options.signal },
-  );
-
 /**
  * Place order for participant
  * @param orderId - order id
