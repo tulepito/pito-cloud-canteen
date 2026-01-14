@@ -9,7 +9,7 @@ import { getIntegrationSdk, handleError } from '@services/sdk';
 import { denormalisedResponseEntities, Listing } from '@src/utils/data';
 import { EOrderType } from '@src/utils/enums';
 
-const CHUNK_SIZE = 200;
+const CHUNK_SIZE = 100;
 
 /**
  * Fetch users by chunked IDs

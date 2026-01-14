@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import type { Event } from 'react-big-calendar';
 import { useIntl } from 'react-intl';
 import { shallowEqual } from 'react-redux';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
 
 import BottomNavigationBar from '@components/BottomNavigationBar/BottomNavigationBar';
@@ -13,7 +12,6 @@ import Tabs from '@components/Tabs/Tabs';
 import { useAppDispatch, useAppSelector } from '@hooks/reduxHooks';
 import useBoolean from '@hooks/useBoolean';
 import { useBottomScroll } from '@hooks/useBottomScroll';
-import { useUserInEvent } from '@hooks/useUserInEvent';
 import { fetchParticipantReviews } from '@redux/slices/Reviews.participant.slice';
 import { currentUserSelector } from '@redux/slices/user.slice';
 import { CurrentUser } from '@src/utils/data';
@@ -80,7 +78,6 @@ const SubOrders = () => {
   const currentUserId = currentUserGetter.getId();
   const ratingSubOrderModalControl = useBoolean();
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
-  const { isUserInEvent } = useUserInEvent();
   const deliveredSubOrders = useAppSelector(
     (state) => state.ParticipantSubOrderList.deliveredSubOrders,
     shallowEqual,
@@ -260,16 +257,6 @@ const SubOrders = () => {
     <div className={css.container}>
       <div className={`${css.title} flex justify-between items-center`}>
         {intl.formatMessage({ id: 'GeneralLayoutTopBar.menuItem.myOrders' })}
-        <RenderWhen condition={isUserInEvent}>
-          <Link
-            href="/participant/events/mens-day"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-br from-[#5ec9ff] to-[#b1e4fe] text-white text-sm font-semibold no-underline shadow-sm transition-all duration-200 ease-in-out hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 active:shadow-sm">
-            <span className="uppercase tracking-[0.02em]">Nhận quà</span>
-            <span className="px-[10px] py-0.5 rounded-full bg-white/15 text-xs leading-4">
-              19.11
-            </span>
-          </Link>
-        </RenderWhen>
       </div>
       <Tabs
         items={tabItems as any}
