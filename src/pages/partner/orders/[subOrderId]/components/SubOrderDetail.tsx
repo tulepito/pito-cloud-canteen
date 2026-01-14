@@ -60,6 +60,7 @@ const SubOrderDetail: React.FC<TSubOrderDetailProps> = ({
   const [, date] = (subOrderId as string)?.split('_');
 
   const { plan, participants = [], anonymous = [] } = order;
+
   const planGetter = Listing(plan as TListing);
   const { orderDetail = {} } = planGetter.getMetadata();
 
